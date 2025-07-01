@@ -1,0 +1,15 @@
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+
+.env
+.venv
+.cursor
+.cursorignore
+dist/
+elevenlabs_mcp.egg-info/
+.coverage
+coverage.xml

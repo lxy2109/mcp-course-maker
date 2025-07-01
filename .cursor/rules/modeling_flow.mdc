@@ -1,0 +1,86 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<cursorrules_modeling_flow>
+type: Always
+description: 整合工具，规范化完整的建模流程，实现文生图、图片筛选、图片上传、图生模型、模型网格重构减面、减面后模型重命名的流程
+
+***规则内容***
+  - 共六个步骤，每个步骤完成后进行阶段性输出展示，询问用户是否继续
+  - 如过程中有错误出现，需要详细告诉用户错误原因
+  - 每个步骤进行前都进行详细分析
+
+
+[步骤一：文字描述生成图片]
+
+- 输入文字描述，输出一张便于后续建模的图片
+- 图片命名提取文字描述中的主体词
+- 提示词优化：包含详细的外观描述、材质信息、品牌标识、按钮细节等
+- 背景要求：纯白色背景，专业产品摄影风格
+- 角度要求：选择最能展现设备特征的正面或3/4视角
+- 主体要求：单一主体，无干扰项
+- 色彩要求：高对比度，清晰的颜色边界，避免色彩模糊
+- 关键词分析需严格遵循 *[RULE] text_image_generate_model_rules.mdc* 规则内容
+- 保存目录参数需严格遵循 *[RULE] saving_directory.mdc* 规则内容
+- 保存目录调用 **[MCP] mcp_FileSimp_to_absolute_path** 转换成绝对路径
+
+
+[步骤二：图片上传前筛选]
+
+- 自动调用 **[MCP] mcp_BaiduImageRecognition_baidu_image_recognition** 进行图片择优
+- 严格遵循 *[RULE] picture_rating.mdc* 规则内容
+- 必要时进行图片优化处理
+
+
+[步骤三：图片上传与预处理]
+
+- 自动调用 **[MCP] mcp_Picui_picui_api** 上传至图床并暴露公网url
+
+
+[步骤四：图片生成3D模型]
+
+- 输入上一步获取的图片url，输出与图片一致的3d模型
+- Meshy3D参数补充：texture_image_url=上一步获取的图片url
+- 模型命名与图片命名一致
+- 工具选用及参数优化遵循 *[RULE] 3dmodeling.mdc*
+- 输出完整的glb模型的下载链接，不允许擅自删除修改身份认证部分信息
+
+
+[步骤五：智能减面处理]
+
+- 输入上一步生成模型的完整glb下载链接，不允许擅自删除身份认证部分（例如"https://assets.meshy.ai/7de37ff1-8e5b-40a5-93e9-03cb8e33d26c/tasks/0197aa76-8f22-763b-a184-7ef1e637b658/output/model.glb?Expires=1751170991&Signature=R7P~w6Lcc0XALqNmtpuMpiIaygdImPVRS8-Z~9n1yAFqNLD5XGdccRMlJJ~-Pk1eOlkoRXyrT7MWEPeW1EHeadGmd0guaqzmWsNyENch6IU5boYZhMnuXIfgh7HylFu9Zu4ks3txhVfnDhdX2YnfBKM10XVZ5oDMDjrx-fLl3cuPyg5HXUPCWd98gp~Nr1zjO5tzggR~YQp94TMysh2TbywkwPRAl1x5fgC3DGWyCyS-oCVHnLaxoc6CJhG08IvL65NOM7O-lHELtwYDmHlXSEpguA9MxUfAa96mnXjTQgvybDFeZ1HOKhpJkJ6MCttXqxUSwbbL1jgc5Q59q0TozQ__&Key-Pair-Id=KL5I0C8H7HX83"），进行减面
+- 减面严格遵循 *[RULE] mesh_decimation.mdc* 规则内容
+- 减面策略：使用simplify模式，保护边界和UV坐标
+- 边界保护：保护外轮廓和重要特征边缘
+- UV坐标保护：确保纹理映射不变形
+- 法线保护：保持表面光滑度和反射效果
+- 材质边界保护：不同材质区域的边界保持清晰
+- 调用 **[MCP] mcp_InstantMeshes_process_model** 根据参数进行减面
+  
+
+[步骤六：关键词重命名]
+
+- 调用 **[MCP] mcp_FileSimp_rename_files** 用关键词重命名减面后的模型，便于管理和识别
+- 减面后的模型位于 **[PATH] instant-meshes-mcp/mesh_dec/archives/{归档文件夹名称}_{时间戳}/model/{归档文件夹名称}.glb**（模型名称无时间戳）
+- 保持文件名的描述性和唯一性
+
+
+
+***错误处理***
+
+- 每个步骤都要有错误捕获和处理机制
+- 提供详细的错误信息和解决建议
+- 支持从任意步骤重新开始流程
+- 特别关注纹理色彩问题的快速识别和解决
+
+
+***数据库支持文件***
+
+- 模型复杂度数据库：*[JSON] Assets/ModelParameterLib/ModelComplexityDatabase.json*
+  - 提供通用的模型复杂度分析标准和减面策略
+  - 支持8个学科领域的智能复杂度识别
+  - 包含S/A/B/C/D五级复杂度分类系统
+
+</cursorrules_modeling_flow>

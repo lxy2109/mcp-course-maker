@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<cursorrules_saving_directory>
+type: Always
+decription: 规范生成的图片或音频的保存目录。
+
+***规则内容***
+- 保存路径调用 **[MCP] mcp_FileSimp_to_absolute_path** 解析相对路径转换成绝对路径
+- 所有生成的音频、图片、模型文件，必须严格按照以下规定的对应目录进行保存，不允许随意修改：
+  - doubao: **[PATH] Output/doubao"**
+  - elevenlabs: **[PATH] Output/elevenlabs"**
+  - jimeng: **[PATH] Output/jimeng**
+  - minimax: 如果是图片，则 **[PATH] Output/minimax/pictures**；如果是音频，则 **[PATH] Output/minimax/audios**
+  - 3D模型等其他类型，按后续扩展目录规范执行
+
+- 文件生成后，必须自动调用重命名工具 **[MCP] mcp_FileSimp_rename_files**，对新生成的文件进行自动重命名。
+  - 重命名优先使用输入的关键词（如"光度计""兰亭集序"），如有重名则自动递增序号（如"光度计.jpg""光度计_1.jpg"）。
+  - 若用户指定了文件名，则优先使用用户指定的文件名，遇重名自动递增序号。
+  - 若无关键词也无指定文件名，则用当前时间（如"20240609_153000"）作为文件名，遇重名自动递增序号。
+  - 文件扩展名必须与实际文件类型一致。
+  - 整个保存与重命名流程应全自动、无人工干预。
+
+- 允许后续扩展新的文件类型或保存目录时，按上述规则自动适配。
+
+</cursorrules_saving_directory>

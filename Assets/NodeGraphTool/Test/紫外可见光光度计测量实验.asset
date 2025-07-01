@@ -1,0 +1,784 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42d69c60c6f69884ab458cc4c3dec99b, type: 3}
+  m_Name: "\u7D2B\u5916\u53EF\u89C1\u5149\u5149\u5EA6\u8BA1\u6D4B\u91CF\u5B9E\u9A8C"
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: eventNodes
+      Entry: 7
+      Data: 0|System.Collections.Generic.List`1[[EventNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: stateNodes
+      Entry: 7
+      Data: 1|System.Collections.Generic.List`1[[StateNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: combineNodes
+      Entry: 7
+      Data: 2|System.Collections.Generic.List`1[[CombineNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: compareNodes
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[CompareNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: flowEventNodes
+      Entry: 7
+      Data: 4|System.Collections.Generic.List`1[[FlowEventNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 5
+    - Name: 
+      Entry: 7
+      Data: 5|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: ade7d2ba-a051-4c23-b596-a96b9f51946d
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 300
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u8BFE\u7A0B\u4ECB\u7ECD"
+    - Name: eventName
+      Entry: 1
+      Data: "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u672C\u5B9E\u9A8C\u5C06\u5E26\u9886\u5927\u5BB6\u5B66\u4E60\u5982\u4F55\u4F7F\u7528\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA\u6D4B\u91CF\u6837\u54C1\u7684\u5438\u5149\u5EA6\uFF0C\u638C\u63E1\u4EEA\u5668\u7684\u57FA\u672C\u64CD\u4F5C\u548C\u6CE8\u610F\u4E8B\u9879\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 6|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 7|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u4ECB\u7ECD\u5B9E\u9A8C\u76EE\u7684"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u8BB2\u89E3\u5B9E\u9A8C\u76EE\u7684\u548C\u610F\u4E49\uFF0C\u8BF4\u660E\u5B9E\u9A8C\u5185\u5BB9\u548C\u5B66\u4E60\u76EE\u6807\u3002"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u8BFE\u7A0B\u4ECB\u7ECD\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u8BFE\u7A0B\u4ECB\u7ECD_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u73AF\u89C6\u6574\u4E2A\u5B9E\u9A8C\u53F0\uFF0C\u5C55\u793A\u6240\u6709\u5B9E\u9A8C\u8BBE\u5907"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 8|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 5b170be3-68b1-44dc-a99c-f68a292d416f
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 600
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u5168\u90E8\u5B9E\u9A8C\u8BBE\u5907\u89C2\u770B"
+    - Name: eventName
+      Entry: 1
+      Data: "\u68C0\u67E5\u5668\u5177\u9F50\u5168"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u8BF7\u68C0\u67E5\u5B9E\u9A8C\u684C\u4E0A\u6240\u6709\u5B9E\u9A8C\u5668\u5177\u662F\u5426\u9F50\u5168\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 9|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 10|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u5668\u5177"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u5B9E\u9A8C\u684C\u4E0A\u7684\u6240\u6709\u5668\u5177"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u68C0\u67E5\u5668\u5177\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u68C0\u67E5\u5668\u5177_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u4ECE\u5F53\u524D\u70B9\u4F4D\u5E73\u79FB\u81F3\u5B9E\u9A8C\u684C\u4E0A\u65B9\uFF0C\u4FEF\u89C6\u6240\u6709\u5668\u5177\u540E\u8FD4\u56DE"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 11|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 73981049-5a7f-49fb-b160-0d845b2ae34b
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 900
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u68C0\u67E5\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+    - Name: eventName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u5916\u89C2"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u8BF7\u68C0\u67E5\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA\u5916\u89C2\u662F\u5426\u5B8C\u597D\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 12|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 13|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u5916\u89C2"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u5916\u89C2"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u5916\u89C2\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u5916\u89C2_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u5230\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA\u8FDB\u884C\u7279\u5199\u89C2\u5BDF"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 11b9d109-edc2-443c-b825-0f8b4b61a9b6
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 900
+    - Name: 
+      Entry: 4
+      Data: 300
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u68C0\u67E5\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+    - Name: eventName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u7535\u6E90"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u8BF7\u68C0\u67E5\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA\u7535\u6E90\u662F\u5426\u63D2\u597D\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 15|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 16|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u7535\u6E90"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u7535\u6E90\u662F\u5426\u63D2\u5165"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u7535\u6E90\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u7535\u6E90_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u5230\u7535\u6E90\u63A5\u53E3\u8FDB\u884C\u7279\u5199"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 44a67b1d-16ce-49a0-a089-1bf0bff00781
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 900
+    - Name: 
+      Entry: 4
+      Data: 600
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u68C0\u67E5\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+    - Name: eventName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u8BF7\u6253\u5F00\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA\u6837\u54C1\u5BA4\u76D6\u5E76\u89C2\u5BDF\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 18|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 19|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u5230\u6837\u54C1\u5BA4\u90E8\u4F4D\u8FDB\u884C\u7279\u5199"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4_\u6837\u54C1\u5BA4"
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: "\u6837\u54C1\u5BA4\u76D6\u5B50\u5411\u4E0A\u65CB\u8F6C90\xB0\uFF0C\u7B49\u4E00\u79D2\u6062\u590D\u539F\u72B6"
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: stateStartNodeDatas
+      Entry: 7
+      Data: 20|System.Collections.Generic.List`1[[StateStartNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: floatNodes
+      Entry: 7
+      Data: 21|System.Collections.Generic.List`1[[FloatNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: intNodes
+      Entry: 7
+      Data: 22|System.Collections.Generic.List`1[[IntNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: vector2Nodes
+      Entry: 7
+      Data: 23|System.Collections.Generic.List`1[[Vector2NodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: vector3Nodes
+      Entry: 7
+      Data: 24|System.Collections.Generic.List`1[[Vector3NodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: vector4Nodes
+      Entry: 7
+      Data: 25|System.Collections.Generic.List`1[[Vector4NodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: colorNodes
+      Entry: 7
+      Data: 26|System.Collections.Generic.List`1[[ColorNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: stickyNodes
+      Entry: 7
+      Data: 27|System.Collections.Generic.List`1[[StickyNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  startNodeDatas:
+  - GUID: 60bb7eaa-53cd-4778-9bab-d2037fd642f2
+    NodeName: StartNode
+    Position:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 100
+      height: 150
+  stateEndNodeDatas: []
+  groupSavedData: []
+  links: []

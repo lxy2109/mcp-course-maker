@@ -1,0 +1,14 @@
+==== GLB批量转换报告 ====
+总文件数: 10
+总用时: 44.31秒
+
+- 塑料洗瓶.glb | 大小: 1286KB | Prefab: 是
+- 实验桌.glb | 大小: 2247KB | Prefab: 是
+- 废液烧杯.glb | 大小: 1381KB | Prefab: 是
+- 擦拭棉球.glb | 大小: 1296KB | Prefab: 是
+- 比色皿1.glb | 大小: 1460KB | Prefab: 是
+- 比色皿2.glb | 大小: 1313KB | Prefab: 是
+- 比色皿3.glb | 大小: 1355KB | Prefab: 是
+- 电源线.glb | 大小: 1774KB | Prefab: 是
+- 笔记本.glb | 大小: 1938KB | Prefab: 是
+- 紫外线光度计.glb | 大小: 1532KB | Prefab: 是

@@ -1,0 +1,5 @@
+{
+  "request": "{\r\n  \"modelName\": \"标准照明灯\",\r\n  \"boundsCenter\": {\r\n    \"x\": -0.3351048,\r\n    \"y\": 0.4616972,\r\n    \"z\": 8.77706552E-05\r\n  },\r\n  \"boundsSize\": {\r\n    \"x\": 0.06709371,\r\n    \"y\": 0.299999923,\r\n    \"z\": 0.237610281\r\n  },\r\n  \"scale\": {\r\n    \"x\": 0.1495731,\r\n    \"y\": 0.1495731,\r\n    \"z\": 0.1495731\r\n  },\r\n  \"sceneHint\": \"\\nBounds center: (-0.34, 0.46, 0.00), size: (0.07, 0.30, 0.24), scale: (0.15, 0.15, 0.15)\",\r\n  \"time\": \"2025-07-01 13:33:35\"\r\n}",
+  "aiResult": "{\n  \"parent\": \"实验桌\",\n  \"position\": [0.0, 0.23, 0.0],\n  \"rotation\": [0, 0, 0],\n  \"front_dir\": [0, 0, 1],\n  \"layout_mode\": \"Linear\",\n  \"group\": \"\"\n}",
+  "error": null
+}

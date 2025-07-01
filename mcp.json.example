@@ -1,0 +1,145 @@
+{
+  "mcpServers": {
+    
+    "unityMCP": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "YOUR_PATH/Assets/unitymcp/Python",
+        "run",
+        "server.py"
+      ]
+    },
+
+    "excel": {
+      "url": "http://localhost:8000/sse",
+      "env": {
+        "EXCEL_FILES_PATH": "your_abs_dir/Assets"
+      }
+    },
+
+    "FileSimp": {
+      "command": "python",
+      "args": [
+        "YOUR_PATH/file-simp-server/server.py"
+      ],
+      "env": {
+        "PROJECT_ROOT": "YOUR_PATH"
+      }
+    },
+
+    "DoubaoTTS": {
+      "command": "doubao-tts-mcp",
+      "args": [],
+      "env": {
+        "VOLC_APPID": "YOUR_VOLC_APPID",
+        "VOLC_TOKEN": "YOUR_VOLC_TOKEN",
+        "PORT": "5001",
+        "OUTPUT_DIR": "your_output_filepath"
+      },
+      "description": "火山引擎大模型TTS合成服务支持官方内置音色。"
+    },
+
+    "ElevenLabs": {
+      "command": "python",
+      "args": [
+        "YOUR_PATH/elevenlabs-mcp/elevenlabs_mcp/server.py"
+      ],
+      "env": {
+        "ELEVENLABS_API_KEY": "YOUR_ELEVENLABS_API_KEY",
+        "ELEVENLABS_MCP_BASE_PATH": "your_output_filepath"
+      }
+    },
+
+    "MiniMax": {
+      "command": "uvx",
+      "args": [
+        "minimax-mcp"
+      ],
+      "env": {
+        "MINIMAX_API_KEY": "YOUR_MINIMAX_API_KEY",
+        "MINIMAX_MCP_BASE_PATH": "YOUR_OUTPUT_DIR",
+        "MINIMAX_API_HOST": "https://api.minimax.chat 或 https://api.minimaxi.chat",
+        "MINIMAX_API_RESOURCE_MODE": "local 或 url"
+      }
+    },
+
+    "JiMengAI": {
+        "command": "uv",
+        "args": [
+            "run",
+            "--with",
+            "fastmcp",
+            "fastmcp",
+            "run",
+            "YOUR_PATH/image-gen-server-main/server.py"
+        ],
+        "env": {
+            "JIMENG_API_TOKEN": "YOUR_JIMENG_SESSIONID",
+            "IMG_SAVA_FOLDER": "YOUR_IMAGE_SAVE_PATH"
+        }
+    },
+    
+    "BaiduImageRecognition": {
+      "command": "python",
+      "args": ["server.py"],
+      "cwd": "baidu-image-recognition-mcp",
+      "env": {
+        "BAIDU_API_KEY": "YOUR_BAIDU_API_KEY",
+        "BAIDU_SECRET_KEY": "YOUR_BAIDU_SECRET_KEY"
+      }
+    },
+
+    "Picui": {
+      "command": "python",
+      "args": [
+        "YOUR_PATH/picui-image-upload-mcp/server.py"
+      ],
+      "env": {
+        "PICUI_TOKEN": "YOUR_PICUI_BEARER_TOKEN"
+      }
+    },
+
+    "Meshy3D":{
+      "command": "python",
+      "args": [
+        "YOUR_PATH/meshy-ai-mcp-server/src/server.py"
+      ],
+      "env":{
+        "MESHY_API_KEY":"YOUR_MESHY_API_KEY"
+      }
+    },
+
+    "Tripo3D": {
+      "command": "python",
+      "args": [
+        "YOUR_PATH/tripo-mcp/src/main.py"
+      ],
+      "env": {
+        "TRIPO_API_KEY": "YOUR_TRIPO3D_API_KEY"
+      },
+      "url": "http://localhost:5001/mcp"
+    },
+
+    "Hunyuan3D": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@cloudbase/mcp-transformer",
+        "postToStdio",
+        "--url",
+        "https://YOUR_ENV_ID.api.tcloudbasegateway.com/v1/cloudrun/YOUR_SERVICE_NAME/messages",
+        "--token",
+        "YOUR_API_KEY"
+      ]
+    },
+
+    "InstantMeshes": {
+      "command": "instant-meshes-mcp",
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "BLENDER_PATH": "YOUR_BLENDER3.6_PATH"
+      }
+    }
+  }
+}

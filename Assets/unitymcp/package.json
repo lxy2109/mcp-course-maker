@@ -1,0 +1,12 @@
+{
+  "name": "com.vrjobs.unitymcp",
+  "version": "0.1.5",
+  "displayName": "Unity MCP",
+  "description": "A Unity package to communicate with a local MCP Client via a Python server.",
+  "unity": "2022.3",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.2",
+    "com.unity.render-pipelines.universal": "17.0.3"
+  },
+  "_fingerprint": "58f24ce41e962fef1915c436899884b58a665559"
+}

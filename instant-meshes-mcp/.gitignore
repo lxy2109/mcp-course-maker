@@ -1,0 +1,7 @@
+.specstory/
+logs/
+output_remesh/
+temp/
+.cursorindexingignore 
+__pycache__/
+archives/

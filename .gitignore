@@ -1,0 +1,55 @@
+# Unity Generated Files
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ibrary/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Visual Studio / MonoDevelop
+.vs/
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Unity Package Files
+*.unitypackage
+
+# Unity meta files
+*.meta
+
+# Large files that should use LFS
+*.unitypackage filter=lfs diff=lfs merge=lfs -text 
+
+# Python
+*.venv/
+*__pycache__/
+*.egg-info/
+
+*.log
+
+*.idea/
+*.specstory/
+*.vsconfig

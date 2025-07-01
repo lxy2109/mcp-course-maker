@@ -1,0 +1,43 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<cursorrules_mesh_decimation>
+type:Always
+description:3D模型减面与重拓扑自动化处理流程规范，集成通用模型复杂度数据库的智能减面决策系统。
+
+***规则内容***
+
+[智能减面决策系统]
+- 自动读取 **[PATH] [JSON] Assets/ModelParameterLib/ModelComplexityDatabase.json** ，根据模型名称和描述，自动判定复杂度等级（S/A/B/C/D），并设定目标面数和减面参数
+- 分析维度：几何复杂度、功能复杂度、视觉重要性、尺寸规模，全部自动化处理
+- 分级目标面数自动分配：
+    S级：15000-25000面
+    A级：8000-15000面
+    B级：4000-8000面
+    C级：1500-4000面
+    D级：500-1500面
+- 目标面数自动计算：
+    目标面数 = 基础面数 × 复杂度系数 × 尺寸系数 × 重要性系数
+
+[特殊减面规则与保护策略]
+- 精密仪器自动优先保留显示屏、按钮、Logo、接口等细节
+- 玻璃器皿自动优先保留边缘、刻度、外观
+- 机械部件自动优先保留关节、管路、螺丝等关键结构
+
+[技术实现与文件处理]
+- 支持GLB/OBJ格式输入
+- OBJ自动保证引用MTL，贴图完整，GLB自动提取贴图
+- 默认使用simplify模式
+- 默认用 **[MCP] mcp_InstantMeshes_process_model** 自动减面，参数随等级自动调整，保护UV、边界、法线等关键属性
+
+[质量检查与迭代优化]
+- 自动检测几何完整性、特征保留、UV正确性、性能指标、视觉评分
+- 质量评分<85分自动调整参数重试，支持多次迭代，关键特征丢失自动保护，纹理异常自动回退
+
+[输出与日志管理]
+- 调用 **[MCP] mcp_InstantMeshes_manage_archive**
+- 输出GLB需自动重命名,调用 **[MCP] mcp_FileSimp_rename_files**
+
+</cursorrules_mesh_decimation>

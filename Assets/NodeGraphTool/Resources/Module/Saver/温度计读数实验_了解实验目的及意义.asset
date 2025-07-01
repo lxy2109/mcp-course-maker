@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 590f545bd3e481f41b3b7fc74536233a, type: 3}
+  m_Name: "\u6E29\u5EA6\u8BA1\u8BFB\u6570\u5B9E\u9A8C_\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  objectNames:
+  - "\u5B9E\u9A8C\u684C"
+  - "\u6E29\u5EA6\u8BA1"
+  - "\u70E7\u676F"
+  eventNames:
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  gameObjectStates:
+  - position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    localScale: {x: 0.5970064, y: 0.5970064, z: 0.5970064}
+    active: 1
+  - position: {x: 0.2, y: 0.043, z: 0}
+    rotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+    localScale: {x: 0.1499213, y: 0.1499213, z: 0.1499213}
+    active: 1
+  - position: {x: 0, y: 0.082, z: 0}
+    rotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+    localScale: {x: 0.0546701, y: 0.054670103, z: 0.054670103}
+    active: 1

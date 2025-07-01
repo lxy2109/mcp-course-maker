@@ -1,0 +1,12 @@
+Label {
+    font-size: 20px;
+    -unity-font-style: normal;
+    color: rgb(198, 198, 198);
+}   
+
+GridBackground {
+    --grid-background-color: rgb(24, 24, 24);
+    --line-color: rgba(100, 100, 100, 0.1);
+    --thick-line-color: rgba(100, 100, 100, 0.1);
+    --spacing: 10;
+}

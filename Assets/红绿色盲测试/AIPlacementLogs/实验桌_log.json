@@ -1,0 +1,5 @@
+{
+  "request": "{\r\n  \"modelName\": \"实验桌\",\r\n  \"boundsCenter\": {\r\n    \"x\": 0.000408227439,\r\n    \"y\": -0.00102681108,\r\n    \"z\": -0.000629802642\r\n  },\r\n  \"boundsSize\": {\r\n    \"x\": 1.2,\r\n    \"y\": 0.625448048,\r\n    \"z\": 0.5727194\r\n  },\r\n  \"scale\": {\r\n    \"x\": 0.598472536,\r\n    \"y\": 0.598472536,\r\n    \"z\": 0.598472536\r\n  },\r\n  \"sceneHint\": \"\\nBounds center: (0.00, 0.00, 0.00), size: (1.20, 0.63, 0.57), scale: (0.60, 0.60, 0.60)\",\r\n  \"time\": \"2025-07-01 13:33:35\"\r\n}",
+  "aiResult": "{\n  \"parent\": \"实验桌\",\n  \"position\": [0.0, 0.315, 0.0],\n  \"rotation\": [0, 0, 0],\n  \"front_dir\": [0, 0, 1],\n  \"layout_mode\": \"Linear\",\n  \"group\": \"\"\n}",
+  "error": null
+}

@@ -1,0 +1,1044 @@
+{
+  "database_info": {
+    "name": "通用模型复杂度分析数据库",
+    "version": "1.0",
+    "description": "基于几何复杂度、功能复杂度、视觉重要性的智能减面策略数据库",
+    "last_updated": "2025-01-27",
+    "supported_domains": ["实验室科学", "建筑工程", "机械制造", "生物医学", "物理演示", "日常生活", "交通工具", "电子设备"]
+  },
+  "complexity_levels": {
+    "S级-超精密": {
+      "complexity_score": [90, 100],
+      "target_faces_range": [15000, 25000],
+      "description": "高精度设备，具有复杂曲面、精密部件、多功能组件",
+      "quality_requirements": {
+        "detail_preservation": 95,
+        "edge_sharpness": 90,
+        "texture_fidelity": 95,
+        "functional_accuracy": 100
+      },
+      "reduction_strategy": {
+        "method": "adaptive_preservation",
+        "protect_features": ["显示屏", "操作按钮", "品牌标识", "接口端口", "精密刻度"],
+        "preserve_uv": true,
+        "edge_protection": "maximum",
+        "normal_smoothing": "minimal"
+      }
+    },
+    "A级-精密设备": {
+      "complexity_score": [70, 89],
+      "target_faces_range": [8000, 15000],
+      "description": "标准实验设备，具有明确功能部件和操作界面",
+      "quality_requirements": {
+        "detail_preservation": 85,
+        "edge_sharpness": 80,
+        "texture_fidelity": 85,
+        "functional_accuracy": 90
+      },
+      "reduction_strategy": {
+        "method": "feature_aware",
+        "protect_features": ["主要操作面板", "关键按钮", "显示区域", "连接接口"],
+        "preserve_uv": true,
+        "edge_protection": "high",
+        "normal_smoothing": "moderate"
+      }
+    },
+    "B级-标准设备": {
+      "complexity_score": [50, 69],
+      "target_faces_range": [4000, 8000],
+      "description": "常规实验设备，基本功能明确但细节相对简单",
+      "quality_requirements": {
+        "detail_preservation": 75,
+        "edge_sharpness": 70,
+        "texture_fidelity": 75,
+        "functional_accuracy": 80
+      },
+      "reduction_strategy": {
+        "method": "balanced_reduction",
+        "protect_features": ["主要轮廓", "基本功能部件", "重要标识"],
+        "preserve_uv": true,
+        "edge_protection": "medium",
+        "normal_smoothing": "standard"
+      }
+    },
+    "C级-简单器材": {
+      "complexity_score": [30, 49],
+      "target_faces_range": [1500, 4000],
+      "description": "简单几何形状，基础功能，较少细节特征",
+      "quality_requirements": {
+        "detail_preservation": 60,
+        "edge_sharpness": 60,
+        "texture_fidelity": 65,
+        "functional_accuracy": 70
+      },
+      "reduction_strategy": {
+        "method": "geometric_simplification",
+        "protect_features": ["基本外形", "主要边缘"],
+        "preserve_uv": true,
+        "edge_protection": "low",
+        "normal_smoothing": "aggressive"
+      }
+    },
+    "D级-辅助物品": {
+      "complexity_score": [10, 29],
+      "target_faces_range": [500, 1500],
+      "description": "基础几何体，装饰性或辅助性物品",
+      "quality_requirements": {
+        "detail_preservation": 40,
+        "edge_sharpness": 40,
+        "texture_fidelity": 50,
+        "functional_accuracy": 50
+      },
+      "reduction_strategy": {
+        "method": "aggressive_reduction",
+        "protect_features": ["基本形状"],
+        "preserve_uv": false,
+        "edge_protection": "minimal",
+        "normal_smoothing": "maximum"
+      }
+    }
+  },
+  "complexity_analysis_criteria": {
+    "geometric_complexity": {
+      "weight": 0.4,
+      "factors": {
+        "curved_surfaces": {
+          "description": "曲面数量和复杂程度",
+          "scoring": {
+            "simple_curves": 10,
+            "complex_curves": 30,
+            "compound_curves": 50,
+            "freeform_surfaces": 80
+          }
+        },
+        "detail_density": {
+          "description": "细节特征密度",
+          "scoring": {
+            "low_detail": 5,
+            "medium_detail": 20,
+            "high_detail": 40,
+            "ultra_detail": 70
+          }
+        },
+        "edge_complexity": {
+          "description": "边缘锐利度和数量",
+          "scoring": {
+            "smooth_edges": 5,
+            "defined_edges": 15,
+            "sharp_edges": 30,
+            "complex_edges": 50
+          }
+        },
+        "surface_variation": {
+          "description": "表面变化复杂程度",
+          "scoring": {
+            "uniform": 5,
+            "moderate_variation": 20,
+            "high_variation": 40,
+            "extreme_variation": 60
+          }
+        }
+      }
+    },
+    "functional_complexity": {
+      "weight": 0.35,
+      "factors": {
+        "interactive_elements": {
+          "description": "可操作部件数量",
+          "scoring": {
+            "no_interaction": 0,
+            "simple_controls": 15,
+            "multiple_controls": 35,
+            "complex_interface": 60
+          }
+        },
+        "mechanical_parts": {
+          "description": "机械运动部件",
+          "scoring": {
+            "static_object": 0,
+            "simple_joints": 20,
+            "multiple_joints": 40,
+            "complex_mechanisms": 70
+          }
+        },
+        "display_elements": {
+          "description": "显示屏、指示器等",
+          "scoring": {
+            "no_display": 0,
+            "simple_indicators": 15,
+            "digital_display": 30,
+            "complex_interface": 50
+          }
+        },
+        "connection_ports": {
+          "description": "接口、连接器数量",
+          "scoring": {
+            "no_ports": 0,
+            "few_ports": 10,
+            "multiple_ports": 25,
+            "complex_connectivity": 45
+          }
+        }
+      }
+    },
+    "visual_importance": {
+      "weight": 0.25,
+      "factors": {
+        "educational_focus": {
+          "description": "教学重点程度",
+          "scoring": {
+            "background_object": 5,
+            "supporting_element": 15,
+            "important_component": 35,
+            "primary_focus": 60
+          }
+        },
+        "brand_visibility": {
+          "description": "品牌标识重要性",
+          "scoring": {
+            "no_branding": 0,
+            "simple_logo": 10,
+            "detailed_branding": 25,
+            "complex_branding": 40
+          }
+        },
+        "scene_hierarchy": {
+          "description": "场景中的层级重要性",
+          "scoring": {
+            "background": 5,
+            "secondary": 15,
+            "primary": 30,
+            "hero_object": 50
+          }
+        }
+      }
+    }
+  },
+  "domain_specific_models": {
+    "实验室科学": {
+      "精密仪器": {
+        "显微镜": {
+          "base_complexity": 85,
+          "typical_faces": 18000,
+          "key_features": ["目镜", "物镜", "调焦旋钮", "载物台", "光源"],
+          "protection_priority": ["光学部件", "精密调节器", "品牌标识"]
+        },
+        "分光光度计": {
+          "base_complexity": 78,
+          "typical_faces": 12000,
+          "key_features": ["显示屏", "样品室", "操作按钮", "接口端口"],
+          "protection_priority": ["显示区域", "操作面板", "样品室开口"]
+        },
+        "精密天平": {
+          "base_complexity": 82,
+          "typical_faces": 15000,
+          "key_features": ["称盘", "显示屏", "校准按钮", "防风罩"],
+          "protection_priority": ["称盘精度", "显示清晰度", "按钮独立性"]
+        }
+      },
+      "标准设备": {
+        "加热板": {
+          "base_complexity": 55,
+          "typical_faces": 6000,
+          "key_features": ["加热面", "温度控制旋钮", "指示灯"],
+          "protection_priority": ["加热面平整度", "控制旋钮"]
+        },
+        "搅拌器": {
+          "base_complexity": 48,
+          "typical_faces": 5000,
+          "key_features": ["搅拌台面", "控制面板", "转速调节"],
+          "protection_priority": ["台面平整度", "控制区域"]
+        },
+        "pH计": {
+          "base_complexity": 62,
+          "typical_faces": 7000,
+          "key_features": ["显示屏", "校准按钮", "电极接口"],
+          "protection_priority": ["显示屏", "接口精度"]
+        }
+      },
+      "玻璃器皿": {
+        "烧杯": {
+          "base_complexity": 35,
+          "typical_faces": 2500,
+          "key_features": ["倾倒口", "刻度标记", "把手"],
+          "protection_priority": ["边缘轮廓", "刻度清晰度"]
+        },
+        "试管": {
+          "base_complexity": 22,
+          "typical_faces": 1200,
+          "key_features": ["试管口", "底部圆弧"],
+          "protection_priority": ["口部精度", "整体轮廓"]
+        },
+        "量筒": {
+          "base_complexity": 28,
+          "typical_faces": 1800,
+          "key_features": ["刻度标记", "倾倒口", "底座"],
+          "protection_priority": ["刻度精度", "倾倒口形状"]
+        }
+      }
+    },
+    "建筑工程": {
+      "测量仪器": {
+        "水准仪": {
+          "base_complexity": 88,
+          "typical_faces": 20000,
+          "key_features": ["望远镜", "水准泡", "调节螺钉", "基座"],
+          "protection_priority": ["光学部件", "精密调节器", "水准泡"]
+        },
+        "激光测距仪": {
+          "base_complexity": 72,
+          "typical_faces": 10000,
+          "key_features": ["激光发射口", "显示屏", "按键", "握把"],
+          "protection_priority": ["激光口精度", "显示屏", "按键独立性"]
+        }
+      }
+    },
+    "机械制造": {
+      "精密工具": {
+        "游标卡尺": {
+          "base_complexity": 65,
+          "typical_faces": 8000,
+          "key_features": ["主尺", "游标", "测量爪", "刻度"],
+          "protection_priority": ["刻度精度", "测量爪精度", "滑动机构"]
+        },
+        "千分尺": {
+          "base_complexity": 70,
+          "typical_faces": 9000,
+          "key_features": ["主轴", "副轴", "刻度环", "棘轮"],
+          "protection_priority": ["螺纹精度", "刻度清晰度", "机械结构"]
+        }
+      }
+    }
+  },
+  "special_processing_rules": {
+    "透明材质物体": {
+      "priority": "edge_preservation",
+      "edge_protection_level": "maximum",
+      "internal_simplification": "aggressive",
+      "uv_protection": "boundary_only"
+    },
+    "机械运动部件": {
+      "priority": "joint_preservation",
+      "joint_protection_radius": 0.05,
+      "connection_accuracy": "high",
+      "clearance_maintenance": true
+    },
+    "显示设备": {
+      "priority": "screen_clarity",
+      "screen_face_density": "maximum",
+      "button_independence": true,
+      "interface_precision": "high"
+    },
+    "品牌标识区域": {
+      "priority": "text_readability",
+      "logo_protection": "complete",
+      "text_edge_sharpness": "maximum",
+      "embossed_detail_preservation": true
+    }
+  },
+  "model_size_factors": {
+    "micro_objects": {
+      "size_range": [0, 5],
+      "unit": "cm",
+      "face_multiplier": 0.6,
+      "detail_priority": "essential_only"
+    },
+    "small_objects": {
+      "size_range": [5, 20],
+      "unit": "cm", 
+      "face_multiplier": 0.8,
+      "detail_priority": "important_features"
+    },
+    "medium_objects": {
+      "size_range": [20, 100],
+      "unit": "cm",
+      "face_multiplier": 1.0,
+      "detail_priority": "full_detail"
+    },
+    "large_objects": {
+      "size_range": [100, 500],
+      "unit": "cm",
+      "face_multiplier": 1.5,
+      "detail_priority": "enhanced_detail"
+    },
+    "extra_large_objects": {
+      "size_range": [500, 9999],
+      "unit": "cm",
+      "face_multiplier": 2.0,
+      "detail_priority": "maximum_detail"
+    }
+  },
+  "performance_optimization": {
+    "unity_performance_targets": {
+      "desktop_platform": {
+        "max_faces_per_object": 25000,
+        "total_scene_faces": 500000,
+        "texture_size_limit": 4096
+      },
+      "mobile_platform": {
+        "max_faces_per_object": 5000,
+        "total_scene_faces": 50000,
+        "texture_size_limit": 1024
+      },
+      "vr_platform": {
+        "max_faces_per_object": 3000,
+        "total_scene_faces": 30000,
+        "texture_size_limit": 512
+      }
+    },
+    "lod_generation": {
+      "lod0_percentage": 100,
+      "lod1_percentage": 60,
+      "lod2_percentage": 30,
+      "lod3_percentage": 15
+    }
+  },
+  "quality_validation": {
+    "geometric_integrity": {
+      "hole_detection": true,
+      "normal_validation": true,
+      "manifold_check": true,
+      "self_intersection_check": true
+    },
+    "visual_quality_metrics": {
+      "silhouette_preservation": 0.9,
+      "feature_retention": 0.85,
+      "texture_fidelity": 0.8,
+      "overall_coherence": 0.88
+    },
+    "functional_validation": {
+      "joint_clearance": true,
+      "interface_compatibility": true,
+      "scale_consistency": true,
+      "physics_compatibility": true
+    }
+  },
+  "fallback_strategies": {
+    "quality_insufficient": {
+      "increase_target_faces": 0.2,
+      "enable_feature_protection": true,
+      "reduce_simplification_aggressiveness": true,
+      "max_retry_attempts": 3
+    },
+    "performance_exceeded": {
+      "decrease_target_faces": 0.15,
+      "enable_aggressive_simplification": true,
+      "prioritize_essential_features": true,
+      "generate_lod_variants": true
+    },
+    "database_match_failed": {
+      "use_generic_complexity_analysis": true,
+      "apply_conservative_face_count": true,
+      "enable_manual_review_flag": true,
+      "default_complexity_level": "B级-标准设备"
+    }
+  },
+  "integration_settings": {
+    "unity_script_hooks": {
+      "pre_optimization": "ModelOptimizer.PreProcessAnalysis",
+      "complexity_calculation": "ModelOptimizer.CalculateComplexity",
+      "post_optimization": "ModelOptimizer.ValidateResults",
+      "quality_assessment": "ModelOptimizer.AssessQuality"
+    },
+    "file_naming_conventions": {
+      "optimized_suffix": "_optimized",
+      "complexity_prefix": "complexity_",
+      "backup_suffix": "_original"
+    },
+    "logging_settings": {
+      "enable_detailed_logging": true,
+      "log_complexity_analysis": true,
+      "log_optimization_steps": true,
+      "log_quality_metrics": true
+    }
+  },
+  "equipment_complexity_mapping": {
+    "实验室仪器类": {
+      "紫外可见光分光光度计": {
+        "complexity_level": "S级-超精密",
+        "complexity_score": 95,
+        "analysis": {
+          "geometric_complexity": 85,
+          "functional_complexity": 90,
+          "visual_importance": 80
+        },
+        "target_faces": 20000,
+        "special_requirements": ["保护显示屏细节", "保持操作按钮清晰", "维护品牌标识"]
+      },
+      "显微镜": {
+        "complexity_level": "S级-超精密",
+        "complexity_score": 92,
+        "analysis": {
+          "geometric_complexity": 80,
+          "functional_complexity": 85,
+          "visual_importance": 85
+        },
+        "target_faces": 18000,
+        "special_requirements": ["保护镜头组件", "维护调焦机构", "保持目镜细节"]
+      },
+      "电子天平": {
+        "complexity_level": "A级-精密设备",
+        "complexity_score": 78,
+        "analysis": {
+          "geometric_complexity": 60,
+          "functional_complexity": 75,
+          "visual_importance": 70
+        },
+        "target_faces": 12000,
+        "special_requirements": ["保护称盘结构", "维护显示屏", "保持按键清晰"]
+      },
+      "离心机": {
+        "complexity_level": "A级-精密设备",
+        "complexity_score": 75,
+        "analysis": {
+          "geometric_complexity": 70,
+          "functional_complexity": 70,
+          "visual_importance": 65
+        },
+        "target_faces": 10000,
+        "special_requirements": ["保护转子室", "维护控制面板", "保持安全锁机构"]
+      }
+    },
+    "玻璃器皿类": {
+      "烧杯": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 35,
+        "analysis": {
+          "geometric_complexity": 25,
+          "functional_complexity": 20,
+          "visual_importance": 40
+        },
+        "target_faces": 2500,
+        "special_requirements": ["保持圆形轮廓", "维护刻度标记", "保护倾倒口"]
+      },
+      "锥形瓶": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 40,
+        "analysis": {
+          "geometric_complexity": 35,
+          "functional_complexity": 25,
+          "visual_importance": 45
+        },
+        "target_faces": 3000,
+        "special_requirements": ["保持锥形轮廓", "维护瓶颈细节", "保护底部稳定性"]
+      },
+      "试管": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 25,
+        "analysis": {
+          "geometric_complexity": 15,
+          "functional_complexity": 10,
+          "visual_importance": 30
+        },
+        "target_faces": 1000,
+        "special_requirements": ["保持圆柱形状", "维护开口边缘"]
+      }
+    },
+    "建筑模型类": {
+      "标准砖块": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 20,
+        "analysis": {
+          "geometric_complexity": 15,
+          "functional_complexity": 5,
+          "visual_importance": 25
+        },
+        "target_faces": 800,
+        "special_requirements": ["保持矩形轮廓", "维护表面纹理"]
+      },
+      "混凝土柱": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 35,
+        "analysis": {
+          "geometric_complexity": 30,
+          "functional_complexity": 20,
+          "visual_importance": 40
+        },
+        "target_faces": 2000,
+        "special_requirements": ["保持圆柱形状", "维护表面细节", "保护连接部位"]
+      },
+      "窗户框架": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 55,
+        "analysis": {
+          "geometric_complexity": 50,
+          "functional_complexity": 40,
+          "visual_importance": 60
+        },
+        "target_faces": 5000,
+        "special_requirements": ["保护框架结构", "维护玻璃分割", "保持五金件细节"]
+      },
+      "标准门": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 60,
+        "analysis": {
+          "geometric_complexity": 55,
+          "functional_complexity": 50,
+          "visual_importance": 65
+        },
+        "target_faces": 6000,
+        "special_requirements": ["保护门把手", "维护门框结构", "保持表面装饰"]
+      }
+    },
+    "机械零件类": {
+      "标准螺栓": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 28,
+        "analysis": {
+          "geometric_complexity": 25,
+          "functional_complexity": 15,
+          "visual_importance": 20
+        },
+        "target_faces": 1200,
+        "special_requirements": ["保持螺纹细节", "维护六角头形状"]
+      },
+      "轴承": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 45,
+        "analysis": {
+          "geometric_complexity": 40,
+          "functional_complexity": 35,
+          "visual_importance": 30
+        },
+        "target_faces": 3500,
+        "special_requirements": ["保护内外圈结构", "维护滚珠细节", "保持密封件"]
+      },
+      "齿轮": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 65,
+        "analysis": {
+          "geometric_complexity": 70,
+          "functional_complexity": 60,
+          "visual_importance": 50
+        },
+        "target_faces": 7000,
+        "special_requirements": ["保护齿形精度", "维护齿根过渡", "保持轮毂细节"]
+      }
+    },
+    "生物标本类": {
+      "人体心脏模型": {
+        "complexity_level": "A级-精密设备",
+        "complexity_score": 85,
+        "analysis": {
+          "geometric_complexity": 90,
+          "functional_complexity": 70,
+          "visual_importance": 90
+        },
+        "target_faces": 14000,
+        "special_requirements": ["保护血管细节", "维护心室结构", "保持解剖标识"]
+      },
+      "人体骨骼": {
+        "complexity_level": "A级-精密设备",
+        "complexity_score": 80,
+        "analysis": {
+          "geometric_complexity": 85,
+          "functional_complexity": 60,
+          "visual_importance": 85
+        },
+        "target_faces": 12000,
+        "special_requirements": ["保护骨骼纹理", "维护关节结构", "保持解剖特征"]
+      },
+      "细胞模型": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 70,
+        "analysis": {
+          "geometric_complexity": 75,
+          "functional_complexity": 50,
+          "visual_importance": 80
+        },
+        "target_faces": 8000,
+        "special_requirements": ["保护细胞器细节", "维护膜结构", "保持教学标识"]
+      },
+      "DNA双螺旋模型": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 68,
+        "analysis": {
+          "geometric_complexity": 70,
+          "functional_complexity": 45,
+          "visual_importance": 85
+        },
+        "target_faces": 7500,
+        "special_requirements": ["保护螺旋结构", "维护碱基配对", "保持分子标识"]
+      }
+    },
+    "物理演示器材类": {
+      "弹簧振子": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 55,
+        "analysis": {
+          "geometric_complexity": 50,
+          "functional_complexity": 45,
+          "visual_importance": 60
+        },
+        "target_faces": 5000,
+        "special_requirements": ["保护弹簧结构", "维护振子形状", "保持支架细节"]
+      },
+      "单摆": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 40,
+        "analysis": {
+          "geometric_complexity": 35,
+          "functional_complexity": 30,
+          "visual_importance": 50
+        },
+        "target_faces": 3000,
+        "special_requirements": ["保持摆球形状", "维护悬线细节", "保护支架结构"]
+      },
+      "牛顿摆": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 58,
+        "analysis": {
+          "geometric_complexity": 55,
+          "functional_complexity": 50,
+          "visual_importance": 65
+        },
+        "target_faces": 5500,
+        "special_requirements": ["保护摆球阵列", "维护悬线系统", "保持框架精度"]
+      },
+      "棱镜": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 42,
+        "analysis": {
+          "geometric_complexity": 40,
+          "functional_complexity": 25,
+          "visual_importance": 60
+        },
+        "target_faces": 3200,
+        "special_requirements": ["保持棱角精度", "维护光学表面", "保护边缘清晰度"]
+      }
+    },
+    "电子设备类": {
+      "标准电阻": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 15,
+        "analysis": {
+          "geometric_complexity": 10,
+          "functional_complexity": 5,
+          "visual_importance": 15
+        },
+        "target_faces": 600,
+        "special_requirements": ["保持圆柱形状", "维护色环标识"]
+      },
+      "电容器": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 20,
+        "analysis": {
+          "geometric_complexity": 15,
+          "functional_complexity": 10,
+          "visual_importance": 20
+        },
+        "target_faces": 800,
+        "special_requirements": ["保持基本形状", "维护引脚细节", "保护标识文字"]
+      },
+      "印刷电路板": {
+        "complexity_level": "A级-精密设备",
+        "complexity_score": 82,
+        "analysis": {
+          "geometric_complexity": 75,
+          "functional_complexity": 80,
+          "visual_importance": 75
+        },
+        "target_faces": 13000,
+        "special_requirements": ["保护电路走线", "维护元件布局", "保持焊盘细节"]
+      },
+      "LED灯": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 18,
+        "analysis": {
+          "geometric_complexity": 12,
+          "functional_complexity": 8,
+          "visual_importance": 25
+        },
+        "target_faces": 700,
+        "special_requirements": ["保持透镜形状", "维护引脚结构"]
+      }
+    },
+    "日常用品类": {
+      "标准课桌": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 50,
+        "analysis": {
+          "geometric_complexity": 45,
+          "functional_complexity": 40,
+          "visual_importance": 55
+        },
+        "target_faces": 4500,
+        "special_requirements": ["保持桌面平整", "维护支撑结构", "保护边缘细节"]
+      },
+      "办公椅": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 65,
+        "analysis": {
+          "geometric_complexity": 70,
+          "functional_complexity": 60,
+          "visual_importance": 60
+        },
+        "target_faces": 7000,
+        "special_requirements": ["保护座椅曲线", "维护调节机构", "保持扶手细节"]
+      },
+      "书本": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 22,
+        "analysis": {
+          "geometric_complexity": 15,
+          "functional_complexity": 10,
+          "visual_importance": 30
+        },
+        "target_faces": 900,
+        "special_requirements": ["保持矩形轮廓", "维护封面细节", "保护书脊文字"]
+      },
+      "笔": {
+        "complexity_level": "D级-辅助物品",
+        "complexity_score": 25,
+        "analysis": {
+          "geometric_complexity": 20,
+          "functional_complexity": 15,
+          "visual_importance": 25
+        },
+        "target_faces": 1000,
+        "special_requirements": ["保持圆柱形状", "维护笔尖细节", "保护品牌标识"]
+      },
+      "杯子": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 35,
+        "analysis": {
+          "geometric_complexity": 30,
+          "functional_complexity": 20,
+          "visual_importance": 40
+        },
+        "target_faces": 2500,
+        "special_requirements": ["保持圆形轮廓", "维护把手结构", "保护表面装饰"]
+      }
+    },
+    "交通工具类": {
+      "小轿车": {
+        "complexity_level": "S级-超精密",
+        "complexity_score": 98,
+        "analysis": {
+          "geometric_complexity": 95,
+          "functional_complexity": 90,
+          "visual_importance": 95
+        },
+        "target_faces": 24000,
+        "special_requirements": ["保护车身曲线", "维护细节装饰", "保持品牌特征", "保护内饰细节"]
+      },
+      "自行车": {
+        "complexity_level": "A级-精密设备",
+        "complexity_score": 75,
+        "analysis": {
+          "geometric_complexity": 70,
+          "functional_complexity": 70,
+          "visual_importance": 70
+        },
+        "target_faces": 10000,
+        "special_requirements": ["保护车架结构", "维护轮辐细节", "保持传动系统"]
+      },
+      "公交车": {
+        "complexity_level": "S级-超精密",
+        "complexity_score": 96,
+        "analysis": {
+          "geometric_complexity": 90,
+          "functional_complexity": 85,
+          "visual_importance": 90
+        },
+        "target_faces": 22000,
+        "special_requirements": ["保护车身结构", "维护门窗细节", "保持内部布局", "保护标识系统"]
+      }
+    },
+    "医疗器械类": {
+      "听诊器": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 58,
+        "analysis": {
+          "geometric_complexity": 55,
+          "functional_complexity": 50,
+          "visual_importance": 65
+        },
+        "target_faces": 5500,
+        "special_requirements": ["保护胸件细节", "维护管路结构", "保持耳件形状"]
+      },
+      "注射器": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 40,
+        "analysis": {
+          "geometric_complexity": 35,
+          "functional_complexity": 30,
+          "visual_importance": 45
+        },
+        "target_faces": 3000,
+        "special_requirements": ["保持圆柱形状", "维护刻度标记", "保护针头细节"]
+      },
+      "血压计": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 62,
+        "analysis": {
+          "geometric_complexity": 60,
+          "functional_complexity": 55,
+          "visual_importance": 70
+        },
+        "target_faces": 6000,
+        "special_requirements": ["保护表盘细节", "维护袖带结构", "保持管路连接"]
+      }
+    },
+    "园艺农业类": {
+      "花盆": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 38,
+        "analysis": {
+          "geometric_complexity": 35,
+          "functional_complexity": 25,
+          "visual_importance": 45
+        },
+        "target_faces": 2800,
+        "special_requirements": ["保持锥形轮廓", "维护排水孔", "保护表面纹理"]
+      },
+      "浇水壶": {
+        "complexity_level": "B级-标准设备",
+        "complexity_score": 52,
+        "analysis": {
+          "geometric_complexity": 50,
+          "functional_complexity": 45,
+          "visual_importance": 55
+        },
+        "target_faces": 4800,
+        "special_requirements": ["保护壶嘴结构", "维护把手形状", "保持容器轮廓"]
+      },
+      "铲子": {
+        "complexity_level": "C级-简单器材",
+        "complexity_score": 42,
+        "analysis": {
+          "geometric_complexity": 40,
+          "functional_complexity": 35,
+          "visual_importance": 50
+        },
+        "target_faces": 3200,
+        "special_requirements": ["保护铲刃形状", "维护手柄细节", "保持连接部位"]
+      }
+    }
+  },
+  "adaptive_calculation_formulas": {
+    "base_face_calculation": {
+      "formula": "目标面数 = 基础面数 × 复杂度系数 × 尺寸系数 × 重要性系数",
+      "parameters": {
+        "基础面数": {
+          "range": [500, 3000],
+          "description": "根据物体类型的最低面数要求"
+        },
+        "复杂度系数": {
+          "range": [1.0, 8.0],
+          "calculation": "complexity_score / 100 * 8",
+          "description": "基于复杂度评分的动态系数"
+        },
+        "尺寸系数": {
+          "range": [0.5, 2.0],
+          "small_objects": 0.5,
+          "medium_objects": 1.0,
+          "large_objects": 1.5,
+          "huge_objects": 2.0,
+          "description": "基于物体在场景中的相对尺寸"
+        },
+        "重要性系数": {
+          "range": [0.7, 1.5],
+          "background": 0.7,
+          "supporting": 0.9,
+          "important": 1.2,
+          "primary_focus": 1.5,
+          "description": "基于教学重要性的调整系数"
+        }
+      }
+    },
+    "quality_thresholds": {
+      "minimum_quality_score": 80,
+      "acceptable_quality_score": 85,
+      "excellent_quality_score": 90,
+      "evaluation_criteria": {
+        "geometric_integrity": 0.3,
+        "feature_preservation": 0.25,
+        "uv_mapping_quality": 0.2,
+        "performance_optimization": 0.15,
+        "visual_appeal": 0.1
+      }
+    }
+  },
+  "reduction_strategies": {
+    "adaptive_preservation": {
+      "description": "自适应特征保护策略，适用于S级精密设备",
+      "parameters": {
+        "feature_detection_threshold": 0.1,
+        "importance_weighting": true,
+        "edge_collapse_limit": 0.05,
+        "normal_deviation_limit": 5,
+        "uv_distortion_limit": 0.02
+      }
+    },
+    "feature_aware": {
+      "description": "特征感知减面策略，适用于A级精密设备",
+      "parameters": {
+        "feature_detection_threshold": 0.15,
+        "importance_weighting": true,
+        "edge_collapse_limit": 0.1,
+        "normal_deviation_limit": 10,
+        "uv_distortion_limit": 0.05
+      }
+    },
+    "balanced_reduction": {
+      "description": "平衡减面策略，适用于B级标准设备",
+      "parameters": {
+        "feature_detection_threshold": 0.2,
+        "importance_weighting": false,
+        "edge_collapse_limit": 0.15,
+        "normal_deviation_limit": 15,
+        "uv_distortion_limit": 0.08
+      }
+    },
+    "geometric_simplification": {
+      "description": "几何简化策略，适用于C级简单器材",
+      "parameters": {
+        "feature_detection_threshold": 0.3,
+        "importance_weighting": false,
+        "edge_collapse_limit": 0.25,
+        "normal_deviation_limit": 20,
+        "uv_distortion_limit": 0.12
+      }
+    },
+    "aggressive_reduction": {
+      "description": "激进减面策略，适用于D级辅助物品",
+      "parameters": {
+        "feature_detection_threshold": 0.5,
+        "importance_weighting": false,
+        "edge_collapse_limit": 0.4,
+        "normal_deviation_limit": 30,
+        "uv_distortion_limit": 0.2
+      }
+    }
+  },
+  "validation_metrics": {
+    "quality_assessment": {
+      "visual_similarity": {
+        "weight": 0.3,
+        "measurement": "SSIM comparison with original",
+        "threshold": 0.85
+      },
+      "geometric_accuracy": {
+        "weight": 0.25,
+        "measurement": "Hausdorff distance",
+        "threshold": 0.02
+      },
+      "feature_completeness": {
+        "weight": 0.2,
+        "measurement": "Feature point preservation ratio",
+        "threshold": 0.9
+      },
+      "performance_gain": {
+        "weight": 0.15,
+        "measurement": "Rendering time improvement",
+        "threshold": 2.0
+      },
+      "memory_efficiency": {
+        "weight": 0.1,
+        "measurement": "Memory usage reduction",
+        "threshold": 0.5
+      }
+    }
+  }
+} 

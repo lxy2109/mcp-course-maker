@@ -1,0 +1,242 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<cursorrules_course_creation>
+type: Always
+description: Unity虚拟实验课程制作完整自动化流程，实现从课程名称输入到完成制作的八阶段标准化流程。
+             ★ 已集成 *[RULE] modeling_flow.mdc* 的六步标准化建模流程 ★
+
+***规则内容***
+- 所有课程制作必须严格按照八阶段流程执行，不允许跳过任何阶段。
+- 每个阶段进行前需进行详细分析，并告知用户。
+- 每个阶段完成后必须中断，检测阶段性输出结果，并询问用户是否继续。
+- 每个阶段或步骤出现错误时需详细分析错误原因，并告知用户。
+- 每个阶段正常或异常中断时需要给出用户可行的选项。
+- 所有文件必须按照统一目录结构管理，确保项目规范化。
+- **阶段5的3D建模流程已集成 *[RULE] modeling_flow.mdc* 的六步标准化建模规则**：
+  · 每步完成后进行阶段性输出展示，询问用户是否继续
+  · 严格按照：文生图→图片筛选→图片上传→图生3D→智能减面→关键词重命名
+  · 基于 *[JSON] ModelComplexityDatabase.json* 的智能减面决策系统
+- 所有路径，不论是源路径还是目标路径，必须使用绝对路径，不允许传入相对路径
+- **[MCP] mcp_FileSimp_to_absolute_path**
+- 音频、模型、timeline采用批量生成策略，如有多个流程，则批量逐一进行流程
+
+
+***八阶段完整流程***
+- [阶段1：课程名称标准化处理与目录创建]
+  * 输入：用户输入的课程名称（2-20字符）
+  * 处理：去除特殊字符，确保文件系统兼容性
+  * 目录创建：在Assets下创建{课程名称}文件夹
+  * 输出：标准化课程名称，Assets/{课程名称}/
+  * 验证：检查重名，确认命名规范，确认目录创建成功
+
+- [阶段2：智能课程类型分析]
+  * 输入：标准化课程名称
+  * 分析：基于关键词识别课程类型（例如医学护理、理化实验、生物实验、工程技术）
+  * 输出：课程类型、实验框架模板、器材清单
+  * 验证：确认课程类型准确性
+
+- [阶段3：Excel模板自动生成]
+  * 输入：课程类型和框架模板
+  * 遵循：严格遵守 *[RULE] excel_prompt.mdc* 规则内容
+  * 位置：Assets/{课程名称}/ 目录下
+  * 生成：14列标准结构Excel文件（实验步骤(FlowGraph)实验逻辑部分|实验动作(EventName)具体动作事件|引导文本(阶段文案 UI引导提示)|手部提示（当前需要点击的物品名称）|虚拟交互Enter(进入事件时进行的Event名称)|交互内容Enter(进入事件时进行的Event内容)|虚拟交互Exit(离开事件时进行的Event名称)|交互内容Exit(离开事件时进行的Event名内容)|配音脚本名称(进入事件时播放的音频名称)|配音脚本内容(进入事件时播放的音频文案内容)|镜头timeline名称|镜头timeline内容|物体timeline名称|物体timeline内容
+  * 工具：**[MCP] mcp_excel_create_workbook**、**[MCP] mcp_excel_create_worksheet**、**[MCP] mcp_excel_write_data_to_excel**
+  * 验证：检查14列完整性，4个Sheet结构
+
+- [阶段4：课程子目录结构创建]
+  * 输入：生成的Excel文件，已存在的Assets/{课程名称}/
+  * 目标：在 **[PATH] Assets/{课程名称}/** 下创建完整子目录结构
+  * 结构：{课程名称}.xlsx、Audio/、Timeline/、Models/、Materials/、Textures/、Prefabs/、Scripts/
+  * 验证：确认子目录结构完整，Excel文件正确保存
+
+- [阶段5：音频与3D模型生成并即时导入]
+  * 音频生成与导入：基于智能需求分析的音频生成系统
+      · 严格遵循 *[RULE] tts.mdc* 规则内容
+      · 需要分析出适合课程讲解的音色，并调用 **[MCP] mcp_DoubaoTTS_list_voice** 或 **[MCP] mcp_MiniMax_list_voices** 或 **[MCP] mcp_ElevenLabs_voice_manage** 进行音色查找匹配
+      · 发音准确性检查：专业术语、数字、单位的正确发音
+      · 语调自然度评估：避免机械感，确保自然流畅
+      · 音频格式标准化：统一输出为适合Unity的音频格式
+      · 立即导入Unity：音频生成完成后，分析 **[PATH] Assets/{课程名称}/Audio/** 的绝对路径，直接导入
+      · 文件命名规范：按Excel中的配音脚本名称命名
+  * 音频生成前需要分析并查找合适的声音
+  * 逐一生成所有所需音频
+
+  * 3D模型生成：基于modeling_flow.mdc的六步标准化建模流程
+    **流程说明**：严格按照六步骤执行，每步完成后进行阶段性输出展示，询问用户是否继续
+    · 严格遵循 *[RULE] modeling_flow.mdc* 规则内容
+    · 立即导入Unity：模型减面完成后调用 **[MCP] mcp_FileSimp_to_absolute_path** 获取 **[PATH] Assets/{课程名称}/Models/** 的绝对路径，直接导入
+    · 文件命名规范：按Excel中的物品名称命名
+    · 需要多个模型生成时，按步骤同时进行多个模型的建模流程
+    
+- [阶段6：模型实例化与场景布局]
+  * 输入：Excel中的相关信息、Assets/{课程名称}/Models
+  * 调用 **[MCP] mcp_unityMCP_new_scene** 新建场景，命名为{课程名称}
+    - 场景保存在Assets/{课程名称} 目录下
+    - 新场景中需要调用 **[MCP] mcp_unityMCP_create_object** 创建Directional Light 和 Main Camera
+    - 设置Main Camera的tag为MainCamera
+    - 实例化Assets/Prefabs/MCP/Canvas.prefab在场景中
+  * 调用 **[MCP] mcp_unityMCP_glb_batch_convert** ("Assets/{课程名称}")
+    - 工具实现代码为"GLBToPrefabBatchConverter.cs"
+    - 预制件存储位置为 **[PATH] Assets/{课程名称}/Prefabs**
+    - 转换时默认应用转换设置中选项
+    - 玻璃材质存储位置为 **[PATH] Assets/{课程名称}/Materials**
+  * 读取分析excel中各个物品的相关信息，将场景中物体进行合理的transform调整
+    - 布局需严格遵守 *[RULE] posset.mdc* 规则内容
+    - 每个模型的位置需要分析excel来设定
+  * 验证：布局完成后输出各个模型所在的position
+
+- [阶段7：基于场景布局的Timeline动画生成]
+  * 输入：Excel中的Timeline描述、场景中已实例化的模型位置信息
+  * Timeline生成策略：
+    - 严格遵循 *[RULE] timeline.mdc* 规则内容
+  * Timeline资产保存：
+    - 保存路径：**[PATH] Assets/{课程名称}/Timeline/**
+    - 命名规范：按Excel中timeline名称命名
+    - 自动关联：Timeline自动引用场景中对应的游戏对象
+  * 验证：确认Timeline文件生成成功，动画轨迹合理，无碰撞冲突
+
+- [阶段8：NodeGraph创建]
+  * 输入：课程名称
+  * 创建：空的{课程名称}.asset文件
+  * 工具：**[MCP] mcp_unityMCP_create_empty_nodegraph**
+  * 路径：**[PATH] Assets/{课程名称}/{课程名称}.asset**
+  * 验证：确认NodeGraph文件创建成功
+
+- [阶段9：完整资产关联到节点]
+  * 输入：Excel数据和对应课程空的nodegraph
+  * 关联策略：
+    - 音频资产关联：将 **[PATH] Assets/{课程名称}/Audio/** 中的音频文件关联到对应节点
+    - Timeline资产关联：将 **[PATH] Assets/{课程名称}/Timeline/** 中的相机和物体动画关联到对应节点
+    - 模型实例关联：将场景中实例化的模型GameObject引用关联到对应节点
+    - 数据完整性验证：确保Excel中每行数据都能找到对应的资产引用
+  * 工具：**[MCP] mcp_unityMCP_import_excel_to_nodegraph**
+  * 智能匹配算法：
+    - 精确匹配：优先按名称精确匹配资产
+    - 模糊匹配：支持部分名称匹配和关键词匹配
+    - 路径解析：自动解析相对路径和绝对路径
+  * 验证：检查资产关联率>90%，节点功能完整，所有引用有效
+
+---
+
+***路径规范***
+    - 所有路径必须为绝对路径，禁止传递或保存相对路径，避免跨平台和自动化流程中的路径错误。
+    - 路径获取与传递前，必须调用路径转换工具 **[MCP] mcp_FileSimp_to_absolute_path** 将相对路径转为绝对路径。
+    - 资源生成、保存、上传、导入、重命名等所有环节，均需使用绝对路径参数。
+    - **[MCP] mcp_FileSimp_to_absolute_path** 主要资源目录绝对路径转换参数调用：
+        - 课程主目录：**[PATH] Assets/{课程名称}**
+        - 音频目录：**[PATH] Assets/{课程名称}/Audio**
+        - 模型目录：**[PATH] Assets/{课程名称}/Models**
+        - Timeline目录：**[PATH] Assets/{课程名称}/Timeline**
+        - 材质目录：**[PATH] Assets/{课程名称}/Materials**
+        - 纹理目录：**[PATH] Assets/{课程名称}/Textures**
+        - 预制体目录：**[PATH] Assets/{课程名称}/Prefabs**
+        - 脚本目录：**[PATH] Assets/{课程名称}/Scripts**
+    - 生成与保存流程中的路径处理：
+        - 文生图/图片生成：保存目录需先转为绝对路径
+        - 图片上传：本地图片路径需为绝对路径
+        - 模型减面与重命名：输入输出路径均为绝对路径
+        - 音频生成：output_dir 必须为绝对路径
+        - Unity导入：导入路径与目标路径均需为绝对路径
+    - 所有MCP工具/AI接口：如有路径参数，必须先用路径转换工具转为绝对路径后再传递
+    - 重命名、归档、导入等操作：涉及文件/文件夹路径时，均需传递绝对路径
+
+---
+
+***智能定位决策树***
+  · 主要器材优先级：分光光度计、显微镜等主要设备优先占据核心位置
+  · 辅助器材配置：试管、烧杯等辅助器材围绕主要设备合理分布
+  · 安全距离控制：热源、化学试剂与其他器材保持规定安全距离
+  · 操作便利性：高频使用物品放置在易取位置，符合人体工程学
+  · 美观协调性：整体布局视觉协调，避免大小物品分布失衡
+- *精确贴合算法执行*：按照posset.mdc严格执行物理贴合计算
+  · *强制单体计算*：绝不允许简化或批量处理，每个物体必须单独精确计算
+  · *主轴贴合公式*：严格使用完整posset公式，考虑bounds.center和scale的完整影响
+    - A物体上表面 = A.position.y + A.bounds.center.y * A.scale.y + (A.bounds.size.y / 2) * A.scale.y
+    - B物体贴合A上表面：B.position.y = A.position.y + (A.bounds.center.y - B.bounds.center.y) * B.scale.y + ((A.bounds.size.y + B.bounds.size.y) / 2) * B.scale.y
+  · *非主轴防穿模*：在其他两个轴上严格检查包围盒交集，确保无重叠、无穿模
+  · *旋转处理*：如有rotation，先归零再计算bounds，确保与世界坐标系一致
+  · *多层递归贴合*：支持多个物体依次贴合的递归计算，逐层精确处理
+  · *美观度优化*：横向分布合理，确保视觉协调性和操作便利性
+  · *错误防范*：禁止因某轴尺寸较小就简化其他轴的贴合计算，每轴独立精确处理
+
+---
+
+***关键MCP工具映射***
+- **[MCP] mcp_FileSimp_to_absolute_path**
+- **[MCP] mcp_excel_create_workbook**
+- **[MCP] mcp_excel_create_worksheet**
+- **[MCP] mcp_excel_write_data_to_excel**
+- **[MCP] mcp_excel_read_data_from_excel**
+- **[MCP] mcp_FileSimp_rename_files**
+- **[MCP] mcp_DoubaoTTS_volcengine_tts**
+- **[MCP] mcp_DoubaoTTS_list_voice**
+- **[MCP] mcp_MiniMax_text_to_audio**
+- **[MCP] mcp_MiniMax_list_voices**
+- **[MCP] mcp_ElevenLabs_generate_audio**
+- **[MCP] mcp_ElevenLabs_voice_manage**
+- **[MCP] mcp_JiMengAI_generate_image**
+- **[MCP] mcp_MiniMax_text_to_image**
+- **[MCP] mcp_BaiduImageRecognition_baidu_image_recognition**
+- **[MCP] mcp_Picui_picui_api**
+- **[MCP] mcp_Meshy3D_meshy3d_create_task**
+- **[MCP] mcp_Tripo3D_tripo3d_image_to_model**
+- **[MCP] mcp_Hunyuan3D_submitHunyuanTo3DJob**
+- **[MCP] mcp_InstantMeshes_process_model**
+- **[MCP] mcp_unityMCP_import_asset**
+- **[MCP] mcp_unityMCP_glb_batch_convert**
+- **[MCP] mcp_unityMCP_new_scene**
+- **[MCP] mcp_unityMCP_create_object**
+- **[MCP] mcp_unityMCP_instantiate_prefab**
+- **[MCP] mcp_unityMCP_modify_object**
+- **[MCP] mcp_unityMCP_get_object_properties**
+- **[MCP] mcp_unityMCP_get_object_transform_info**
+- **[MCP] mcp_unityMCP_get_all_scene_objects**
+- **[MCP] mcp_unityMCP_camera_panorama_animation**
+- **[MCP] mcp_unityMCP_camera_sweep_animation**
+- **[MCP] mcp_unityMCP_camera_closeup_animation**
+- **[MCP] mcp_unityMCP_create_multipoint_animation**
+- **[MCP] mcp_unityMCP_rotate_around_target_animation**
+- **[MCP] mcp_unityMCP_create_smart_movement_animation**
+- **[MCP] mcp_unityMCP_create_safe_camera_movement**
+- **[MCP] mcp_unityMCP_create_empty_nodegraph**
+- **[MCP] mcp_unityMCP_import_excel_to_nodegraph**
+- **[MCP] mcp_unityMCP_get_scene_info**
+
+---
+
+***错误处理策略***
+- 任何阶段失败必须记录详细错误信息
+- 支持从任意阶段重新开始流程
+- 资源生成失败时自动切换备用工具
+- 音频生成专项错误处理：
+  · 发音错误：自动识别并切换至备用音色/引擎
+  · 语速不当：根据反馈自动调整语速参数
+  · 音质问题：音频后处理优化或重新生成
+  · 格式兼容：自动转换为Unity兼容格式
+  · 音量不一致：批量音量标准化处理
+- 建模流程专项错误处理：
+  · 纹理色彩偏差：立即切换建模引擎，不重复调参
+  · 模型质量问题：优先重新建模而非强制修复
+  · 比例偏差过大（>50%）：提示重新建模而非强制缩放
+  · 每个建模步骤都有质量检查和迭代机制
+- 提供完整的错误诊断和解决建议
+
+---
+
+***目标效果***
+- 一键式课程生成，用户只需输入课程名称
+- 标准化输出，确保所有课程质量一致
+- 自动化程度>95%，最小化人工干预
+- 支持批量课程创建和管理
+
+禁止跳过任何阶段或简化流程。
+允许后续扩展新的课程类型和资源生成工具，但需补充相应的识别规则和工具映射。
+</cursorrules_course_creation>
+
+
+
+
+

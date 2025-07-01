@@ -1,0 +1,14 @@
+{
+    "mcpServers":{
+        "instant-meshes-mcp": {
+            "command": "python",
+            "args": [
+                "你的绝对地址/instant-meshes-mcp/server.py"
+            ],
+            "env": {
+                "PYTHONUNBUFFERED": "1",
+                "BLENDER_PATH":"your_blender3.6_abs_dir"
+            }
+        }
+    }
+}

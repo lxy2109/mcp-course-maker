@@ -1,0 +1,3836 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!29 &1
+OcclusionCullingSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_OcclusionBakeSettings:
+    smallestOccluder: 5
+    smallestHole: 0.25
+    backfaceThreshold: 100
+  m_SceneGUID: 00000000000000000000000000000000
+  m_OcclusionCullingData: {fileID: 0}
+--- !u!104 &2
+RenderSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 9
+  m_Fog: 0
+  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_FogMode: 3
+  m_FogDensity: 0.01
+  m_LinearFogStart: 0
+  m_LinearFogEnd: 300
+  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientIntensity: 1
+  m_AmbientMode: 0
+  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_HaloStrength: 0.5
+  m_FlareStrength: 1
+  m_FlareFadeSpeed: 3
+  m_HaloTexture: {fileID: 0}
+  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
+  m_DefaultReflectionMode: 0
+  m_DefaultReflectionResolution: 128
+  m_ReflectionBounces: 1
+  m_ReflectionIntensity: 1
+  m_CustomReflection: {fileID: 0}
+  m_Sun: {fileID: 0}
+  m_UseRadianceAmbientProbe: 0
+--- !u!157 &3
+LightmapSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 12
+  m_GIWorkflowMode: 1
+  m_GISettings:
+    serializedVersion: 2
+    m_BounceScale: 1
+    m_IndirectOutputScale: 1
+    m_AlbedoBoost: 1
+    m_EnvironmentLightingMode: 0
+    m_EnableBakedLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
+  m_LightmapEditorSettings:
+    serializedVersion: 12
+    m_Resolution: 2
+    m_BakeResolution: 40
+    m_AtlasSize: 1024
+    m_AO: 0
+    m_AOMaxDistance: 1
+    m_CompAOExponent: 1
+    m_CompAOExponentDirect: 0
+    m_ExtractAmbientOcclusion: 0
+    m_Padding: 2
+    m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
+    m_TextureCompression: 1
+    m_FinalGather: 0
+    m_FinalGatherFiltering: 1
+    m_FinalGatherRayCount: 256
+    m_ReflectionCompression: 2
+    m_MixedBakeMode: 2
+    m_BakeBackend: 1
+    m_PVRSampling: 1
+    m_PVRDirectSampleCount: 32
+    m_PVRSampleCount: 512
+    m_PVRBounces: 2
+    m_PVREnvironmentSampleCount: 256
+    m_PVREnvironmentReferencePointCount: 2048
+    m_PVRFilteringMode: 1
+    m_PVRDenoiserTypeDirect: 1
+    m_PVRDenoiserTypeIndirect: 1
+    m_PVRDenoiserTypeAO: 1
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
+    m_PVREnvironmentMIS: 1
+    m_PVRCulling: 1
+    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusIndirect: 5
+    m_PVRFilteringGaussRadiusAO: 2
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
+  m_LightingDataAsset: {fileID: 0}
+  m_LightingSettings: {fileID: 0}
+--- !u!196 &4
+NavMeshSettings:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_BuildSettings:
+    serializedVersion: 3
+    agentTypeID: 0
+    agentRadius: 0.5
+    agentHeight: 2
+    agentSlope: 45
+    agentClimb: 0.4
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
+    minRegionArea: 2
+    manualCellSize: 0
+    cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
+    buildHeightMesh: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
+    debug:
+      m_Flags: 0
+  m_NavMeshData: {fileID: 0}
+--- !u!1 &69537295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 69537298}
+  - component: {fileID: 69537297}
+  - component: {fileID: 69537296}
+  m_Layer: 0
+  m_Name: Directional Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &69537296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69537295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+--- !u!108 &69537297
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69537295}
+  m_Enabled: 1
+  serializedVersion: 10
+  m_Type: 1
+  m_Shape: 0
+  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Intensity: 1
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 2
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+--- !u!4 &69537298
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69537295}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1001 &79614971
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5056451495886474312, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u6BD4\u8272\u76BF2"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.10978161
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0467
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.19887547
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7379514787565686079, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7422343469851046082, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1357
+      objectReference: {fileID: 0}
+    - target: {fileID: 7422343469851046082, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1371
+      objectReference: {fileID: 0}
+    - target: {fileID: 7422343469851046082, guid: 9beed076afe9375429103be0e2772dc9,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.2288
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9beed076afe9375429103be0e2772dc9, type: 3}
+--- !u!1001 &119307088
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 734649560846207741, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0285
+      objectReference: {fileID: 0}
+    - target: {fileID: 734649560846207741, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.096
+      objectReference: {fileID: 0}
+    - target: {fileID: 734649560846207741, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.077
+      objectReference: {fileID: 0}
+    - target: {fileID: 1506368317023738662, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u5E9F\u6DB2\u70E7\u676F"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.116
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1497
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6840543
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7294311
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -93.677
+      objectReference: {fileID: 0}
+    - target: {fileID: 3792840407701543505, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4152669029667093729, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.217
+      objectReference: {fileID: 0}
+    - target: {fileID: 4152669029667093729, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.072
+      objectReference: {fileID: 0}
+    - target: {fileID: 4152669029667093729, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.194
+      objectReference: {fileID: 0}
+    - target: {fileID: 7202271551926537687, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.225
+      objectReference: {fileID: 0}
+    - target: {fileID: 7202271551926537687, guid: 7840663e727c2b744ac24177f1a5022c,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1277
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7840663e727c2b744ac24177f1a5022c, type: 3}
+--- !u!1001 &241289785
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4362179892974016058, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7717321836098111381, guid: ca5e902970bc74341abff5e1b78bed84,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u5B9E\u9A8C\u684C (1)"
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: -4161369568681901532, guid: ca5e902970bc74341abff5e1b78bed84,
+    type: 3}
+--- !u!1001 &465539632
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.881405
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -30.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.15524292
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1880828063306028179, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4206178885150643684, guid: 04f98f638a81c2848a403b017e0c0d81,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u5851\u6599\u6D17\u74F6"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3530505670581812650, guid: badfe716f898065499b7c8c9eedcb4c2,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.042
+      objectReference: {fileID: 0}
+    - target: {fileID: 3530505670581812650, guid: badfe716f898065499b7c8c9eedcb4c2,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.102
+      objectReference: {fileID: 0}
+    - target: {fileID: 3530505670581812650, guid: badfe716f898065499b7c8c9eedcb4c2,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.186
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: badfe716f898065499b7c8c9eedcb4c2, type: 3}
+--- !u!1001 &556670891
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4610611373127045846, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.272
+      objectReference: {fileID: 0}
+    - target: {fileID: 4610611373127045846, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.146
+      objectReference: {fileID: 0}
+    - target: {fileID: 4610611373127045846, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.156
+      objectReference: {fileID: 0}
+    - target: {fileID: 5301001971816871767, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u6BD4\u8272\u76BF1"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.18504007
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0523
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.20510545
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7626181265453757984, guid: da2e6d4825193484d9d6e3fb0bbc07c6,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: da2e6d4825193484d9d6e3fb0bbc07c6, type: 3}
+--- !u!1 &615481958
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 615481960}
+  - component: {fileID: 615481959}
+  m_Layer: 0
+  m_Name: EventManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &615481959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615481958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d59a69dd1b938c14b843d90fd773a8e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: graphs
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[NodeGraph.NodeGraph,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u9ED8\u8BA4"
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: flowEventNodeDatas
+      Entry: 7
+      Data: 2|System.Collections.Generic.List`1[[FlowEventNodeData, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 11
+    - Name: 
+      Entry: 7
+      Data: 3|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: b1209cda-9e35-4df4-9518-39c4a856a098
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 300
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u8BFE\u7A0B\u4ECB\u7ECD"
+    - Name: eventName
+      Entry: 1
+      Data: "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u672C\u5B9E\u9A8C\u5C06\u5E26\u9886\u5927\u5BB6\u5B66\u4E60\u5982\u4F55\u6D4B\u91CF\u7269\u4F53\u52A0\u901F\u5EA6\uFF0C\u638C\u63E1\u57FA\u7840\u7269\u7406\u6D4B\u91CF\u6280\u80FD\u3002\u8BF7\u8BA4\u771F\u5B66\u4E60\u6BCF\u4E2A\u6B65\u9AA4\uFF0C\u786E\u4FDD\u5B89\u5168\u64CD\u4F5C\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 4|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 5|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u4ECB\u7ECD\u5B9E\u9A8C\u76EE\u7684"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u8BB2\u89E3\u5B9E\u9A8C\u76EE\u7684\u548C\u610F\u4E49\uFF0C\u8BF4\u660E\u5B9E\u9A8C\u5185\u5BB9\u548C\u5B66\u4E60\u76EE\u6807\u3002"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u8BFE\u7A0B\u4ECB\u7ECD\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: 
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: 
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 6|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: b9605c6c-e56f-4270-93f5-1f5977534ab3
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 600
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u51C6\u5907\u5B9E\u9A8C\u5668\u6750"
+    - Name: eventName
+      Entry: 1
+      Data: "\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u8BF7\u68C0\u67E5\u6240\u6709\u5B9E\u9A8C\u5668\u6750\u662F\u5426\u9F50\u5168\u4E14\u5B8C\u597D\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 7|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 8|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u4ECE\u5F53\u524D\u70B9\u4F4D\u51FA\u53D1\uFF0C\u5E73\u79FB\u81F3\u5B9E\u9A8C\u53F0\u5168\u666F\uFF0C\u73AF\u7ED5\u4E00\u5468\u540E\u8FD4\u56DE\u521D\u59CB\u70B9\u4F4D"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 7815b4eb-74f1-4b15-b5ce-f0f1c53905c2
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 900
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u5B89\u88C5\u659C\u9762"
+    - Name: eventName
+      Entry: 1
+      Data: "\u56FA\u5B9A\u659C\u9762"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u5C06\u659C\u9762\u7262\u56FA\u5730\u5B89\u88C5\u5728\u5B9E\u9A8C\u53F0\u4E2D\u592E\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 10|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 11|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u56FA\u5B9A\u659C\u9762"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u56FA\u5B9A\u659C\u9762"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u56FA\u5B9A\u659C\u9762\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u56FA\u5B9A\u659C\u9762_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u659C\u9762\uFF0C\u7F13\u6162\u62C9\u8FD1\uFF0C\u89C2\u5BDF\u5B89\u88C5\u8FC7\u7A0B"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 12|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: da1caee2-0751-4bc7-a0e4-da416cb2440d
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1200
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u653E\u7F6E\u5C0F\u8F66"
+    - Name: eventName
+      Entry: 1
+      Data: "\u5C06\u5C0F\u8F66\u653E\u5728\u659C\u9762\u9876\u7AEF"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u8BF7\u5C06\u5C0F\u8F66\u8F7B\u8F7B\u653E\u7F6E\u5728\u659C\u9762\u9876\u7AEF\uFF0C\u51C6\u5907\u91CA\u653E\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 13|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 14|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u653E\u7F6E\u5C0F\u8F66"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u653E\u7F6E\u5C0F\u8F66"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u653E\u7F6E\u5C0F\u8F66\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u653E\u7F6E\u5C0F\u8F66_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u5C0F\u8F66\uFF0C\u7F13\u6162\u62C9\u8FD1\uFF0C\u89C2\u5BDF\u653E\u7F6E\u8FC7\u7A0B"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 15|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 73f25fd2-1c40-4d2f-a266-6817ddc0bfc8
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1500
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u6D4B\u91CF\u957F\u5EA6"
+    - Name: eventName
+      Entry: 1
+      Data: "\u6D4B\u91CF\u659C\u9762\u957F\u5EA6"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u4F7F\u7528\u523B\u5EA6\u5C3A\u6D4B\u91CF\u659C\u9762\u7684\u957F\u5EA6\uFF0C\u5E76\u8BB0\u5F55\u6570\u636E\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 16|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 17|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u6D4B\u91CF\u659C\u9762\u957F\u5EA6"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u6D4B\u91CF\u659C\u9762\u957F\u5EA6"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u6D4B\u91CF\u659C\u9762\u957F\u5EA6\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u6D4B\u91CF\u659C\u9762\u957F\u5EA6_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u523B\u5EA6\u5C3A\u548C\u659C\u9762\uFF0C\u663E\u793A\u6D4B\u91CF\u8FC7\u7A0B"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: cbe0e956-993e-4d49-b285-8bcd93502153
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1800
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u91CA\u653E\u5C0F\u8F66"
+    - Name: eventName
+      Entry: 1
+      Data: "\u91CA\u653E\u5C0F\u8F66\u5E76\u8BA1\u65F6"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u677E\u5F00\u5C0F\u8F66\uFF0C\u8BA9\u5176\u6CBF\u659C\u9762\u4E0B\u6ED1\uFF0C\u540C\u65F6\u7528\u79D2\u8868\u8BA1\u65F6\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 19|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 20|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u91CA\u653E\u5C0F\u8F66"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u91CA\u653E\u5C0F\u8F66"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u91CA\u653E\u5C0F\u8F66\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u91CA\u653E\u5C0F\u8F66_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u8DDF\u968F\u5C0F\u8F66\u8FD0\u52A8\uFF0C\u5C55\u793A\u4E0B\u6ED1\u8FC7\u7A0B"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 21|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 6a98957b-04d3-4716-8378-fd8b8fc48e1f
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 2100
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u8BB0\u5F55\u65F6\u95F4"
+    - Name: eventName
+      Entry: 1
+      Data: "\u8BB0\u5F55\u4E0B\u6ED1\u65F6\u95F4"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u89C2\u5BDF\u79D2\u8868\uFF0C\u8BB0\u5F55\u5C0F\u8F66\u4E0B\u6ED1\u6240\u7528\u65F6\u95F4\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 22|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 23|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u8BB0\u5F55\u65F6\u95F4"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u8BB0\u5F55\u65F6\u95F4"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u8BB0\u5F55\u65F6\u95F4\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u8BB0\u5F55\u65F6\u95F4_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u79D2\u8868\uFF0C\u663E\u793A\u65F6\u95F4\u8BB0\u5F55\u8FC7\u7A0B"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 24|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: a180e3c6-45c2-4fa3-a997-0ce5eea24d2a
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 2400
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u591A\u6B21\u5B9E\u9A8C"
+    - Name: eventName
+      Entry: 1
+      Data: "\u91CD\u590D\u5B9E\u9A8C\u5E76\u8BB0\u5F55\u6570\u636E"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u591A\u6B21\u91CA\u653E\u5C0F\u8F66\uFF0C\u8BB0\u5F55\u6BCF\u6B21\u4E0B\u6ED1\u65F6\u95F4\uFF0C\u53D6\u5E73\u5747\u503C\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 25|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 26|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u91CD\u590D\u5B9E\u9A8C"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u91CD\u590D\u5B9E\u9A8C"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u91CD\u590D\u5B9E\u9A8C\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u91CD\u590D\u5B9E\u9A8C_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u5C55\u793A\u591A\u6B21\u5B9E\u9A8C\u8FC7\u7A0B\uFF0C\u805A\u7126\u6570\u636E\u8BB0\u5F55"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 27|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 33edcaa9-0c97-4306-aa61-93a531878734
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 2700
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u8BA1\u7B97\u52A0\u901F\u5EA6"
+    - Name: eventName
+      Entry: 1
+      Data: "\u8BA1\u7B97\u5C0F\u8F66\u52A0\u901F\u5EA6"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u6839\u636E\u659C\u9762\u957F\u5EA6\u548C\u5E73\u5747\u4E0B\u6ED1\u65F6\u95F4\uFF0C\u8BA1\u7B97\u5C0F\u8F66\u7684\u52A0\u901F\u5EA6\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 28|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 29|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u8BA1\u7B97\u52A0\u901F\u5EA6"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u8BA1\u7B97\u52A0\u901F\u5EA6"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u8BA1\u7B97\u52A0\u901F\u5EA6\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u8BA1\u7B97\u52A0\u901F\u5EA6_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u6570\u636E\u8BB0\u5F55\u672C\uFF0C\u5C55\u793A\u8BA1\u7B97\u8FC7\u7A0B"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 30|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: b0782aa4-5178-4e41-ae6d-43cec85a4ae4
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 3000
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u6574\u7406\u5668\u6750"
+    - Name: eventName
+      Entry: 1
+      Data: "\u6574\u7406\u5B9E\u9A8C\u5668\u6750"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u7ED3\u675F\u540E\uFF0C\u8BF7\u5C06\u6240\u6709\u5668\u6750\u5F52\u4F4D\uFF0C\u4FDD\u6301\u5B9E\u9A8C\u53F0\u6574\u6D01\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 31|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 32|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u6574\u7406\u5668\u6750"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u6574\u7406\u5668\u6750"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u6574\u7406\u5668\u6750\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u6574\u7406\u5668\u6750_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u62C9\u8FDC\uFF0C\u5C55\u793A\u5B9E\u9A8C\u53F0\u5168\u666F"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 33|FlowEventNodeData, Assembly-CSharp
+    - Name: GUID
+      Entry: 1
+      Data: 2fdd1e29-ce7e-490d-8264-01612d1d1e0c
+    - Name: NodeName
+      Entry: 1
+      Data: FlowEventNode
+    - Name: Position
+      Entry: 7
+      Data: UnityEngine.Rect, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 3300
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 100
+    - Name: 
+      Entry: 4
+      Data: 150
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: description
+      Entry: 6
+      Data: 
+    - Name: flowGraph
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u603B\u7ED3"
+    - Name: eventName
+      Entry: 1
+      Data: "\u603B\u7ED3\u5B9E\u9A8C\u8FC7\u7A0B\u4E0E\u6536\u83B7"
+    - Name: eventContent
+      Entry: 1
+      Data: "\u56DE\u987E\u5B9E\u9A8C\u6B65\u9AA4\uFF0C\u603B\u7ED3\u6240\u5B66\u77E5\u8BC6\u548C\u5B9E\u9A8C\u6536\u83B7\u3002"
+    - Name: handTip
+      Entry: 6
+      Data: 
+    - Name: itemCount
+      Entry: 3
+      Data: 0
+    - Name: selectableObectsID
+      Entry: 7
+      Data: 34|System.Collections.Generic.List`1[[GameObjectID, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: selectableObects
+      Entry: 7
+      Data: 35|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: enterEventName
+      Entry: 1
+      Data: "\u5F00\u59CB\u5B9E\u9A8C\u603B\u7ED3"
+    - Name: enterEventContent
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u5B9E\u9A8C\u603B\u7ED3"
+    - Name: exitEventName
+      Entry: 1
+      Data: 
+    - Name: exitEventContent
+      Entry: 1
+      Data: 
+    - Name: voiceName
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u603B\u7ED3\u914D\u97F3"
+    - Name: voiceContent
+      Entry: 6
+      Data: 
+    - Name: inAudioClip
+      Entry: 6
+      Data: 
+    - Name: cameraTimelineName
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u603B\u7ED3_\u955C\u5934"
+    - Name: cameraTimelineContent
+      Entry: 1
+      Data: "\u955C\u5934\u805A\u7126\u6570\u636E\u8BB0\u5F55\u672C\uFF0C\u5C55\u793A\u603B\u7ED3\u8FC7\u7A0B"
+    - Name: objectTimelineName
+      Entry: 1
+      Data: 
+    - Name: objectTimelineContent
+      Entry: 1
+      Data: 
+    - Name: timelineCount
+      Entry: 3
+      Data: 0
+    - Name: timelineAssets
+      Entry: 6
+      Data: 
+    - Name: endActionEnum
+      Entry: 3
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: currentFlowEvent
+      Entry: 6
+      Data: 
+    - Name: combineGroups
+      Entry: 7
+      Data: 36|System.Collections.Generic.List`1[[CombineGroup, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: stateGroups
+      Entry: 7
+      Data: 37|System.Collections.Generic.List`1[[StateGroup, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: baseEventService
+      Entry: 6
+      Data: 
+  advance: 0
+  autoLoadonEnable: 0
+  contentUI: {fileID: 0}
+  eventAudio: {fileID: 0}
+  currentGraph: {fileID: 11400000, guid: edbd661f1893ecb4bbf627a5cbd5aac0, type: 2}
+  isDefaultSetting: 1
+  isEventTrigger: 0000000000000000000000
+  floweventIndex: 0
+  highlightCone: {fileID: 0}
+--- !u!4 &615481960
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 615481958}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &860496270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 860496272}
+  - component: {fileID: 860496271}
+  m_Layer: 0
+  m_Name: AllUnityEvent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &860496271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 860496270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c349a9a53244746419648398465f79e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: flownodeDic
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[FlowEventNodeD,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 29
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u6570\u636E\u8BB0\u5F55\u672C"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u4ECB\u7ECD\u5B9E\u9A8C\u76EE\u7684"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u8BB2\u89E3\u5B9E\u9A8C\u76EE\u7684\u548C\u610F\u4E49\uFF0C\u8BF4\u660E\u5B9E\u9A8C\u5185\u5BB9\u548C\u5B66\u4E60\u76EE\u6807\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u68C0\u67E5\u5668\u5177\u9F50\u5168"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u684C"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u5668\u5177"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u5B9E\u9A8C\u5668\u5177\u662F\u5426\u9F50\u5168\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u5916\u89C2"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u5916\u89C2"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u5916\u89C2"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u7535\u6E90"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u7535\u6E90"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u7535\u6E90\u662F\u5426\u63D2\u5165"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u4EEA\u5668\u6837\u54C1\u5BA4"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6253\u5F00pH\u8BA1\u7535\u6E90"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "pH\u8BA1"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u6253\u5F00\u7535\u6E90"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u6309\u4E0BpH\u8BA1\u7535\u6E90\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: "\u6253\u5F00\u7535\u6E90Exit"
+    - Name: exitDes
+      Entry: 1
+      Data: "\u6570\u503C\u53D8\u5316\uFF1A\u5C4F\u5E55\u663E\u793A--.--"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u53D6\u4E0B\u7535\u6781\u4FDD\u62A4\u5957"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "pH\u8BA1"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u53D6\u4E0B\u4FDD\u62A4\u5957"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u53D6\u4E0B\u7535\u6781\u4FDD\u62A4\u5957\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u51B2\u6D17\u7535\u67811"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5851\u6599\u6D17\u74F6"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u51B2\u6D17\u7535\u67811"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u7528\u84B8\u998F\u6C34\u51B2\u6D17\u7535\u6781\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u51C6\u5907pH\u8BA1\u540E\u7F6E"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 6
+      Data: 
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u51C6\u5907pH\u8BA1\u540E\u7F6E\u4E8B\u4EF6"
+    - Name: enterDes
+      Entry: 6
+      Data: 
+    - Name: exitEvent
+      Entry: 6
+      Data: 
+    - Name: exitDes
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6821\u51C6\u7F13\u51B2\u6EB6\u6DB2pH6.86"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "pH=6.86\u6807\u51C6\u7F13\u51B2\u6EB6\u6DB2"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u6821\u51C6pH6.86"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5C06\u7535\u6781\u653E\u5165pH6.86\u7F13\u51B2\u6EB6\u6DB2\u5E76\u5F00\u59CB\u6821\u51C6\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: "\u6821\u51C6pH6.86Exit"
+    - Name: exitDes
+      Entry: 1
+      Data: "\u6570\u503C\u53D8\u5316\uFF1A\u5C4F\u5E55\u663E\u793A\u4ECE--.--\u53D8\u4E3A6.86"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u51B2\u6D17\u7535\u67812"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5851\u6599\u6D17\u74F6"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u51B2\u6D17\u7535\u67812"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u518D\u6B21\u7528\u84B8\u998F\u6C34\u51B2\u6D17\u7535\u6781\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6821\u51C6\u7F13\u51B2\u6EB6\u6DB2pH4.00"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "pH=4.00\u6807\u51C6\u7F13\u51B2\u6EB6\u6DB2"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u6821\u51C6pH4.00"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5C06\u7535\u6781\u653E\u5165pH4.00\u7F13\u51B2\u6EB6\u6DB2\u4E2D\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: "\u6821\u51C6pH4.00Exit"
+    - Name: exitDes
+      Entry: 1
+      Data: "\u6570\u503C\u53D8\u5316\uFF1A\u5C4F\u5E55\u663E\u793A\u4ECE6.86\u53D8\u4E3A4.00"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u5B8C\u6210\u6821\u51C6\u5E76\u51B2\u6D17\u7535\u6781"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5851\u6599\u6D17\u74F6"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5B8C\u6210\u6821\u51C6\u51B2\u6D17"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u51B2\u6D17\u7535\u6781\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6D4B\u91CF\u6837\u54C1pH\u503C"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5F85\u6D4B\u6EB6\u6DB2\u70E7\u676F"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u6D4B\u91CF\u6837\u54C1"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5C06\u7535\u6781\u653E\u5165\u5F85\u6D4B\u6EB6\u6DB2\u4E2D\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: "\u6D4B\u91CF\u6837\u54C1Exit"
+    - Name: exitDes
+      Entry: 1
+      Data: "\u6570\u503C\u53D8\u5316\uFF1A\u5C4F\u5E55\u663E\u793A\u4ECE4.00\u53D8\u4E3A8.25"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u8BB0\u5F55pH\u503C"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u8BB0\u5F55\u672C"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u8BB0\u5F55pH\u503C"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5728\u7B14\u8BB0\u672C\u4E0A\u8BB0\u5F55\u6570\u636E\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: "\u8BB0\u5F55pH\u503CExit"
+    - Name: exitDes
+      Entry: 1
+      Data: "\u8BB0\u5F55\uFF1A\u5F85\u6D4B\u6EB6\u6DB2\u7684pH\u503C\u4E3A8.25"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6E05\u6D17\u7535\u6781\u5E76\u76D6\u4E0A\u4FDD\u62A4\u5957"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "pH\u8BA1"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u6E05\u7406\u7535\u6781"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u51B2\u6D17\u5E76\u4FDD\u62A4\u7535\u6781\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u5173\u95EDpH\u8BA1\u7535\u6E90"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "pH\u8BA1"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u5173\u95ED\u7535\u6E90"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5173\u95EDpH\u8BA1\u7535\u6E90\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: "\u5173\u95ED\u7535\u6E90Exit"
+    - Name: exitDes
+      Entry: 1
+      Data: "\u6570\u503C\u53D8\u5316\uFF1A\u5C4F\u5E55\u7184\u706D"
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u7ED3\u675F"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u684C"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5B8C\u6210\u5B9E\u9A8C"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5B8C\u6210\u6240\u6709\u64CD\u4F5C\u3002"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6E05\u7406\u5B9E\u9A8C\u53F0\u540E\u7F6E"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 6
+      Data: 
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u6E05\u7406\u5B9E\u9A8C\u53F0\u540E\u7F6E\u4E8B\u4EF6"
+    - Name: enterDes
+      Entry: 6
+      Data: 
+    - Name: exitEvent
+      Entry: 6
+      Data: 
+    - Name: exitDes
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u53F0"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u68C0\u67E5\u5B9E\u9A8C\u5668\u6750"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u56FA\u5B9A\u659C\u9762"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u659C\u9762"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u56FA\u5B9A\u659C\u9762"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u56FA\u5B9A\u659C\u9762"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u5C06\u5C0F\u8F66\u653E\u5728\u659C\u9762\u9876\u7AEF"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5C0F\u8F66"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u653E\u7F6E\u5C0F\u8F66"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u653E\u7F6E\u5C0F\u8F66"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6D4B\u91CF\u659C\u9762\u957F\u5EA6"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u523B\u5EA6\u5C3A"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u6D4B\u91CF\u659C\u9762\u957F\u5EA6"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u6D4B\u91CF\u659C\u9762\u957F\u5EA6"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u91CA\u653E\u5C0F\u8F66\u5E76\u8BA1\u65F6"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5C0F\u8F66"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u91CA\u653E\u5C0F\u8F66"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u91CA\u653E\u5C0F\u8F66"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u8BB0\u5F55\u4E0B\u6ED1\u65F6\u95F4"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u79D2\u8868"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u8BB0\u5F55\u65F6\u95F4"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u8BB0\u5F55\u65F6\u95F4"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u91CD\u590D\u5B9E\u9A8C\u5E76\u8BB0\u5F55\u6570\u636E"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5C0F\u8F66"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u91CD\u590D\u5B9E\u9A8C"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u91CD\u590D\u5B9E\u9A8C"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u8BA1\u7B97\u5C0F\u8F66\u52A0\u901F\u5EA6"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u6570\u636E\u8BB0\u5F55\u672C"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u8BA1\u7B97\u52A0\u901F\u5EA6"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u8BA1\u7B97\u52A0\u901F\u5EA6"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u6574\u7406\u5B9E\u9A8C\u5668\u6750"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u53F0"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u6574\u7406\u5668\u6750"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u6574\u7406\u5668\u6750"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: "\u603B\u7ED3\u5B9E\u9A8C\u8FC7\u7A0B\u4E0E\u6536\u83B7"
+    - Name: $v
+      Entry: 7
+      Data: FlowEventNodeD, Assembly-CSharp
+    - Name: flowgraph
+      Entry: 6
+      Data: 
+    - Name: currentClickObj
+      Entry: 1
+      Data: "\u6570\u636E\u8BB0\u5F55\u672C"
+    - Name: enterEvent
+      Entry: 1
+      Data: "\u5F00\u59CB\u5B9E\u9A8C\u603B\u7ED3"
+    - Name: enterDes
+      Entry: 1
+      Data: "\u5B9E\u9A8C\u4EBA\u5458\u5F00\u59CB\u5B9E\u9A8C\u603B\u7ED3"
+    - Name: exitEvent
+      Entry: 1
+      Data: 
+    - Name: exitDes
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: objectpartobj
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.String,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 1
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HoldDict
+      Entry: 7
+      Data: 3|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[System.String,
+        mscorlib]], mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 1
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HoldForCombineDict
+      Entry: 7
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Collections.Generic.List`1[[System.String,
+        mscorlib]], mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 1
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+--- !u!4 &860496272
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 860496270}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1028508037
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2889693517305373464, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_Name
+      value: tmp_t7cuh3n
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.363
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.054555
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105450671928439515, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 3150474306388093854, guid: 5fb40fe5470a72c4d92aa1d0282f87b3,
+    type: 3}
+--- !u!1001 &1211125830
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5936353050094417625, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u7535\u6E90\u7EBF"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.099999994
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.099999994
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.099999994
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.226
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.056
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.009
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8225679464403122094, guid: 69f6c260c1b5bd646a5e4ca439ce11bf,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 69f6c260c1b5bd646a5e4ca439ce11bf, type: 3}
+--- !u!1001 &1539964318
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.23959476
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0456
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.18267943
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400885035070765769, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687955259455683518, guid: 6f131473351c3f94994f2ae8e21dfc13,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u6BD4\u8272\u76BF3"
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6f131473351c3f94994f2ae8e21dfc13, type: 3}
+--- !u!1001 &1643678142
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.3814473
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.06888932
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.16375887
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7164877
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.69759977
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 88.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 5893898237416665572, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8182485791605485715, guid: 23410d0a04118e94eba8efbbbbde6797,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u7B14\u8BB0\u672C"
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 23410d0a04118e94eba8efbbbbde6797, type: 3}
+--- !u!1001 &1800849832
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1156017
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0459
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.11921376
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 884906578588711063, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3171241784935823840, guid: 1cd8297ed5572394d9b2ffdeb0f14f28,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u64E6\u62ED\u68C9\u7403"
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1cd8297ed5572394d9b2ffdeb0f14f28, type: 3}
+--- !u!1001 &1947004382
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4814140183114437194, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u5B9E\u9A8C\u684C"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.21728721
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.6864686
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6147826009795423660, guid: b8f4aa2e1be644544a5bb34763cc5456,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 3150474306388093854, guid: b8f4aa2e1be644544a5bb34763cc5456,
+    type: 3}
+--- !u!1 &2007701823
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2007701826}
+  - component: {fileID: 2007701825}
+  - component: {fileID: 2007701824}
+  - component: {fileID: 2007701827}
+  m_Layer: 0
+  m_Name: Main Camera
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!81 &2007701824
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007701823}
+  m_Enabled: 1
+--- !u!20 &2007701825
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007701823}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!4 &2007701826
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007701823}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.273199, y: -0, z: -0, w: 0.9619576}
+  m_LocalPosition: {x: 0, y: 1.2, z: -1.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 31.709, y: 0, z: 0}
+--- !u!114 &2007701827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007701823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+--- !u!1001 &2063897985
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1720982367417892525, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_Name
+      value: "\u7D2B\u5916\u7EBF\u5149\u5EA6\u8BA1"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.14428982
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.117
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.149
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4010308244771799002, guid: 9ae259c1d1cba7b4e8d69b6056e787bb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9ae259c1d1cba7b4e8d69b6056e787bb, type: 3}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 2007701826}
+  - {fileID: 69537298}
+  - {fileID: 860496272}
+  - {fileID: 615481960}
+  - {fileID: 465539632}
+  - {fileID: 1800849832}
+  - {fileID: 556670891}
+  - {fileID: 79614971}
+  - {fileID: 1539964318}
+  - {fileID: 1211125830}
+  - {fileID: 1643678142}
+  - {fileID: 2063897985}
+  - {fileID: 119307088}
+  - {fileID: 1947004382}
+  - {fileID: 1028508037}
+  - {fileID: 241289785}

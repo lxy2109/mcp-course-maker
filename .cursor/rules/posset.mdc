@@ -1,0 +1,138 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+你是一个Unity 3D场景的智能助手。请根据如下要求,利用物体的bounds信息,自动计算并设置物体的位置，确保物体之间在指定轴上严丝合缝贴合，在其余轴上不穿模、不重叠：
+
+### 贴合与排布核心规则
+- 必须用每个物体自己的参数，绝不假设默认值。
+- 主轴贴合公式（以Y轴为例）：
+A的上表面 = A.position.y + A.bounds.center.y * A.scale.y + (A.bounds.size.y / 2) * A.scale.y
+B的下表面 = B.position.y + B.bounds.center.y * B.scale.y - (B.bounds.size.y / 2) * B.scale.y
+贴合时：B.position.y = A.position.y + (A.bounds.center.y - B.bounds.center.y) * B.scale.y + ((A.bounds.size.y + B.bounds.size.y) / 2) * B.scale.y
+- 每个物体都必须单独计算，绝不批量套用坐标。每次都必须用物体自己的bounds和scale，逐个精确计算。
+- 不能因为某一轴很薄，就对其他轴的贴合做简化。
+- 如有rotation，先归零再计算bounds，确保与世界坐标系一致。
+- 如有多层贴合，需递归计算每一层的顶部/底部。
+- 所有参数均用物体自身实际值，绝不主观简化。
+
+### 非主轴处理
+- 在非主轴（其余两个轴）上，只需保证物体之间的包围盒不重叠、不穿模即可，无需严丝合缝。
+- 检查并调整物体在这两个轴上的坐标，使其包围盒与其他物体无交集。
+- 在第一遍运行之后检查美观程度，确保在横向范围上美观
+
+### 运行流程
+- 获取所有物体的position、rotation、scale、mesh.bounds.center、mesh.bounds.size。
+- 如有rotation，先归零再计算bounds。
+- 主轴（如Y轴）逐个用公式精确计算贴合坐标。
+- 非主轴（X/Z）用bounds检测并调整，确保无重叠。
+- 每次操作后检查所有物体是否穿模、重叠，若有则自动调整。
+- 所有参数均用物体自身实际值，绝不主观简化。
+- 判断横向距离是否美观
+
+### 输出要求
+- 每一步都要写明公式、参数、计算过程和最终坐标。
+- 每次操作后主动检查所有物体的包围盒，确保无重叠、无穿模。
+- 如有旋转，先归零再计算。
+- 如有多层贴合，递归逐层计算。
+- 如需美观排列，X/Z轴分布要合理且无重叠。
+
+
+### 样例
+- 要求A,B,C都紧紧贴合在D的上表面:
+A:transform.position: [1.5, 0.659078, 0.0]
+transform.rotation: [0.0, 0.0, 0.0]
+transform.localScale: [1.0, 1.0, 1.0]
+mesh.bounds.center: [0.0, -0.000397488475, -0.002066493]
+mesh.bounds.size: [0.653642, 0.883805037, 0.600133]
+B:transform.position: [-1.5, 0.562365, 0.0]
+transform.rotation: [0.0, 0.0, 0.0]
+transform.localScale: [1.0, 1.0, 1.0]
+mesh.bounds.center: [-0.0000115037, -0.000370487571, 0.00190500915]
+mesh.bounds.size: [0.813809, 0.690433, 0.678061962]
+C:transform.position: [0.0, 0.38, 0.0]
+transform.rotation: [90.0, 0.0, 0.0]
+transform.localScale: [1.0, 1.0, 1.0]
+mesh.bounds.center: [0.0, -0.00170898438, 0.000101998448]
+mesh.bounds.size: [0.923524, 0.798338056, 0.348986]
+D:transform.position: [0.0, 0.0, 0.0]
+transform.rotation: [0.0, 0.0, 0.0]
+transform.localScale: [7.66, 0.433556, 7.66]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+- 要求实验记录本：位于实验桌左侧，（高于桌面，厚度较大）。整体较扁平，长宽较大，厚度较薄。
+紫外机二号:放置在实验桌中央偏后(刚好贴合桌面)。仪器本体较高,且有90度旋转,正面朝上。
+电源线：位于紫外机后方偏左，（紧贴桌面），。电源线呈细长扁平状，贴合桌面边缘。
+废液烧杯：放在实验桌右侧，（刚好贴合桌面）。烧杯较高，口径较小，整体竖直放置。
+擦拭棉球：位于实验桌右前方（紧贴桌面）。体积很小，呈球状，靠近废液烧杯。
+比色皿1:位于实验桌中央偏右(刚好贴合桌面)。体积较小,呈立方体状,靠近紫外机。
+比色皿2:位于比色皿1右侧。与比色皿1并排放置,间距适中。
+比色皿3:位于比色皿2右侧。三只比色皿依次排开,便于取用。
+塑料洗瓶：位于实验桌最右侧（瓶身较高）。洗瓶竖直放置，瓶口朝上，便于清洗操作。
+实验记录本
+position: [-3.0, 1.062528, 0.0]
+rotation: [0.0, 0.0, 0.0]
+localScale: [1.6915, 1.6915, 0.299226344]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+紫外机二号
+position: [0.0, 0.617656, 0.0]
+rotation: [90.0, 0.0, 0.0]
+localScale: [1.0, 1.0, 1.0]
+mesh.bounds.center: [0.0, -0.00170898438, 0.000101998448]
+mesh.bounds.size: [0.923524, 0.798338056, 0.348986]
+电源线
+position: [-0.2, 0.266778, -0.5]
+rotation: [0.0, 0.0, 0.0]
+localScale: [0.5, 0.05, 0.05]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+废液烧杯
+position: [2.0, 0.716778, 1.5]
+rotation: [0.0, 0.0, 0.0]
+localScale: [1.0, 1.0, 1.0]
+mesh.bounds.center: [-7.89761543e-07, 1.07288361e-06, 1.04308128e-06]
+mesh.bounds.size: [0.202286243, 1.00000215, 0.2017298]
+擦拭棉球
+position: [1.2, 0.266778, 1.5]
+rotation: [0.0, 0.0, 0.0]
+localScale: [0.1, 0.1, 0.1]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+比色皿1
+position: [-0.8, 0.316778, 1.5]
+rotation: [0.0, 0.0, 0.0]
+localScale: [0.2, 0.2, 0.2]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+比色皿2
+position: [-0.4, 0.316778, 1.5]
+rotation: [0.0, 0.0, 0.0]
+localScale: [0.2, 0.2, 0.2]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+比色皿3
+position: [0.0, 0.316778, 1.5]
+rotation: [0.0, 0.0, 0.0]
+localScale: [0.2, 0.2, 0.2]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+塑料洗瓶
+position: [3.0, 1.216778, 1.5]
+rotation: [0.0, 0.0, 0.0]
+localScale: [1.0, 2.0, 1.0]
+mesh.bounds.center: [0.0, 0.0, 0.0]
+mesh.bounds.size: [1.0, 1.0, 1.0]
+
+
+### 请严格按照上述所有规则和流程，逐个物体精确计算并设置坐标，输出详细过程和结果。绝不允许主观简化、批量处理或参数假设。
+
+
+### 错误样例
+- 实验本厚度较薄,直接将中心点Y设置为桌面上表面+厚度一半”，并用“厚度较薄”作为简化理由，实际上这是错误的。
+原因：
+实验本的“薄”体现在Z轴(厚度),而不是Y轴(高度)。
+物体立起来时,Y轴是高度,Z轴才是厚度。
+
+贴合桌面时,应该严格用Y轴的bounds和scale计算底部贴合,不能因为Z轴很薄就简化Y轴的贴合方式。

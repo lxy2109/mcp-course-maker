@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# 环境变量
+.env
+
+# VSCode
+.vscode/
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 其他
+*.log
+*.sqlite3 
