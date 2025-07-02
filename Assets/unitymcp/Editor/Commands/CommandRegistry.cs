@@ -98,6 +98,7 @@ namespace UnityMCP.Editor.Commands
             //EventObject control commands
             { "FLOW_EVENT_FORTH",parameters => EventCommandHandler.FlowEventForth(parameters)},
             {"ADD_EVENT_OBJECT", parameters => EventCommandHandler.AddEventObject(parameters)},
+            {"CREATE_BASE" , parameters => EventCommandHandler.CreateBase(parameters)},
             //Event control commands
             { "ADD_GRAPH_POOL", parameters => NodeGraphCommandHandler.AddGraphPool(parameters)},
             // { "ADD_EVENT", _ => EventCommandHandler.AddEvent()},

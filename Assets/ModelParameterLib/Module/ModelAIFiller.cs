@@ -301,30 +301,33 @@ namespace ModelParameterLib.Module
 
         private string BuildPlacementPrompt(string itemName, string sceneHint)
         {
-            // 优化AI提示词，强调mesh主面法线分析和front_dir返回
-            string extraRules = @"
-- You must analyze the object's mesh bounds, proportions, and geometry (center, size, scale, main faces, normals) to infer the most reasonable world euler angles for rotation and the object's front direction.
-- The front_dir field must be a normalized vector (e.g. [0,0,1]) representing the object's main display/opening/button/most detailed side in its local space. If the object is a book, card, or board, the front_dir is the normal of the largest face. For a lamp or tube, the front_dir is the direction the lamp/tube points. For a display, opening, or button, make that side the front_dir.
-- The rotation field must represent the world euler angles (in degrees) that make the object's bottom flush with the tabletop (Y+ up), and its front_dir face the positive Z axis in world space. If the object is already correctly oriented, return [0,0,0]. Otherwise, provide the necessary rotation.
-- The position field is the offset (in meters) of the object's center relative to the parent object's center (e.g. the table), not a world coordinate.
-- Do not return offset or main_axis fields.
-- Example: For a beaker, rotation should be [0,0,0], front_dir [0,0,1]; for a sideways table, rotation might be [0,0,90], front_dir [0,0,1]; for a lamp with a button on one side, rotation should make the button face Z+, front_dir [0,0,1].
-- Only return JSON with the following fields: parent, position, rotation, front_dir, layout_mode, group. Do not explain anything.
-";
-            string scenePart = string.IsNullOrEmpty(sceneHint) ? "" : $", scene description: {sceneHint}";
+            // 获取场景名（UnityEditor环境下）
+            string sceneName = "";
+#if UNITY_EDITOR
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            sceneName = scene.name;
+#endif
+            // 获取场景中所有可选父物体名和所有模型名
+            var root = GameObject.Find("GameObjectRoot");
+            List<string> parentNames = new List<string>();
+            List<string> modelNames = new List<string>();
+            if (root != null)
+            {
+                foreach (Transform child in root.transform)
+                {
+                    parentNames.Add(child.name);
+                    modelNames.Add(child.name);
+                }
+            }
+            string parentList = string.Join("、", parentNames);
+            string modelList = string.Join("、", modelNames);
+
+            string extraRules = $"\n- parent字段必须从以下物体名称中选择：[{parentList}]，不要创造新名称。\n- 当前场景包含的所有模型名称为：[{modelList}]。\n- 你只需分析parent（父物体/依附对象）、group（分组名/功能组）、layout_mode（推荐分布方式：Linear/Grid/Circle）、is_main_model（是否为主要模型，true/false），不要返回具体的position，所有空间布局将由代码自动完成。\n- \"主要模型\"定义：通常为场景核心设备、实验主对象、桌面等。请根据场景名和所有模型名，智能判断当前物体是否为主要模型。\n- 只返回JSON，不要解释。\n- 当前场景名称：{sceneName}。\n";
+            string scenePart = string.IsNullOrEmpty(sceneHint) ? "" : $"\n{sceneHint}";
             string prompt =
-                "You are an intelligent assistant for Unity 3D scenes. According to the item name \"" + itemName + "\"" + scenePart + ",\n"
+                $"你是Unity 3D场景的智能助手。根据物品名称\"{itemName}\"{scenePart}，\n"
                 + extraRules +
-@"
-Intelligently recommend its best placement in a virtual experiment scene. Return JSON with the following fields:
-- parent: recommended parent object to attach to (e.g. '实验桌')
-- position: recommended offset relative to the parent center (e.g. [0.2, 0, 0], unit: meters)
-- rotation: recommended world euler angles (e.g. [0, 90, 0], unit: degrees)
-- front_dir: the object's main front direction in its local space (e.g. [0,0,1])
-- layout_mode: layout mode (Linear, Grid, Circle)
-- group: group name if any, otherwise leave empty
-Only return JSON, do not explain. The position field must be the offset relative to the parent center, not a world coordinate.";
-            Debug.Log($"[ModelAIFiller] BuildPlacementPrompt: {prompt}");
+"请智能推荐其在虚拟实验场景中的最佳结构关系。只返回如下JSON字段：\n- parent: 推荐父物体（必须从上面列表中选）\n- group: 推荐分组名（如有，由AI智能分析赋值）\n- layout_mode: 推荐分布方式（Linear/Grid/Circle）\n- is_main_model: 是否为主要模型（true/false）\n";
             return prompt;
         }
 

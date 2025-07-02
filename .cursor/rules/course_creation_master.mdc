@@ -77,7 +77,11 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
     - 场景保存在Assets/{课程名称} 目录下
     - 新场景中需要调用 **[MCP] mcp_unityMCP_create_object** 创建Directional Light 和 Main Camera
     - 设置Main Camera的tag为MainCamera
-    - 实例化Assets/Prefabs/MCP/Canvas.prefab在场景中
+    - 调用 **[MCP] mcp_unitymcp_create_base** 创建场景内的基础物件，你需要传入该课程的名称并根据传入的课程名称使用以下格式生成学习目标：
+    【实验目的】
+    1. [具体学习目标内容]
+    2. [具体学习目标内容]
+    一并传入。
   * 调用 **[MCP] mcp_unityMCP_glb_batch_convert** ("Assets/{课程名称}")
     - 工具实现代码为"GLBToPrefabBatchConverter.cs"
     - 预制件存储位置为 **[PATH] Assets/{课程名称}/Prefabs**
@@ -108,11 +112,11 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
 - [阶段9：完整资产关联到节点]
   * 输入：Excel数据和对应课程空的nodegraph
   * 关联策略：
-    - 音频资产关联：将 **[PATH] Assets/{课程名称}/Audio/** 中的音频文件关联到对应节点
-    - Timeline资产关联：将 **[PATH] Assets/{课程名称}/Timeline/** 中的相机和物体动画关联到对应节点
-    - 模型实例关联：将场景中实例化的模型GameObject引用关联到对应节点
+  * 工具1：**[MCP] mcp_unityMCP_import_excel_to_nodegraph**
+    - 首先使用该工具把excel导入到nodegraph当中并注册该nodegraph
     - 数据完整性验证：确保Excel中每行数据都能找到对应的资产引用
-  * 工具：**[MCP] mcp_unityMCP_import_excel_to_nodegraph**
+  * 工具2： **[MCP] mcp_unityMCP_flow_event_forth**
+    - 输入：当前的课程名称
   * 智能匹配算法：
     - 精确匹配：优先按名称精确匹配资产
     - 模糊匹配：支持部分名称匹配和关键词匹配

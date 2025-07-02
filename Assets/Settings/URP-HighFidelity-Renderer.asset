@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5231839384046391649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d111dc2a0b22b142804f4d59508b893, type: 3}
+  m_Name: EPO Feature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &-1878332245247344467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,6 +68,7 @@ MonoBehaviour:
   - {fileID: -1878332245247344467}
   - {fileID: 107073755136856818}
   - {fileID: 0}
+  - {fileID: -5231839384046391649}
   m_RendererFeatureMap: adc0de57c6d2eee5f212b35303677c01d62ecbb89b446d06
   m_UseNativeRenderPass: 1
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

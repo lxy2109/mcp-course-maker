@@ -10,10 +10,45 @@ using System.Threading.Tasks;
 using System.Reflection;
 using UnityEngine.Events;
 using System.Linq;
-using UnityEditor.Timeline.Actions;
+using EPOOutline;
 
 #if UNITY_EDITOR
 #endif
+
+public enum HighlightType
+{
+    /// <summary>
+    /// 使用提示符高亮（默认方式）
+    /// </summary>
+    Prompt,
+
+    /// <summary>
+    /// 使用材质高亮
+    /// </summary>
+    OutLine,
+
+    /// <summary>
+    /// 同时使用提示符和材质高亮
+    /// </summary>
+    Both
+}
+
+public enum OutlineType
+{
+    None,
+    /// <summary>
+    /// 呼吸灯
+    /// </summary>
+    WidthBreathing,
+
+    /// <summary>
+    /// 颜色闪烁效果
+    /// </summary>
+    ColorBlinking,
+}
+
+
+
 
 /// <summary>
 /// 事件管理器 - 场景单例类
@@ -143,8 +178,15 @@ public class EventManager : SceneSingleton<EventManager>
     // 新增：UI动画服务类
     private UIEventService uiService;
     private TimelineService timelineService;  
-    private HighlightService highlightService;
+    public HighlightService highlightService;
     public BaseEventService baseEventService;
+
+    #region Camera
+    private Camera camera;
+    private Vector3 cameraOriginalPosition;
+    private Quaternion cameraOriginalRotation;
+    #endregion
+
 
     /// <summary>
     /// 启动时初始化
@@ -164,6 +206,9 @@ public class EventManager : SceneSingleton<EventManager>
         showUI = GameObject.Find("Canvas").transform.GetChild(3);
         targetpos = GameObject.Find("Canvas").transform.GetChild(5).transform.position;
         originalpos = GameObject.Find("Canvas").transform.GetChild(4).transform.position;
+        contentUI = GameObject.Find("Canvas").transform.GetChild(3).transform.GetComponentInChildren<TextMeshProUGUI>();
+        eventAudio = GameObject.Find("AudioManager").GetComponent<AudioSource>();    
+
 
         uiService = new UIEventService(showUI, targetpos, originalpos);
         timelineService = new TimelineService();
@@ -171,11 +216,22 @@ public class EventManager : SceneSingleton<EventManager>
         baseEventService = new BaseEventService();
         highlightService.SetCoroutineHost(this);
 
-        // 注册事件
+        
         uiService.OnUIAnimationComplete += () => Debug.Log("UI动画完成");
         timelineService.OnTimelineComplete += (data) => Debug.Log($"Timeline完成: {data.eventName}");
 
-        
+
+        camera = Camera.main;
+
+        // 保存摄像机的初始位置和旋转值
+        if (camera != null)
+        {
+            cameraOriginalPosition = camera.transform.position;
+            cameraOriginalRotation = camera.transform.rotation;
+            Debug.Log($"摄像机初始位置已保存: {cameraOriginalPosition}");
+        }
+
+        // 注册事件
         AddEvents();
     }
 
@@ -343,7 +399,9 @@ public class EventManager : SceneSingleton<EventManager>
 
         // 切换节点前只终止并重置UI动画和高亮动画
         uiService.StopUIAnimationAndReset();
-
+        TimelineManager.instance.ForceStopAllTimelines();
+        ResetCameraPos();
+       
         if (highlightService != null)
         {
             highlightService.HideHighlight();
@@ -442,7 +500,9 @@ public class EventManager : SceneSingleton<EventManager>
 
         if (highlightService != null)       
             highlightService.HideHighlight();
-        
+
+        TimelineManager.instance.ForceStopAllTimelines();
+        ResetCameraPos();
         // 播放事件音频，先停止前一个音频
         if (eventAudio)
         {
@@ -747,10 +807,7 @@ public class EventManager : SceneSingleton<EventManager>
             if (action != null)
                 await action();
         });
-    }
-
-
-    
+    } 
 
     /// <summary>
     /// 查找所有实现了IEventListeners接口的组件并注册事件。
@@ -907,6 +964,20 @@ public class EventManager : SceneSingleton<EventManager>
     }
 
 
+    public void ResetCameraPos()
+    {
+        if (camera != null)
+        {
+            camera.transform.position = cameraOriginalPosition;
+            camera.transform.rotation = cameraOriginalRotation;
+            Debug.Log($"摄像机已重置到初始位置: {cameraOriginalPosition}");
+        }
+        else
+        {
+            Debug.LogError("Camera is null!");
+        }
+    }
+
     #region 辅助类
 
     /// <summary>
@@ -1052,25 +1123,90 @@ public class EventManager : SceneSingleton<EventManager>
     /// <summary>
     /// 高亮服务类，负责高亮物体的显示、动画、协程管理。
     /// </summary>
-    private class HighlightService
+    [Serializable]
+    public class HighlightService
     {
-        
+
         private GameObject highlightCone;
         private Sequence floatSequence;
-        private Coroutine highlightCoroutine;
+        private Coroutine highlightCoroutine; 
         private GameObject lastHighlightTarget = null;
         private MonoBehaviour coroutineHost;
+        private Dictionary<Outlinable, Tween> outlineTweens = new Dictionary<Outlinable, Tween>();
+
+
+        [SerializeField]
+        private HighlightType highlightType = HighlightType.Prompt;
+        [SerializeField]
+        private OutlineType outlineType = OutlineType.None;
+        [SerializeField]
+        private List<GameObject> highlightedObjects = new List<GameObject>();
+
+
+        [Header("常亮效果")]
+        [SerializeField] private int lightDur = 8;
+
+        [Header("宽度呼吸效果")]
+        [SerializeField]private float startWidth = 2f;
+        [SerializeField]private float endWidth = 10f;
+        [SerializeField]private float widthDuration = .5f;
+        [SerializeField]private int widthLoops = 8;
+        [SerializeField]private Ease widthEase = Ease.InOutSine;
+
+        [Header("颜色闪烁效果")]
+        [SerializeField] private Color startColor = Color.yellow;
+        [SerializeField] private Color endColor = Color.red;
+        [SerializeField] private float colorDuration = .5f;
+        [SerializeField] private int colorLoops = 8;
+        [SerializeField] private Ease colorEase = Ease.InOutSine;
+
+
 
         public HighlightService(GameObject highlightCone)
         {
-            this.highlightCone = highlightCone;
-            if (highlightCone != null)
+            this.highlightCone = highlightCone;          
+            if (highlightCone == null)
+            {
+                this.highlightCone = LoadDefaultPromptPrefab();
+            }
+            else
+            {
                 highlightCone.SetActive(false); // 初始化时隐藏
+            }
+
         }
 
         public void SetCoroutineHost(MonoBehaviour host)
         {
             this.coroutineHost = host;
+        }
+
+        /// <summary>
+        /// 选择物体高亮的形式
+        /// </summary>
+        public void NextHighlightType()
+        {
+            highlightType = highlightType switch
+            {
+                HighlightType.Prompt => HighlightType.OutLine,
+                HighlightType.OutLine => HighlightType.Both,
+                HighlightType.Both => HighlightType.Prompt,
+                _ => HighlightType.Prompt
+            };
+        }
+
+        /// <summary>
+        /// 选择外缘线的形式
+        /// </summary>
+        public void NextOutlineType()
+        {
+            outlineType = outlineType switch
+            {
+                OutlineType.None => OutlineType.WidthBreathing,
+                OutlineType.WidthBreathing => OutlineType.ColorBlinking,
+                OutlineType.ColorBlinking => OutlineType.None,
+                _ => OutlineType.None
+            };
         }
 
         /// <summary>
@@ -1085,7 +1221,31 @@ public class EventManager : SceneSingleton<EventManager>
                 // 已在高亮，无需重复
                 return;
             }
+
             lastHighlightTarget = target;
+
+            // 根据高亮方式执行不同的高亮逻辑
+            switch (highlightType)
+            {
+                case HighlightType.Prompt:
+                    ShowPromptHighlight(target);
+                    break;
+                case HighlightType.OutLine:
+                    ShowOutlineHighlight(target);
+                    break;
+                case HighlightType.Both:
+                    ShowPromptHighlight(target);
+                    ShowOutlineHighlight(target);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 显示提示符高亮
+        /// </summary>
+        /// <param name="target">目标物体</param>
+        private void ShowPromptHighlight(GameObject target)
+        {
             if (coroutineHost != null)
             {
                 if (highlightCoroutine != null)
@@ -1093,24 +1253,33 @@ public class EventManager : SceneSingleton<EventManager>
                     coroutineHost.StopCoroutine(highlightCoroutine);
                 }
                 highlightCoroutine = coroutineHost.StartCoroutine(ShowHighlightCoroutine(target));
+                highlightedObjects.Add(target);
             }
         }
 
-        /// <summary>
-        /// 隐藏高亮动画。
-        /// </summary>
-        public void HideHighlight()
+        #region 标识符
+        private GameObject LoadDefaultPromptPrefab()
         {
-            lastHighlightTarget = null;
-            if (coroutineHost != null && highlightCoroutine != null)
+            try
             {
-                coroutineHost.StopCoroutine(highlightCoroutine);
-                highlightCoroutine = null;
+                GameObject defaultPromptPrefab = Resources.Load<GameObject>("Course/Prefabs/默认提示标");
+                if (defaultPromptPrefab == null)
+                {
+                    Debug.LogWarning("【高亮服务】无法加载默认提示标预制体，请检查路径：Assets/Resources/Course/Prefabs/默认提示标.glb");
+                    return null;
+                }
+                else
+                {
+                    GameObject promptInstance = Instantiate(defaultPromptPrefab, Vector3.zero, Quaternion.identity);
+                    Debug.Log("【高亮服务】成功加载默认提示标预制体");
+                    return promptInstance;
+                }
             }
-            if (highlightCone != null)
-                highlightCone.SetActive(false);
-            if (floatSequence != null)
-                floatSequence.Kill();
+            catch (System.Exception e)
+            {
+                Debug.LogError($"【高亮服务】加载默认提示标预制体时发生错误：{e.Message}");
+                return null;
+            }
         }
 
         /// <summary>
@@ -1154,6 +1323,180 @@ public class EventManager : SceneSingleton<EventManager>
             }
             highlightCoroutine = null;
         }
+        #endregion
+
+        #region 外缘线
+        /// <summary>
+        /// 显示材质高亮
+        /// </summary>
+        /// <param name="target">目标物体</param>
+        private void ShowOutlineHighlight(GameObject target)
+        {
+            try
+            {
+                var outlinable = target.GetComponent<Outlinable>();
+                outlinable.enabled = true;
+
+
+                // 停止之前的动画
+                if (outlineTweens.ContainsKey(outlinable) && outlineTweens[outlinable] != null)
+                {
+                    outlineTweens[outlinable].Kill();
+                }
+
+                Tween highlightTween = CreateOutlineEffect(outlinable, outlineType);
+
+                highlightTween.OnComplete(() =>//回调函数用于后续结束后保证暂停组件
+                {
+                    if (outlinable != null)
+                    {
+                        outlinable.enabled = false;
+                        outlinable.OutlineParameters.DilateShift = 0f;
+                        Debug.Log($"【高亮服务】外缘线动画完成，已禁用: {target.name}");
+                    }
+                });
+                outlineTweens[outlinable] = highlightTween;//添加字典方便后续删除
+                highlightedObjects.Add(target);
+            }            
+            catch (System.Exception e)
+            {
+                Debug.LogError($"【高亮服务】应用外缘线高亮时发生错误：{e.Message}");
+            }
+        }
+
+        private Tween CreateOutlineEffect(Outlinable outlinable, OutlineType effectType)
+        {
+            switch (effectType)
+            {
+                case OutlineType.None:
+                    return NoneEffect(outlinable);
+
+                case OutlineType.WidthBreathing:
+                    return CreateWidthBreathingEffect(outlinable);
+
+                case OutlineType.ColorBlinking:
+                    return CreateColorBlinkingEffect(outlinable);
+
+                default:
+                    return NoneEffect(outlinable);
+            }
+        }
+
+        private Tween NoneEffect(Outlinable outlinable)
+        {
+            return DOTween.To(
+                () => outlinable.OutlineParameters.DilateShift,
+                 x => outlinable.OutlineParameters.DilateShift = x,
+                 6f,  // 轻微变化
+                 4f   // 慢速度
+            ).SetLoops(lightDur, LoopType.Yoyo)  // 无限循环
+             .SetEase(Ease.InOutSine);     // 平滑缓动
+        }
+
+        /// <summary>
+        /// 创建宽度呼吸效果
+        /// </summary>
+        private Tween CreateWidthBreathingEffect(Outlinable outlinable)
+        {
+            outlinable.OutlineParameters.DilateShift = startWidth;
+
+            return DOTween.To(
+                () => outlinable.OutlineParameters.DilateShift,
+                x => outlinable.OutlineParameters.DilateShift = x,
+                endWidth,
+                widthDuration
+            ).SetLoops(widthLoops, LoopType.Yoyo)
+             .SetEase(colorEase);
+        }
+
+        /// <summary>
+        /// 创建颜色闪烁效果
+        /// </summary>
+        private Tween CreateColorBlinkingEffect(Outlinable outlinable)
+        {
+            outlinable.OutlineParameters.DilateShift = 6;
+            outlinable.OutlineParameters.Color = startColor;
+
+            return DOTween.To(
+                () => outlinable.OutlineParameters.Color,
+                x => outlinable.OutlineParameters.Color = x,
+                endColor,
+                colorDuration
+            ).SetLoops(colorLoops, LoopType.Yoyo)
+             .SetEase(colorEase);
+        }
+    
+
+
+    /// <summary>
+    /// 隐藏高亮动画。
+    /// </summary>
+    public void HideHighlight()
+        {
+            lastHighlightTarget = null;
+
+            // 停止提示符动画
+            if (coroutineHost != null && highlightCoroutine != null)
+            {
+                coroutineHost.StopCoroutine(highlightCoroutine);
+                highlightCoroutine = null;
+            }
+            if (highlightCone != null)
+                highlightCone.SetActive(false);
+            if (floatSequence != null)
+                floatSequence.Kill();
+
+            // 恢复材质
+            CancleOutline();
+        }
+
+        /// <summary>
+        /// 恢复原始材质
+        /// </summary>
+        private void CancleOutline()
+        {
+            try
+            {
+                foreach (GameObject obj in highlightedObjects)
+                {
+                    var outlinable = obj.GetComponent<Outlinable>();
+
+                    // 关闭动画
+                    if (outlineTweens.ContainsKey(outlinable) && outlineTweens[outlinable] != null)
+                    {
+                        outlineTweens[outlinable].Kill();
+                        outlineTweens.Remove(outlinable);
+                    }
+                    // 还原参数
+                    outlinable.OutlineParameters.DilateShift = 0f;
+                    
+                    outlinable.enabled = false;
+               
+                }
+                highlightedObjects.Clear();
+                Debug.Log("【高亮服务】已恢复所有外缘线高亮参数");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"【高亮服务】恢复外缘线高亮时发生错误：{e.Message}");
+            }
+        }
+   
+
+        /// <summary>
+        /// 更新高亮切换按钮的文本显示
+        /// </summary>
+        /// <param name="highlightType">当前高亮方式</param>
+        public HighlightType GetHighlightType()
+        {
+           return highlightType;
+        }
+        public OutlineType GetOutlineType()
+        {
+            return outlineType;
+        }
+
+        #endregion
     }
 
 

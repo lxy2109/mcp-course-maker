@@ -349,6 +349,7 @@ namespace UnityMCP.Editor
                     // 周佳铭的
                     "FLOW_EVENT_FORTH" => EventCommandHandler.FlowEventForth(command.@params),
                     "ADD_GRAPH_POOL" => NodeGraphCommandHandler.AddGraphPool(command.@params),
+                    "CREATE_BASE" => EventCommandHandler.CreateBase(command.@params),
                     // "ADD_EVENT" => EventCommandHandler.AddEvent(),
                     "ADD_EVENT_OBJECT" => EventCommandHandler.AddEventObject(command.@params),
                     "SET_TRANSFORM_POSITION" => ObjectCommandHandler.SetTransformPosition(command.@params),

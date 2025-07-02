@@ -593,6 +593,9 @@ namespace ModelParameterLib.Editor
                         if (instance != null)
                         {
                             instance.transform.SetParent(root.transform, false);
+                            
+                            // 🔥 新增：为场景中的实例添加Clickable uiPrefab赋值
+                            AssignClickableUIPrefab(instance);
                         }
                     }
                 }
@@ -790,6 +793,9 @@ namespace ModelParameterLib.Editor
                     if (instance != null)
                     {
                         instance.transform.SetParent(root.transform, false);
+                        
+                        // 🔥 新增：为场景中的实例添加Clickable uiPrefab赋值
+                        AssignClickableUIPrefab(instance);
                     }
                 }
             }
@@ -819,6 +825,21 @@ namespace ModelParameterLib.Editor
 
             // 3. 不再写入JSON报告文件，直接返回report对象
             return report;
+        }
+
+        // 🔥 新增：为场景中的实例添加Clickable uiPrefab赋值的工具方法
+        private static void AssignClickableUIPrefab(GameObject instance)
+        {
+            var clickables = instance.GetComponentsInChildren<Clickable>(true);
+            var canvas = GameObject.Find("Canvas");
+            GameObject uiPrefab = null;
+            if (canvas != null && canvas.transform.childCount > 2)
+                uiPrefab = canvas.transform.GetChild(2).gameObject;
+            foreach (var clickable in clickables)
+            {
+                clickable.uiPrefab = uiPrefab;
+                Debug.Log($"[场景实例化] 为 {clickable.gameObject.name} 的Clickable组件赋值uiPrefab: {(uiPrefab != null ? uiPrefab.name : "null")}");
+            }
         }
     }
 } 

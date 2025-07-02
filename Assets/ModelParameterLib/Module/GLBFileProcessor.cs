@@ -7,6 +7,7 @@ using System.Threading;
 using System.IO;
 using System.Linq;
 
+
 namespace ModelParameterLib.Module
 {
     /// <summary>
@@ -49,14 +50,35 @@ namespace ModelParameterLib.Module
             // 3. 添加碰撞体和刚体
             if (options.applyCollider || options.applyRigidbody)
                 AddColliderAndRigidbodySelective(prefabInstance, options.applyCollider, options.applyRigidbody);
-            // 4. 判断是否为玻璃材质
+            // 3. 添加 ObjectRegister
+            if (prefabInstance.GetComponent<ObjectRegister>() == null)
+                prefabInstance.AddComponent<ObjectRegister>();
+
+            // 4. 添加 Outlinable
+            if (prefabInstance.GetComponent<EPOOutline.Outlinable>() == null)
+            {
+                prefabInstance.AddComponent<EPOOutline.Outlinable>();
+                var outlinable = prefabInstance.GetComponent<EPOOutline.Outlinable>();
+                outlinable.OutlineParameters.BlurShift = 0;
+            }
+
+            // 5. 添加 Clickable 组件（不赋值uiPrefab，在场景实例化时赋值）
+            if (prefabInstance.GetComponent<Clickable>() == null)
+            {
+                prefabInstance.AddComponent<Clickable>();
+                // 移除uiPrefab赋值，改为在场景实例化时处理
+            }
+
+            CreateSubObjects(); 
+  
+            // 6. 判断是否为玻璃材质
             bool isGlass = false;
             if (options.applyGlassMaterial)
                 isGlass = await IsGlassMaterial(file);
-            // 5. 赋值玻璃材质
+            // 7. 赋值玻璃材质
             if (options.applyGlassMaterial && isGlass)
                 AssignGlassMaterial(prefabInstance, file.fullPath);
-            // 6. 保存预制体
+            // 8. 保存预制体
             bool saved = SaveAndCleanupPrefab(prefabInstance, file, outputFolder);
             if (!saved)
             {
@@ -315,6 +337,38 @@ namespace ModelParameterLib.Module
             {
                 float scale = targetMaxSize / modelMaxSize;
                 prefab.transform.localScale = Vector3.one * scale;
+            }
+        }
+
+         public static void CreateSubObjects()
+        {
+            var objdic = AllUnityEvent.GetInstanceInEditor().objectpartobj;
+            if (objdic == null || objdic.Count == 0)
+            {
+                Debug.LogWarning("objectpartobj字典为空");
+                return;
+            }
+
+            foreach (var item in objdic)
+            {
+                var parobj = GameObjectPool.GetInstanceInEditor().allNeedObject;
+                GameObject parentObj = parobj.ContainsKey(item.Key) ? parobj[item.Key] : null;
+                if (parentObj == null) continue;
+
+                string[] childNames = System.Text.RegularExpressions.Regex.Split(item.Value, "[,，]");
+                foreach (string childName in childNames)
+                {
+                    string trimmedName = childName.Trim();
+                    if (string.IsNullOrEmpty(trimmedName)) continue;
+                    if (parentObj.transform.Find(trimmedName) != null) continue;
+
+                    GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    cube.name = trimmedName;
+                    cube.transform.SetParent(parentObj.transform);
+                    cube.transform.localPosition = Vector3.zero;
+                    cube.transform.localRotation = Quaternion.identity;
+                    cube.transform.localScale = new Vector3(.02f, .02f, .02f);
+                }
             }
         }
     }

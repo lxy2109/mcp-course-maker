@@ -9,28 +9,31 @@ using System.Reflection;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using DG.DemiEditor;
+using UnityEngine.Playables;
+using EPOOutline;
+using UnityEngine.UI;
 
 namespace UnityMCP.Editor.Commands
 {
     public static class EventCommandHandler
     {
         /// <summary>
-        /// 入口：自动完成流程分析、资源匹配、事件脚本生成
+        /// 入口：自动完成场景必要物体的创建
         /// </summary>
-        public static object FlowEventForth(JObject @params)
+        [MenuItem("Tools/第一步")]
+        public static object CreateBase(JObject @params)
         {
             try
             {
-                string coursename = (string)@params["coursename"];
-                EventLinkAnalyzer.AnalyzeAndSaveNodeEventLinks(coursename);
-                EventAutoMatcher.AutoMatch(coursename);
-                EventScriptGenerator.CreateUnityEvent(coursename);
-                return new { success = true, message = "FlowEventForth executed successfully." };
+                string title = (string)@params["coursename"]??null;
+                string studyGoal = (string)@params["studyGoal"]??null;
+                return SceneManagerUtility.CreateSceneManagers(title,studyGoal);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error executing FlowEventForth: {ex}");
-                return new { success = false, message = ex.Message };
+                Debug.LogError($"CreateSceneManagers failed: {ex.Message}");
+                return new { success = false, error = ex.Message };
             }
         }
 
@@ -48,6 +51,27 @@ namespace UnityMCP.Editor.Commands
             {
                 Debug.LogError($"AddEventObject failed: {ex.Message}");
                 return new { success = false, error = ex.Message };
+            }
+        }
+
+        /// <summary>
+        /// 入口：自动完成流程分析、资源匹配、事件脚本生成
+        /// </summary>
+        public static object FlowEventForth(JObject @params)
+        {
+            try
+            {
+                string coursename = (string)@params["coursename"];
+                EventLinkAnalyzer.AnalyzeAndSaveNodeEventLinks(coursename);
+                EventAutoMatcher.AutoMatch(coursename);
+               
+                EventScriptGenerator.CreateUnityEvent(coursename);
+                return new { success = true, message = "FlowEventForth executed successfully." };
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error executing FlowEventForth: {ex}");
+                return new { success = false, message = ex.Message };
             }
         }
 
@@ -92,6 +116,11 @@ namespace UnityMCP.Editor.Commands
                 AddClickableIfMissing(instance);
                 AddComponentIfMissing<BoxCollider>(instance);
 
+                instance.AddComponent<Outlinable>();
+                var outlineable = instance.GetComponent<Outlinable>();
+                outlineable.OutlineParameters.BlurShift = 0;
+
+
                 createdObjects.Add(instance.name);
             }
 
@@ -127,7 +156,7 @@ namespace UnityMCP.Editor.Commands
                     var click = obj.GetComponent<Clickable>();
                     var canvas = GameObject.Find(EventCommandConstants.CanvasName);
                     if (canvas != null && canvas.transform.childCount > 1)
-                        click.uiPrefab = canvas.transform.GetChild(1).gameObject;
+                        click.uiPrefab = canvas.transform.GetChild(2).gameObject;
                 }
             }
         }
@@ -146,7 +175,7 @@ namespace UnityMCP.Editor.Commands
         /// <summary>
         /// 创建细小子物体（Cube）到父物体下
         /// </summary>
-        private static void CreateSubObjects()
+        public static void CreateSubObjects()
         {
             var objdic = AllUnityEvent.GetInstanceInEditor().objectpartobj;
             if (objdic == null || objdic.Count == 0)
@@ -176,6 +205,149 @@ namespace UnityMCP.Editor.Commands
                     cube.transform.localScale = new Vector3(.02f, .02f, .02f);
                 }
             }
+        }
+
+
+    }
+
+
+    public static class SceneManagerUtility
+    {
+        /// <summary>
+        /// 在场景中生成所有必需的管理器空物体
+        /// </summary>
+        public static object CreateSceneManagers(string coursename, string studyGoal)
+        {
+            List<string> createdManagers = new List<string>();
+            List<string> existingManagers = new List<string>();
+
+            var camera = Camera.main;
+            var cameraobj = camera.gameObject;
+
+            cameraobj.AddComponent<Outliner>();
+            var outliner = cameraobj.GetComponent<Outliner>();
+            outliner.DilateIterations = 4;
+            outliner.BlurIterations = 1;
+
+            // 定义需要创建的管理器名称和对应的组件类型
+            var managerConfigs = new Dictionary<string,string>
+        {
+            { "AllUnityEvent", "AllUnityEvent" },
+            { "EventInvokerManager","EventInvokerManager" },
+            { "EventManager",  "EventManager" },
+            { "GameObjectRoot", "GameObjectPool" },
+            { "TimelineManager", "TimelineManager" },
+            { "UnityEventListeners", "" },
+            { "AudioManager", ""},
+            { "AutoPlacer", "AutoPlacer"}
+        };
+
+            // 创建管理器物体
+            foreach (var config in managerConfigs)
+            {
+                string managerName = config.Key;
+                string componentType = config.Value;
+
+                // 检查是否已存在
+                GameObject existingManager = GameObject.Find(managerName);
+                if (existingManager != null)
+                {
+                    existingManagers.Add(managerName);
+                    Debug.Log($"管理器 {managerName} 已存在，跳过创建");
+                    continue;
+                }
+
+                // 创建空物体
+                GameObject managerObj = new GameObject(managerName);
+                createdManagers.Add(managerName);
+
+                   if (!string.IsNullOrEmpty(componentType))
+                    {
+                        AddComponentIfMissing(managerObj, componentType);
+                    }
+
+                if (managerName == "AudioManager")
+                    managerObj.AddComponent<AudioSource>();
+                if (managerName == "TimelineManager")
+                {
+                    managerObj.AddComponent<PlayableDirector>();
+
+                }
+
+            }
+
+            // 加载Canvas Prefab
+            string prefabPath = "Assets/Prefabs/MCP/Canvas.prefab";
+            if (File.Exists(prefabPath))
+            {
+                GameObject existingCanvas = GameObject.Find("Canvas");
+                if (existingCanvas == null)
+                {
+                    GameObject canvasPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                    if (canvasPrefab != null)
+                    {
+                        GameObject canvasInstance = (GameObject)PrefabUtility.InstantiatePrefab(canvasPrefab);
+                        if (canvasInstance != null)
+                        {
+                            Debug.Log($"成功加载Canvas Prefab到场景: {canvasInstance.name}");
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log("场景中已存在Canvas，跳过加载");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Canvas Prefab不存在: {prefabPath}");
+            }
+
+            if(studyGoal != null && coursename != null)
+            {
+                var Canvas = GameObject.Find("Canvas");
+                var title = Canvas.transform.GetChild(1).GetChild(0).GetComponentInChildren<Text>();
+                title.text = coursename;
+                var study = Canvas.transform.GetChild(1).GetChild(1).GetComponentInChildren<Text>();
+                study.text = studyGoal;
+            }
+           
+
+            return new
+            {
+                success = true,
+                created = createdManagers,
+                existing = existingManagers,
+                message = $"成功创建 {createdManagers.Count} 个管理器，{existingManagers.Count} 个已存在"
+            };
+        }
+
+        private static void AddComponentIfMissing(GameObject obj, string scriptName)
+        {
+            if (obj.GetComponent(scriptName) == null)
+            {
+                var scriptType = Type.GetType(scriptName) ?? GetTypeByName(scriptName);
+                if (scriptType != null)
+                {
+                    obj.AddComponent(scriptType);
+                    Debug.Log($"为 {obj.name} 添加组件: {scriptName}");
+                }
+                else
+                {
+                    Debug.LogWarning($"未找到组件类型: {scriptName}，跳过添加");
+                }
+            }
+        }
+
+        private static Type GetTypeByName(string scriptName)
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var type = assembly.GetType(scriptName);
+                if (type != null)
+                    return type;
+            }
+            return null;
         }
     }
 
@@ -207,9 +379,9 @@ namespace UnityMCP.Editor.Commands
 
             NodeGraph.NodeGraph targetGraph = null;
             if (eventmanager.graphs.ContainsKey(coursename))
-            {
                 targetGraph = eventmanager.graphs[coursename];
-            }
+            else if (eventmanager.graphs["默认"].name == coursename)
+                targetGraph = eventmanager.graphs["默认"];
             else
             {
                 string assetDir = $"Assets/{coursename}";
@@ -371,6 +543,7 @@ namespace UnityMCP.Editor.Commands
                     }
                 }
 
+                // 保存更改
                 EditorUtility.SetDirty(targetGraph);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
@@ -413,11 +586,13 @@ namespace UnityMCP.Editor.Commands
             // 获取当前打开的NodeGraph
             NodeGraph.NodeGraph targetGraph = null;
 
-            // 根据名称查找指定的NodeGraph
+            // 先是有没有默认的，然后是有没有对应字典的，最后是直接找
             var eventmanager = EventManager.GetInstanceInEditor();
             if(eventmanager.graphs.ContainsKey(coursename))
                 targetGraph = eventmanager.graphs[coursename];
-            else           
+            else if (eventmanager.graphs["默认"].name == coursename)
+                targetGraph = eventmanager.graphs["默认"];
+            else
             {
                 string assetDir = $"Assets/{coursename}";
                 string[] guids = AssetDatabase.FindAssets("t:NodeGraph", new[] { assetDir });
@@ -530,7 +705,14 @@ namespace UnityMCP.Editor.Commands
                 }
                 NodeGraph.NodeGraph targetGraph = null;
                 var eventmanager = EventManager.GetInstanceInEditor();
-                if (eventmanager == null || eventmanager.graphs == null || !eventmanager.graphs.ContainsKey(nodegraphname))
+                if (eventmanager.graphs.ContainsKey(nodegraphname))
+                    targetGraph = eventmanager.graphs[nodegraphname];
+                else if (eventmanager.graphs["默认"].name == nodegraphname)
+                {
+                    targetGraph = eventmanager.graphs["默认"];
+                    Debug.Log("aaaa");
+                }
+                else
                 {
                     string assetDir = $"Assets/{nodegraphname}";
                     string[] guids = AssetDatabase.FindAssets("t:NodeGraph", new[] { assetDir });
@@ -541,7 +723,7 @@ namespace UnityMCP.Editor.Commands
                         if (nodeGraphAsset != null)
                         {
                             targetGraph = nodeGraphAsset;
-                            Debug.Log($"已从Asset中加载NodeGraph: {assetPath}");                           
+                            Debug.Log($"已从Asset中加载NodeGraph: {assetPath}");
                         }
                     }
                     if (targetGraph == null)
@@ -549,10 +731,10 @@ namespace UnityMCP.Editor.Commands
                         Debug.LogError($"EventManager中未找到名为 {nodegraphname} 的NodeGraph，且Assets目录下也未找到！");
                     }
                 }
-
+                
                 var holdDict = allevent.HoldDict;
                 var holdForCombineDict = allevent.HoldForCombineDict;
-                var nodeGraph = eventmanager.graphs[nodegraphname] == null ? targetGraph : eventmanager.graphs["默认"];
+                var nodeGraph = targetGraph;
                 var nodes = nodeGraph.flowEventNodes;
 
                 // 生成时间戳
@@ -707,7 +889,7 @@ namespace UnityMCP.Editor.Commands
                 scriptContent.AppendLine("}");
 
                 // 写入文件 - 文件名包含时间戳
-
+                Debug.Log("aa");
                 string scriptPath = $"Assets\\{nodeGraph.name}\\Scripts\\{className}.cs";
                 File.WriteAllText(scriptPath, scriptContent.ToString());
                 AssetDatabase.Refresh();

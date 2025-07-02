@@ -16,6 +16,7 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
+    - {fileID: 8300000, guid: f0f3ae7cedd0f1c46adde4f7d1a92409, type: 3}
     - {fileID: 11400000, guid: 4026410854ab46246a7299881d20592f, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -423,8 +424,8 @@ MonoBehaviour:
       Entry: 6
       Data: 
     - Name: inAudioClip
-      Entry: 6
-      Data: 
+      Entry: 10
+      Data: 0
     - Name: cameraTimelineName
       Entry: 1
       Data: "\u6446\u653E\u6D4B\u8BD5\u5361_\u955C\u5934"
@@ -449,7 +450,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 10
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 13
       Data: 

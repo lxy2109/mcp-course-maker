@@ -8,6 +8,61 @@ def register_event_tools(mcp: FastMCP):
     """Register all object inspection and manipulation tools with the MCP server."""
 
     @mcp.tool()
+    def create_base(
+        ctx: Context,
+        coursename: str,
+        study_goal: str
+    ) -> Dict[str, Any]:
+        """
+        在场景中创建所有必需的基础管理器空物体。
+        该函数会创建以下管理器：
+        - AllUnityEvent (添加AllUnityEvent组件)
+        - EventInvokerManager (添加EventInvokerManager组件)
+        - EventManager (添加EventManager组件)
+        - GameObjectRoot (添加GameObjectPool组件，作为根物体)
+        - TimelineManager (添加TimelineManager和PlayableDirector组件)
+        - UnityEventListeners (空物体)
+        - AudioManager (添加AudioSource组件)
+        - Canvas (从Prefab加载)
+
+        参数:
+            coursename: 课程名称
+            study_goal: 学习目标
+
+        返回:
+            success: 是否成功创建
+            message: 成功或失败的消息
+            created: 成功创建的管理器列表
+            existing: 已存在的管理器列表
+            unity_result: Unity返回的结果
+        """
+        try:
+            unity = get_unity_connection()
+            # 调用Unity中的CreateBase命令，传入课程名称和学习目标
+            result = unity.send_command("CREATE_BASE", {
+                "coursename": coursename,
+                "studyGoal": study_goal
+            })
+            
+            if not result.get("success", False):
+                return {
+                    "success": False,
+                    "message": result.get("error", "Unknown error occurred in CreateBase."),
+                    "unity_result": result
+                }
+
+            return {
+                "success": True,
+                "message": result.get("message", "Successfully created base scene managers"),
+                "created": result.get("created", []),
+                "existing": result.get("existing", []),
+                "unity_result": result
+            }
+        except Exception as ex:
+            return {"success": False, "message": str(ex)}
+
+
+    @mcp.tool()
     def add_graph_pool(
         ctx: Context,
         node_graph_name: str

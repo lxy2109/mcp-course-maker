@@ -1,5 +1,5 @@
 {
-  "request": "{\r\n  \"modelName\": \"标准照明灯\",\r\n  \"boundsCenter\": {\r\n    \"x\": -0.3351048,\r\n    \"y\": 0.4616972,\r\n    \"z\": 8.77706552E-05\r\n  },\r\n  \"boundsSize\": {\r\n    \"x\": 0.06709371,\r\n    \"y\": 0.299999923,\r\n    \"z\": 0.237610281\r\n  },\r\n  \"scale\": {\r\n    \"x\": 0.1495731,\r\n    \"y\": 0.1495731,\r\n    \"z\": 0.1495731\r\n  },\r\n  \"sceneHint\": \"\\nBounds center: (-0.34, 0.46, 0.00), size: (0.07, 0.30, 0.24), scale: (0.15, 0.15, 0.15)\",\r\n  \"time\": \"2025-07-01 13:33:35\"\r\n}",
-  "aiResult": "{\n  \"parent\": \"实验桌\",\n  \"position\": [0.0, 0.23, 0.0],\n  \"rotation\": [0, 0, 0],\n  \"front_dir\": [0, 0, 1],\n  \"layout_mode\": \"Linear\",\n  \"group\": \"\"\n}",
+  "request": "{\r\n  \"modelName\": \"标准照明灯\",\r\n  \"boundsCenter\": {\r\n    \"x\": 0.0,\r\n    \"y\": 0.0,\r\n    \"z\": 0.0\r\n  },\r\n  \"boundsSize\": {\r\n    \"x\": 0.0,\r\n    \"y\": 0.0,\r\n    \"z\": 0.0\r\n  },\r\n  \"scale\": {\r\n    \"x\": 0.1495731,\r\n    \"y\": 0.1495731,\r\n    \"z\": 0.1495731\r\n  },\r\n  \"sceneHint\": \"\\nBounds center: (0.00, 0.00, 0.00), size: (0.00, 0.00, 0.00), scale: (0.15, 0.15, 0.15)\\n桌面中心为(0.00,0.00,0.00)，长宽分别为1.20和0.57。请将所有物体均匀分布在桌面上，避免重叠，每个物体的X/Z应尽量分散，不要全部靠近中心。position字段以桌面中心为原点，X/Z范围在[-0.60, +0.60]和[-0.29, +0.29]内。\\n\",\r\n  \"time\": \"2025-07-02 15:39:00\"\r\n}",
+  "aiResult": "{\n  \"parent\": \"实验桌\",\n  \"group\": \"照明设备\",\n  \"layout_mode\": \"Linear\",\n  \"is_main_model\": false\n}",
   "error": null
 }

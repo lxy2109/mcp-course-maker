@@ -118,6 +118,39 @@ public class TimelineManager : SceneSingleton<TimelineManager>
             }
     }
 
+    /// <summary>
+    /// 强制停止所有正在播放的Timeline（基于实际机制）
+    /// </summary>
+    public void ForceStopAllTimelines()
+    {
+        Debug.Log("【TimelineManager】开始强制停止所有Timeline");
+
+        // 1. 停止所有协程（关键）
+        StopAllCoroutines();
+
+        currentPlayers.Clear();
+
+
+        // 4. 查找场景中所有以Timeline名称命名的临时GameObject并销毁
+        GameObject[] allGameObjects = FindObjectsOfType<GameObject>();
+        foreach (GameObject go in allGameObjects)
+        {
+            if (go != null && go != this.gameObject)
+            {
+                PlayableDirector director = go.GetComponent<PlayableDirector>();
+                if (director != null)
+                {
+                    DestroyImmediate(go);
+                }
+            }
+        }
+
+        // 5. 重置临时变量
+        tempPlaybleDirector = playableDirector;
+
+        
+    }
+
     #region HELPER FUNCTION
 
     /// <summary>

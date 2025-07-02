@@ -6,654 +6,590 @@ using ModelParameterLib.Module;
 using System;
 using System.Collections;
 using Newtonsoft.Json;
+using ModelParameterLib.Data;
+#if UNITY_EDITOR
+using Unity.EditorCoroutines.Editor;
+#endif
 
 namespace ModelParameterLib.Core{
-/// <summary>
-/// 3D模型自动贴合与自适应摆放工具（支持AI参数、分组、多分布方式）
-/// </summary>
-public class AutoPlacer : MonoBehaviour
-{
-    public enum LayoutMode { Linear, Grid, Circle }
-
-    [System.Serializable]
-    public class ItemRule
-    {
-        [BoxGroup("基础信息")]
-        [LabelText("关键字")]
-        public string keyword;
-
-        [BoxGroup("基础信息")]
-        [LabelText("父物体关键字")]
-        public string parentKeyword;
-
-        [BoxGroup("最终变换")]
-        [LabelText("最终世界坐标")]
-        public Vector3 position;
-
-        [BoxGroup("最终变换")]
-        [LabelText("最终世界欧拉角")]
-        public Vector3 rotation;
-
-        [BoxGroup("分布与分组")]
-        [LabelText("分布方式")]
-        public LayoutMode layoutMode = LayoutMode.Linear;
-
-        [BoxGroup("分布与分组")]
-        [LabelText("网格行数")]
-        public int gridRow = 1;
-
-        [BoxGroup("分布与分组")]
-        [LabelText("圆形半径")]
-        public float circleRadius = 1.0f;
-
-        [BoxGroup("分布与分组")]
-        [LabelText("分组名")]
-        public string group;
-    }
-
-    // 支持AI扩展字段
-    [System.Serializable]
-    public class ItemRuleExt : ItemRule
-    {
-        public Vector3 frontDir = Vector3.zero; // AI mesh分析正面
-    }
-
-    [ShowInInspector]
-    [DictionaryDrawerSettings(KeyLabel = "模型名/关键字", ValueLabel = "AI规则")]
-    public Dictionary<string, ItemRule> itemRules = new Dictionary<string, ItemRule>();
-
-    [BoxGroup("基础参数")]
-    [LabelText("主轴方向（如Y为上下贴合）")]
-    public Vector3 mainAxis = Vector3.up;
-
-    [BoxGroup("基础参数")]
-    [LabelText("横向排列间距")]
-    public float horizontalSpacing = 0.2f;
-
-    [BoxGroup("基础参数")]
-    [LabelText("网格分布间距")]
-    public Vector2 gridSpacing = new Vector2(0.3f, 0.3f);
-
-    [Button("一键AI分析并填充规则")]
-    public void AIAnalyzeButton()
-    {
-        AnalyzeAllWithAI();
-    }
-
-    [Button("自动摆放（应用规则）")]
-    public void AutoArrangeButton()
-    {
-        AutoArrange();
-    }
 
     /// <summary>
-    /// 一键AI分析所有模型，填充itemRules，分析结果立即显示在Inspector
+    /// 3D模型自动贴合与自适应摆放工具（支持AI参数、分组、多分布方式）
     /// </summary>
-    public void AnalyzeAllWithAI(string sceneHint = "")
+    
+    public class AutoPlacer: MonoBehaviour
     {
-        var root = GameObject.Find("GameObjectRoot");
-        if (root == null)
+        #region Inspector参数与按钮
+        [ShowInInspector]
+        [DictionaryDrawerSettings(KeyLabel = "模型名/关键字", ValueLabel = "AI规则")]
+        public Dictionary<string, ItemRule> itemRules = new Dictionary<string, ItemRule>();
+
+        [BoxGroup("基础参数")]
+        [LabelText("网格分布间距 (X/Z)")]
+        [MinValue(0.01f)]
+        public Vector2 gridSpacing = new Vector2(0.2f, 0.2f);
+
+        [BoxGroup("基础参数")]
+        [LabelText("是否自动Y轴贴合父物体表面")]
+        public bool autoYAlign = true;
+
+        [Button("一键AI分析并填充规则")]
+        public void AIAnalyzeButton()
         {
-            Debug.LogError("未找到名为GameObjectRoot的GameObject！");
-            return;
+            AnalyzeAllWithAI();
         }
-        var aiFiller = new ModelAIFiller();
-        itemRules.Clear();
-        int total = root.transform.childCount;
-        int finished = 0;
-        string logDir = "Assets/ModelParameterLib/AIPlacementLogs";
-#if UNITY_EDITOR
-        try {
-            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
-            if (!string.IsNullOrEmpty(scene.path)) {
-                string sceneDir = System.IO.Path.GetDirectoryName(scene.path);
-                if (!string.IsNullOrEmpty(sceneDir)) {
-                    logDir = System.IO.Path.Combine(sceneDir, "AIPlacementLogs");
-                }
-            }
-        } catch (Exception ex) {
-            Debug.LogWarning($"[AutoPlacer] 获取场景目录失败，使用默认AIPlacementLogs目录: {ex.Message}");
-        }
-#endif
-        if (!System.IO.Directory.Exists(logDir))
-            System.IO.Directory.CreateDirectory(logDir);
-        Debug.Log($"[AutoPlacer] AI分析日志保存目录: {logDir}");
-        foreach (Transform child in root.transform)
+
+        [Button("自动摆放（应用规则）")]
+        public void AutoArrangeButton()
         {
-            string modelName = child.gameObject.name;
-            // 获取bounds信息
-            Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
-            var mr = child.GetComponent<MeshRenderer>();
-            if (mr != null) bounds = mr.bounds;
-            else {
-                var mf = child.GetComponent<MeshFilter>();
-                if (mf != null && mf.sharedMesh != null) bounds = mf.sharedMesh.bounds;
-            }
-            Vector3 scale = child.localScale;
-            string boundsInfo = $"Bounds center: {bounds.center}, size: {bounds.size}, scale: {scale}";
-            string fullSceneHint = sceneHint + $"\n{boundsInfo}";
-            // 记录请求参数（只序列化基础数值，避免循环引用）
-            var requestLog = new {
-                modelName = modelName,
-                boundsCenter = new { x = bounds.center.x, y = bounds.center.y, z = bounds.center.z },
-                boundsSize = new { x = bounds.size.x, y = bounds.size.y, z = bounds.size.z },
-                scale = new { x = scale.x, y = scale.y, z = scale.z },
-                sceneHint = fullSceneHint,
-                time = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-            };
-            string logPath = $"{logDir}/{modelName}_log.json";
-            if (System.IO.File.Exists(logPath))
+            if (hasArranged)
             {
-                // 直接读取json，解析为ItemRule
-                string jsonText = System.IO.File.ReadAllText(logPath);
-                var logObj = JsonConvert.DeserializeObject<AIPlacementLog>(jsonText);
-                if (logObj != null && !string.IsNullOrEmpty(logObj.aiResult))
-                {
-                    var rule = ParseAIPlacementJson(modelName, logObj.aiResult);
-                    if (rule != null)
-                        itemRules[modelName] = rule;
-                }
-                finished++;
-                if (finished == total)
-                {
-#if UNITY_EDITOR
-                    EditorUtility.SetDirty(this);
-                    UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-#endif
-                    Debug.Log("AI分析全部完成！（部分或全部使用缓存）");
-                }
-                continue;
+                Debug.LogWarning("[AutoPlacer] 已自动摆放过，无需重复执行。");
+                return;
             }
-            // 没有缓存才调用AI
-            aiFiller.AnalyzePlacementAsync(
-                modelName,
-                fullSceneHint,
-                ModelAIFiller.DeepSeekApiKey,
-                (success, json, error) =>
+            AutoArrange();
+            //hasArranged = true;
+        }
+        #endregion
+
+        #region AI分析与规则填充
+        /// <summary>
+        /// 一键AI分析所有模型，填充itemRules，分析结果立即显示在Inspector
+        /// </summary>
+        public void AnalyzeAllWithAI(string sceneHint = "")
+        {
+            var root = GameObject.Find("GameObjectRoot");
+            if (root == null)
+            {
+                Debug.LogError("未找到名为GameObjectRoot的GameObject！");
+                return;
+            }
+            var aiFiller = new ModelAIFiller();
+            itemRules.Clear();
+            int total = root.transform.childCount;
+            int finished = 0;
+            string logDir = "Assets/ModelParameterLib/AIPlacementLogs";
+    #if UNITY_EDITOR
+            try {
+                var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+                if (!string.IsNullOrEmpty(scene.path)) {
+                    string sceneDir = System.IO.Path.GetDirectoryName(scene.path);
+                    if (!string.IsNullOrEmpty(sceneDir)) {
+                        logDir = System.IO.Path.Combine(sceneDir, "AIPlacementLogs");
+                    }
+                }
+            } catch (Exception ex) {
+                Debug.LogWarning($"[AutoPlacer] 获取场景目录失败，使用默认AIPlacementLogs目录: {ex.Message}");
+            }
+    #endif
+            if (!System.IO.Directory.Exists(logDir))
+                System.IO.Directory.CreateDirectory(logDir);
+            Debug.Log($"[AutoPlacer] AI分析日志保存目录: {logDir}");
+            foreach (Transform child in root.transform)
+            {
+                string modelName = child.gameObject.name;
+                // 获取bounds信息
+                Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
+                var mr = child.GetComponent<MeshRenderer>();
+                if (mr != null) bounds = mr.bounds;
+                else {
+                    var mf = child.GetComponent<MeshFilter>();
+                    if (mf != null && mf.sharedMesh != null) bounds = mf.sharedMesh.bounds;
+                }
+                Vector3 scale = child.localScale;
+                string boundsInfo = $"Bounds center: {bounds.center}, size: {bounds.size}, scale: {scale}";
+                // === 新增：自动拼接桌面(parent)分布优化提示 ===
+                string parentName = "实验桌"; // 默认parent
+                var parentRule = GetRule(modelName);
+                if (parentRule != null && !string.IsNullOrEmpty(parentRule.parentKeyword))
+                    parentName = parentRule.parentKeyword;
+                var parentObj = GameObject.Find(parentName);
+                string tableHint = "";
+                if (parentObj != null)
                 {
-                    finished++;
-                    // 记录AI返回
-                    var logObj = new AIPlacementLog {
-                        request = JsonConvert.SerializeObject(requestLog, Formatting.Indented),
-                        aiResult = json,
-                        error = error
-                    };
-                    System.IO.File.WriteAllText(logPath, JsonConvert.SerializeObject(logObj, Formatting.Indented));
-                    if (success)
+                    var parentBounds = GetWorldMeshBounds(parentObj);
+                    tableHint = $"桌面中心为({parentBounds.center.x:F2},{parentBounds.center.y:F2},{parentBounds.center.z:F2})，长宽分别为{parentBounds.size.x:F2}和{parentBounds.size.z:F2}。请将所有物体均匀分布在桌面上，避免重叠，每个物体的X/Z应尽量分散，不要全部靠近中心。position字段以桌面中心为原点，X/Z范围在[-{parentBounds.size.x/2:F2}, +{parentBounds.size.x/2:F2}]和[-{parentBounds.size.z/2:F2}, +{parentBounds.size.z/2:F2}]内。";
+                }
+                // === 新增：mesh.bounds和底部顶点信息 ===
+                string meshInfo = "";
+                var meshFilter = child.GetComponent<MeshFilter>();
+                if (meshFilter != null && meshFilter.sharedMesh != null)
+                {
+                    var mesh = meshFilter.sharedMesh;
+                    var verts = mesh.vertices;
+                    float minY = mesh.bounds.min.y;
+                    List<string> bottomVerts = new List<string>();
+                    foreach (var v in verts)
                     {
-                        var rule = ParseAIPlacementJson(modelName, json);
+                        if (Mathf.Abs(v.y - minY) < 1e-4f)
+                            bottomVerts.Add($"[{v.x:F3},{v.y:F3},{v.z:F3}]");
+                    }
+                    meshInfo = $"mesh_bounds: min={mesh.bounds.min}, max={mesh.bounds.max}, center={mesh.bounds.center}, size={mesh.bounds.size}; bottom_vertices: [{string.Join(";", bottomVerts)}]。请根据mesh_bounds和bottom_vertices信息，判断物体真实占地面积和形状，给出合理的分布建议。position字段请确保物体底部完全落在桌面范围内，避免重叠和悬空。";
+                }
+                string fullSceneHint = sceneHint + $"\n{boundsInfo}\n{tableHint}\n{meshInfo}";
+                // 记录请求参数（只序列化基础数值，避免循环引用）
+                var requestLog = new {
+                    modelName = modelName,
+                    boundsCenter = new { x = bounds.center.x, y = bounds.center.y, z = bounds.center.z },
+                    boundsSize = new { x = bounds.size.x, y = bounds.size.y, z = bounds.size.z },
+                    scale = new { x = scale.x, y = scale.y, z = scale.z },
+                    sceneHint = fullSceneHint,
+                    time = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+                string logPath = $"{logDir}/{modelName}_log.json";
+                if (System.IO.File.Exists(logPath))
+                {
+                    // 直接读取json，解析为ItemRule
+                    string jsonText = System.IO.File.ReadAllText(logPath);
+                    var logObj = JsonConvert.DeserializeObject<AIPlacementLog>(jsonText);
+                    if (logObj != null && !string.IsNullOrEmpty(logObj.aiResult))
+                    {
+                        var rule = ParseAIPlacementJson(modelName, logObj.aiResult);
                         if (rule != null)
                             itemRules[modelName] = rule;
                     }
-                    else
-                    {
-                        Debug.LogError($"AI分析失败: {modelName} {error}");
-                    }
+                    finished++;
                     if (finished == total)
                     {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
                         EditorUtility.SetDirty(this);
                         UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-#endif
-                        Debug.Log("AI分析全部完成！");
+                        if (autoArrangeCoroutine != null)
+                            EditorCoroutineUtility.StopCoroutine(autoArrangeCoroutine);
+                        autoArrangeCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(WaitForItemRulesAndAutoArrange());
+    #endif
+                        Debug.Log("AI分析全部完成！（部分或全部使用缓存）");
+                        if (itemRules.Count == GetPlacableModelCount())
+                        {
+                            Debug.Log("[AutoPlacer] AI分析完成后自动检测到itemRules数量齐全，自动开始自动摆放...");
+                            AutoArrange();
+                            hasArranged = true;
+                        }
                     }
+                    continue;
                 }
-            );
-        }
-    }
-
-    /// <summary>
-    /// 自动批量摆放所有子物体（支持分组、分布方式、AI参数）
-    /// 只根据itemRules内容进行实际摆放，不再调用AI
-    /// </summary>
-    public void AutoArrange()
-    {
-        Debug.Log("[AutoPlacer] 开始自动摆放");
-        // 1. 获取GameObjectRoot下的所有子物体
-        var allObjs = new List<GameObject>();
-        var root = GameObject.Find("GameObjectRoot");
-        if (root == null)
-        {
-            Debug.LogError("未找到名为GameObjectRoot的GameObject！");
-            return;
-        }
-        foreach (Transform child in root.transform)
-            allObjs.Add(child.gameObject);
-
-        // 2. 按分组处理（无group的为默认组）
-        var groupDict = new Dictionary<string, List<GameObject>>();
-        foreach (var obj in allObjs)
-        {
-            var rule = GetRule(obj.name);
-            string group = rule != null && !string.IsNullOrEmpty(rule.group) ? rule.group : "__default__";
-            if (!groupDict.ContainsKey(group)) groupDict[group] = new List<GameObject>();
-            groupDict[group].Add(obj);
-        }
-
-        foreach (var group in groupDict)
-        {
-            Debug.Log($"[AutoPlacer] 正在摆放分组: {group.Key}, 包含{group.Value.Count}个物体");
-            ArrangeGroup(group.Value);
-        }
-        Debug.Log("[AutoPlacer] 自动摆放完成");
-    }
-
-    /// <summary>
-    /// 按组自动摆放
-    /// </summary>
-    void ArrangeGroup(List<GameObject> objs)
-    {
-        if (objs == null || objs.Count == 0) return;
-        GameObject baseObj = FindBaseObject(objs);
-        if (baseObj == null) baseObj = objs[0];
-        Debug.Log($"[AutoPlacer] 分组基准物体: {baseObj.name}");
-        var children = new List<GameObject>();
-        foreach (var obj in objs)
-        {
-            if (obj == baseObj) continue;
-            var rule = GetRule(obj.name);
-            if (rule == null || string.IsNullOrEmpty(rule.parentKeyword) || baseObj.name.Contains(rule.parentKeyword))
-                children.Add(obj);
-        }
-        LayoutMode mode = LayoutMode.Linear;
-        int gridRow = 1;
-        float circleRadius = 1.0f;
-        if (children.Count > 0)
-        {
-            var rule = GetRule(children[0].name);
-            if (rule != null)
-            {
-                mode = rule.layoutMode;
-                gridRow = rule.gridRow;
-                circleRadius = rule.circleRadius;
+                // 没有缓存才调用AI
+                aiFiller.AnalyzePlacementAsync(
+                    modelName,
+                    fullSceneHint,
+                    ModelAIFiller.DeepSeekApiKey,
+                    (success, json, error) =>
+                    {
+                        finished++;
+                        // 记录AI返回
+                        var logObj = new AIPlacementLog {
+                            request = JsonConvert.SerializeObject(requestLog, Formatting.Indented),
+                            aiResult = json,
+                            error = error
+                        };
+                        System.IO.File.WriteAllText(logPath, JsonConvert.SerializeObject(logObj, Formatting.Indented));
+                        if (success)
+                        {
+                            var rule = ParseAIPlacementJson(modelName, json);
+                            if (rule != null)
+                                itemRules[modelName] = rule;
+                        }
+                        else
+                        {
+                            Debug.LogError($"AI分析失败: {modelName} {error}");
+                        }
+                        if (finished == total)
+                        {
+    #if UNITY_EDITOR
+                            EditorUtility.SetDirty(this);
+                            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+                            if (autoArrangeCoroutine != null)
+                                EditorCoroutineUtility.StopCoroutine(autoArrangeCoroutine);
+                            autoArrangeCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(WaitForItemRulesAndAutoArrange());
+    #endif
+                            Debug.Log("AI分析全部完成！");
+                        }
+                    }
+                );
             }
         }
-        Debug.Log($"[AutoPlacer] 分布方式: {mode}, gridRow: {gridRow}, circleRadius: {circleRadius}");
-        switch (mode)
-        {
-            case LayoutMode.Linear:
-                PlaceLinear(children, baseObj);
-                break;
-            case LayoutMode.Grid:
-                PlaceGrid(children, baseObj, gridRow);
-                break;
-            case LayoutMode.Circle:
-                PlaceCircle(children, baseObj, circleRadius);
-                break;
-        }
-    }
+        #endregion
 
-    /// <summary>
-    /// 查找分组的基准物体：优先用parentKeyword在场景中找，有则用；否则用objs中最底层（没有其它物体以它为parent的）
-    /// </summary>
-    GameObject FindBaseObject(List<GameObject> objs)
-    {
-        // 1. 优先查找parentKeyword在场景中存在的物体
-        foreach (var obj in objs)
+        #region 自动摆放主流程
+        /// <summary>
+        /// 自动批量摆放所有子物体（支持分组、分布方式、AI参数）
+        /// 只根据itemRules内容进行实际摆放，不再调用AI
+        /// </summary>
+        public void AutoArrange()
         {
-            var rule = GetRule(obj.name);
-            if (rule != null && !string.IsNullOrEmpty(rule.parentKeyword))
+            Debug.Log("[AutoPlacer] 开始自动摆放");
+            // 打印所有itemRules的key
+            Debug.Log("[AutoPlacer] 当前itemRules key:");
+            foreach (var rule in itemRules)
             {
-                var parentGo = GameObject.Find(rule.parentKeyword);
-                if (parentGo != null)
-                    return parentGo;
+                Debug.Log($"  key: {rule.Key}");
             }
-        }
-        // 2. 查找最底层父物体（没有其它物体以它为parentKeyword）
-        foreach (var obj in objs)
-        {
-            bool isBase = true;
-            foreach (var other in objs)
+            // 打印GameObjectRoot下所有子物体名称
+            var root = GameObject.Find("GameObjectRoot");
+            if (root == null)
             {
-                if (other == obj) continue;
-                var rule = GetRule(other.name);
-                if (rule != null && !string.IsNullOrEmpty(rule.parentKeyword) && rule.parentKeyword == obj.name)
+                Debug.LogError("[AutoPlacer] 未找到名为GameObjectRoot的GameObject！");
+                return;
+            }
+            Debug.Log("[AutoPlacer] GameObjectRoot下所有子物体:");
+            foreach (Transform child in root.transform)
+            {
+                Debug.Log($"  child: {child.gameObject.name}");
+            }
+            // 1. 获取GameObjectRoot下的所有子物体，剔除所有parentKeyword为自身的物体（如实验桌）
+            var allObjs = new List<GameObject>();
+            foreach (Transform child in root.transform)
+            {
+                var rule = GetRule(child.gameObject.name);
+                if (rule == null) continue;
+                if (rule.keyword == rule.parentKeyword) continue; // 跳过基准物体
+                allObjs.Add(child.gameObject);
+            }
+            if (allObjs.Count == 0)
+            {
+                Debug.LogWarning("[AutoPlacer] 没有可自动摆放的物体（allObjs.Count==0），提前return");
+                return;
+            }
+            // 2. 找到基准物体（如实验桌）
+            GameObject parentObj = null;
+            foreach (Transform child in root.transform)
+            {
+                var rule = GetRule(child.gameObject.name);
+                if (rule != null && rule.keyword == rule.parentKeyword)
                 {
-                    isBase = false;
+                    parentObj = child.gameObject;
                     break;
                 }
             }
-            if (isBase) return obj;
-        }
-        // 3. 都找不到，返回第一个
-        return objs.Count > 0 ? objs[0] : null;
-    }
-
-    /// <summary>
-    /// 线性分布（已禁用自动横向偏移，只用AI建议位置）
-    /// </summary>
-    void PlaceLinear(List<GameObject> objs, GameObject baseObj)
-    {
-        foreach (var obj in objs)
-        {
-            SetDefaultRotation(obj);
-            PlaceOnTop(baseObj, obj);
-            ApplyOffset(obj);
-        }
-    }
-
-    /// <summary>
-    /// 网格分布（已禁用自动网格偏移，只用AI建议位置）
-    /// </summary>
-    void PlaceGrid(List<GameObject> objs, GameObject baseObj, int row)
-    {
-        foreach (var obj in objs)
-        {
-            SetDefaultRotation(obj);
-            PlaceOnTop(baseObj, obj);
-            ApplyOffset(obj);
-        }
-    }
-
-    /// <summary>
-    /// 圆形分布（已禁用自动圆形偏移，只用AI建议位置）
-    /// </summary>
-    void PlaceCircle(List<GameObject> objs, GameObject baseObj, float radius)
-    {
-        foreach (var obj in objs)
-        {
-            SetDefaultRotation(obj);
-            PlaceOnTop(baseObj, obj);
-            ApplyOffset(obj);
-        }
-    }
-
-    /// <summary>
-    /// 设置默认朝向（始终采用AI分析结果）
-    /// </summary>
-    void SetDefaultRotation(GameObject obj)
-    {
-        // 1. 默认平放（本地X轴朝上，Z轴为正面）
-        obj.transform.rotation = Quaternion.Euler(90, 0, 0);
-
-        // 2. 让Z轴正对摄像机（只调整Y轴）
-        var cam = Camera.main;
-        if (cam != null)
-        {
-            Vector3 objPos = obj.transform.position;
-            Vector3 camPos = cam.transform.position;
-            Vector3 lookDir = camPos - objPos;
-            lookDir.y = 0; // 只绕Y轴旋转
-            if (lookDir.sqrMagnitude > 0.001f)
+            if (parentObj == null)
             {
-                float targetY = Quaternion.LookRotation(lookDir).eulerAngles.y;
-                Vector3 euler = obj.transform.eulerAngles;
-                obj.transform.eulerAngles = new Vector3(90, targetY, 0);
-                Debug.Log($"[AutoPlacer] {obj.name} 平放，正面已朝向主摄像机，最终rotation: {{90, {targetY}, 0}}");
-            }
-        }
-        else
-        {
-            obj.transform.rotation = Quaternion.Euler(90, 0, 0);
-            Debug.Log($"[AutoPlacer] {obj.name} 平放，主摄像机未找到，rotation: {{90, 0, 0}}");
-        }
-        UpdateRuleTransform(obj.name, obj.transform.position, obj.transform.rotation.eulerAngles);
-    }
-
-    // mesh主面法线分析：遍历所有三角面，找最大面积面法线
-    Vector3 AnalyzeMeshMainFaceNormal(GameObject obj)
-    {
-        var mf = obj.GetComponent<MeshFilter>();
-        if (mf == null || mf.sharedMesh == null) return Vector3.forward;
-        var mesh = mf.sharedMesh;
-        var vertices = mesh.vertices;
-        var triangles = mesh.triangles;
-        float maxArea = 0f;
-        Vector3 mainNormal = Vector3.forward;
-        for (int i = 0; i < triangles.Length; i += 3)
-        {
-            Vector3 v0 = vertices[triangles[i]];
-            Vector3 v1 = vertices[triangles[i + 1]];
-            Vector3 v2 = vertices[triangles[i + 2]];
-            Vector3 normal = Vector3.Cross(v1 - v0, v2 - v0).normalized;
-            float area = Vector3.Cross(v1 - v0, v2 - v0).magnitude * 0.5f;
-            if (area > maxArea)
-            {
-                maxArea = area;
-                mainNormal = normal;
-            }
-        }
-        return mainNormal;
-    }
-
-    // 让物体正面（Z轴）绕Y轴朝向主摄像机
-    void FaceToMainCameraY(GameObject obj)
-    {
-        var cam = Camera.main;
-        if (cam == null) return;
-        Vector3 objPos = obj.transform.position;
-        Vector3 camPos = cam.transform.position;
-        Vector3 lookDir = camPos - objPos;
-        lookDir.y = 0; // 只绕Y轴旋转
-        if (lookDir.sqrMagnitude > 0.001f)
-        {
-            float targetY = Quaternion.LookRotation(lookDir).eulerAngles.y;
-            Vector3 euler = obj.transform.eulerAngles;
-            obj.transform.eulerAngles = new Vector3(euler.x, targetY, euler.z);
-            Debug.Log($"[AutoPlacer] {obj.name} 正面已朝向主摄像机，Y轴: {targetY}");
-        }
-    }
-
-    /// <summary>
-    /// 贴合到baseObj上表面（主轴贴合，MeshRenderer.bounds世界空间贴合）
-    /// </summary>
-    void PlaceOnTop(GameObject baseObj, GameObject objToPlace)
-    {
-        var rule = GetRule(objToPlace.name);
-        if (rule != null)
-        {
-            // 1. 以分析出的基准物体为参考，AI建议的position为相对偏移（只用X/Z，Y完全由bounds计算）
-            Vector3 basePos = baseObj.transform.position;
-            Vector3 aiOffset = rule.position;
-            float aiY = aiOffset.y;
-            aiOffset.y = 0f; // 强制Y为0
-            // 先设置rotation
-            SetDefaultRotation(objToPlace);
-            // 设置X/Z
-            Vector3 pos = new Vector3(basePos.x + aiOffset.x, basePos.y, basePos.z + aiOffset.z);
-            objToPlace.transform.position = pos;
-            // 获取MeshRenderer.bounds（世界空间）
-            var baseMr = baseObj.GetComponent<MeshRenderer>();
-            var objMr = objToPlace.GetComponent<MeshRenderer>();
-            if (baseMr == null || objMr == null)
-            {
-                Debug.LogWarning($"[AutoPlacer] {baseObj.name}或{objToPlace.name}缺少MeshRenderer，无法进行bounds贴合，直接用AI建议坐标");
-                UpdateRuleTransform(objToPlace.name, objToPlace.transform.position, objToPlace.transform.rotation.eulerAngles);
+                Debug.LogWarning("[AutoPlacer] 未找到基准物体（如实验桌），提前return");
                 return;
             }
-            // 计算deltaY
-            float baseTopY = baseMr.bounds.max.y;
-            float objBottomY = objMr.bounds.min.y;
-            float deltaY = baseTopY - objBottomY;
-            // 修正Y
+            var parentBounds = GetWorldMeshBounds(parentObj);
+            float baseY = parentBounds.max.y;
+            // 3. XZ平面网格分布
+            int n = allObjs.Count;
+            int cols = Mathf.CeilToInt(Mathf.Sqrt(n));
+            int rows = Mathf.CeilToInt((float)n / cols);
+            float spacingX = gridSpacing.x;
+            float spacingZ = gridSpacing.y;
+            float startX = parentBounds.center.x - (cols - 1) * spacingX / 2f;
+            float startZ = parentBounds.center.z - (rows - 1) * spacingZ / 2f;
+            for (int i = 0; i < n; i++)
+            {
+                int row = i / cols;
+                int col = i % cols;
+                var obj = allObjs[i];
+                float x = startX + col * spacingX;
+                float z = startZ + row * spacingZ;
+                obj.transform.position = new Vector3(x, baseY, z);
+                if (autoYAlign)
+                {
+                    PlaceOnTop(parentObj, obj);
+                }
+            }
+            Debug.Log("[AutoPlacer] XZ网格分布+Y轴贴合自动摆放完成");
+        }
+        #endregion
+
+        #region 贴合与检测
+        /// <summary>
+        /// 设置默认朝向（全部由代码自动设置，AI不参与rotation）
+        /// 只需设置根对象transform.rotation，所有mesh子物体自动跟随
+        /// </summary>
+        void SetDefaultRotation(GameObject obj)
+        {
+            // 统一设置z轴负方向为前
+            obj.transform.rotation = Quaternion.LookRotation(-Vector3.forward, Vector3.up);
+            Debug.Log($"[AutoPlacer] {obj.name} rotation已设置为z轴负方向");
+        }
+
+        // 恢复 PlaceOnTop 用于Y轴贴合
+        void PlaceOnTop(GameObject baseObj, GameObject objToPlace, bool ignoreAIOffset = false)
+        {
+            var rule = GetRule(objToPlace.name);
+            SetDefaultRotation(objToPlace); // 所有模型都设置rotation
+            if (rule != null && rule.keyword == rule.parentKeyword)
+            {
+                // 跳过position设置
+                return;
+            }
+            var baseBounds = GetWorldMeshBounds(baseObj);
+            float tableTopY = baseBounds.max.y;
+            // 1. 先让模型中心X/Z不变，Y初步放在桌面表面
+            Vector3 targetPos = new Vector3(objToPlace.transform.position.x, tableTopY, objToPlace.transform.position.z);
+            objToPlace.transform.position = targetPos;
+
+            // 2. 递归查找所有MeshFilter，收集所有底部顶点的世界坐标
+            var meshFilters = objToPlace.GetComponentsInChildren<MeshFilter>();
+            List<Vector3> allBottomVerts = new List<Vector3>();
+            foreach (var mf in meshFilters)
+            {
+                if (mf.sharedMesh == null) continue;
+                var mesh = mf.sharedMesh;
+                var vertices = mesh.vertices;
+                float minY = mesh.bounds.min.y;
+                Matrix4x4 mat = mf.transform.localToWorldMatrix;
+                foreach (var v in vertices)
+                {
+                    if (Mathf.Abs(v.y - minY) < 1e-4f)
+                        allBottomVerts.Add(mat.MultiplyPoint3x4(v));
+                }
+            }
+            if (allBottomVerts.Count == 0)
+            {
+                Debug.LogWarning($"[AutoPlacer] {objToPlace.name} 未检测到底部顶点，直接贴合中心");
+                objToPlace.transform.position = targetPos;
+                return;
+            }
+            // 3. 计算所有底部顶点的最小Y
+            float minVertY = float.MaxValue;
+            foreach (var v in allBottomVerts) minVertY = Mathf.Min(minVertY, v.y);
+            float deltaY = tableTopY - minVertY;
             objToPlace.transform.position += new Vector3(0, deltaY, 0);
-            UpdateRuleTransform(objToPlace.name, objToPlace.transform.position, objToPlace.transform.rotation.eulerAngles);
-            Debug.Log($"[AutoPlacer] 基准物体: {baseObj.name} 类型: {baseObj.GetType().Name} pos: {baseObj.transform.position}, AI建议pos: {rule.position}, 强制Y=0后: {aiOffset}, baseTopY: {baseTopY}, objBottomY: {objBottomY}, deltaY: {deltaY}, 最终pos: {objToPlace.transform.position}, AI原始Y: {aiY}");
         }
-        else
+        #endregion
+
+        #region 工具方法
+        /// <summary>
+        /// 获取物体所有MeshFilter的网格bounds（世界坐标）
+        /// </summary>
+        Bounds GetWorldMeshBounds(GameObject obj)
         {
-            objToPlace.transform.position = baseObj.transform.position;
-            SetDefaultRotation(objToPlace);
-            UpdateRuleTransform(objToPlace.name, objToPlace.transform.position, objToPlace.transform.rotation.eulerAngles);
-        }
-    }
+            var meshFilters = obj.GetComponentsInChildren<MeshFilter>();
+            if (meshFilters.Length == 0) return new Bounds(obj.transform.position, Vector3.zero);
 
-    /// <summary>
-    /// 获取物体包围盒
-    /// </summary>
-    Bounds GetBounds(GameObject obj)
-    {
-        var mr = obj.GetComponent<MeshRenderer>();
-        if (mr != null) return mr.bounds;
-        var mf = obj.GetComponent<MeshFilter>();
-        if (mf != null && mf.sharedMesh != null)
-            return mf.sharedMesh.bounds;
-        return new Bounds(Vector3.zero, Vector3.one);
-    }
-
-    /// <summary>
-    /// 获取物体在主轴方向的宽度（用于横向分布）
-    /// </summary>
-    float GetObjectWidth(GameObject obj)
-    {
-        var bounds = GetBounds(obj);
-        return bounds.size.x * obj.transform.localScale.x;
-    }
-
-    /// <summary>
-    /// 计算物体在主轴方向的表面坐标
-    /// </summary>
-    float GetSurfacePosition(Vector3 pos, Bounds bounds, Vector3 axis, bool isTop)
-    {
-        int axisIdx = GetAxisIndex(axis);
-        float center = bounds.center[axisIdx] * objScaleOnAxis(axis, bounds, pos);
-        float half = (bounds.size[axisIdx] / 2) * objScaleOnAxis(axis, bounds, pos);
-        return pos[axisIdx] + center + (isTop ? half : -half);
-    }
-
-    /// <summary>
-    /// 获取主轴索引（0:X, 1:Y, 2:Z）
-    /// </summary>
-    int GetAxisIndex(Vector3 axis)
-    {
-        axis = axis.normalized;
-        if (axis == Vector3.right) return 0;
-        if (axis == Vector3.up) return 1;
-        if (axis == Vector3.forward) return 2;
-        return 1;
-    }
-
-    /// <summary>
-    /// 获取物体在主轴方向的缩放
-    /// </summary>
-    float objScaleOnAxis(Vector3 axis, Bounds bounds, Vector3 pos)
-    {
-        var obj = FindObjectAtPosition(pos);
-        if (obj == null) return 1f;
-        int idx = GetAxisIndex(axis);
-        return obj.transform.localScale[idx];
-    }
-
-    /// <summary>
-    /// 通过位置查找物体
-    /// </summary>
-    GameObject FindObjectAtPosition(Vector3 pos)
-    {
-        foreach (Transform child in GameObject.Find("GameObjectRoot").transform)
-        {
-            if ((child.position - pos).sqrMagnitude < 0.01f)
-                return child.gameObject;
-        }
-        return null;
-    }
-
-    /// <summary>
-    /// 应用规则表中的位置微调
-    /// </summary>
-    void ApplyOffset(GameObject obj)
-    {
-        // 不再使用offset，直接同步
-        UpdateRuleTransform(obj.name, obj.transform.position, obj.transform.rotation.eulerAngles);
-    }
-
-    /// <summary>
-    /// 获取物品规则
-    /// </summary>
-    ItemRule GetRule(string objName)
-    {
-        if (itemRules != null && itemRules.ContainsKey(objName))
-            return itemRules[objName];
-        // 支持模糊匹配（如关键字包含）
-        if (itemRules != null)
-        {
-            foreach (var kv in itemRules)
+            Bounds worldBounds = new Bounds();
+            bool first = true;
+            foreach (var mf in meshFilters)
             {
-                if (!string.IsNullOrEmpty(kv.Value.keyword) && objName.Contains(kv.Value.keyword))
-                    return kv.Value;
-            }
-        }
-        return null;
-    }
-
-    private ItemRule ParseAIPlacementJson(string modelName, string json)
-    {
-        if (string.IsNullOrEmpty(json)) return null;
-        try
-        {
-            var aiData = JsonUtility.FromJson<AIPlacementData>(json);
-            var rule = new ItemRule();
-            rule.keyword = modelName;
-            rule.parentKeyword = aiData.parent;
-            // 健壮性校验 rotation
-            if (aiData.rotation != null && aiData.rotation.Length == 3)
-            {
-                bool valid = true;
-                foreach (var v in aiData.rotation)
+                if (mf.sharedMesh == null) continue;
+                var meshBounds = mf.sharedMesh.bounds;
+                // 8个顶点全部转换到世界坐标
+                Vector3[] corners = new Vector3[8];
+                Vector3 min = meshBounds.min;
+                Vector3 max = meshBounds.max;
+                corners[0] = mf.transform.TransformPoint(new Vector3(min.x, min.y, min.z));
+                corners[1] = mf.transform.TransformPoint(new Vector3(max.x, min.y, min.z));
+                corners[2] = mf.transform.TransformPoint(new Vector3(min.x, max.y, min.z));
+                corners[3] = mf.transform.TransformPoint(new Vector3(min.x, min.y, max.z));
+                corners[4] = mf.transform.TransformPoint(new Vector3(max.x, max.y, min.z));
+                corners[5] = mf.transform.TransformPoint(new Vector3(min.x, max.y, max.z));
+                corners[6] = mf.transform.TransformPoint(new Vector3(max.x, min.y, max.z));
+                corners[7] = mf.transform.TransformPoint(new Vector3(max.x, max.y, max.z));
+                foreach (var v in corners)
                 {
-                    if (float.IsNaN(v) || float.IsInfinity(v) || Mathf.Abs(v) > 720)
-                        valid = false;
-                }
-                if (valid)
-                    rule.rotation = new Vector3(aiData.rotation[0], aiData.rotation[1], aiData.rotation[2]);
-                else
-                {
-                    Debug.LogWarning($"[AutoPlacer] {modelName} AI返回的rotation数值异常，已用Vector3.zero替代: {string.Join(",", aiData.rotation)}");
-                    rule.rotation = Vector3.zero;
+                    if (first)
+                    {
+                        worldBounds = new Bounds(v, Vector3.zero);
+                        first = false;
+                    }
+                    else
+                    {
+                        worldBounds.Encapsulate(v);
+                    }
                 }
             }
-            else
-            {
-                Debug.LogWarning($"[AutoPlacer] {modelName} AI返回的rotation字段无效，已用Vector3.zero替代");
-                rule.rotation = Vector3.zero;
-            }
-            rule.layoutMode = ParseLayoutMode(aiData.layout_mode);
-            rule.group = aiData.group;
-            return rule;
+            return worldBounds;
         }
-        catch (Exception ex)
+
+        /// <summary>
+        /// 支持假设位置和旋转的mesh bounds计算
+        /// </summary>
+        Bounds GetWorldMeshBounds(GameObject obj, Vector3 pos, Quaternion rot)
         {
-            Debug.LogError($"AI JSON解析失败: {ex.Message}\n{json}");
+            var meshFilters = obj.GetComponentsInChildren<MeshFilter>();
+            if (meshFilters.Length == 0) return new Bounds(pos, Vector3.zero);
+            Bounds worldBounds = new Bounds();
+            bool first = true;
+            foreach (var mf in meshFilters)
+            {
+                if (mf.sharedMesh == null) continue;
+                var meshBounds = mf.sharedMesh.bounds;
+                Matrix4x4 mat = Matrix4x4.TRS(pos, rot, mf.transform.lossyScale);
+                Vector3 min = meshBounds.min;
+                Vector3 max = meshBounds.max;
+                Vector3[] corners = new Vector3[8];
+                corners[0] = mat.MultiplyPoint3x4(new Vector3(min.x, min.y, min.z));
+                corners[1] = mat.MultiplyPoint3x4(new Vector3(max.x, min.y, min.z));
+                corners[2] = mat.MultiplyPoint3x4(new Vector3(min.x, max.y, min.z));
+                corners[3] = mat.MultiplyPoint3x4(new Vector3(min.x, min.y, max.z));
+                corners[4] = mat.MultiplyPoint3x4(new Vector3(max.x, max.y, min.z));
+                corners[5] = mat.MultiplyPoint3x4(new Vector3(min.x, max.y, max.z));
+                corners[6] = mat.MultiplyPoint3x4(new Vector3(max.x, min.y, max.z));
+                corners[7] = mat.MultiplyPoint3x4(new Vector3(max.x, max.y, max.z));
+                foreach (var v in corners)
+                {
+                    if (first)
+                    {
+                        worldBounds = new Bounds(v, Vector3.zero);
+                        first = false;
+                    }
+                    else
+                    {
+                        worldBounds.Encapsulate(v);
+                    }
+                }
+            }
+            return worldBounds;
+        }
+
+        /// <summary>
+        /// 获取物品规则
+        /// </summary>
+        ItemRule GetRule(string objName)
+        {
+            if (itemRules != null && itemRules.ContainsKey(objName))
+                return itemRules[objName];
+            // 支持模糊匹配（如关键字包含）
+            if (itemRules != null)
+            {
+                foreach (var kv in itemRules)
+                {
+                    if (!string.IsNullOrEmpty(kv.Value.keyword) && objName.Contains(kv.Value.keyword))
+                        return kv.Value;
+                }
+            }
             return null;
         }
-    }
 
-    [Serializable]
-    private class AIPlacementData
-    {
-        public string parent;
-        public float[] rotation;
-        public string layout_mode;
-        public string group;
-    }
-
-    private LayoutMode ParseLayoutMode(string mode)
-    {
-        if (string.IsNullOrEmpty(mode)) return LayoutMode.Linear;
-        switch (mode.ToLower())
+        private ItemRule ParseAIPlacementJson(string modelName, string json)
         {
-            case "grid": return LayoutMode.Grid;
-            case "circle": return LayoutMode.Circle;
-            default: return LayoutMode.Linear;
+            if (string.IsNullOrEmpty(json)) return null;
+            try
+            {
+                var aiData = JsonUtility.FromJson<AIPlacementData>(json);
+                var rule = new ItemRule();
+                rule.keyword = modelName;
+                rule.parentKeyword = aiData.parent;
+                rule.isMainModel = aiData.is_main_model;
+                return rule;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"AI JSON解析失败: {ex.Message}\n{json}");
+                return null;
+            }
         }
-    }
 
-    [System.Serializable]
-    private class AIPlacementLog
-    {
-        public string request;
-        public string aiResult;
-        public string error;
-    }
+//         private void OnEnable()
+//         {
+// #if UNITY_EDITOR
+//             EditorApplication.hierarchyChanged += OnHierarchyChanged;
+// #endif
+//             hasArranged = false; // 每次启用都重置，确保无论如何都能执行一次
+//             int placableCount = GetPlacableModelCount();
+//             lastChildCount = placableCount;
+//             // 无论数量是否变化，都强制检测一次
+//             if (itemRules.Count < placableCount)
+//             {
+//                 Debug.Log("[AutoPlacer] OnEnable: 检测到itemRules数量不足，自动启动AI分析...");
+//                 AnalyzeAllWithAI();
+//             }
+//             else if (itemRules.Count == placableCount)
+//             {
+//                 Debug.Log("[AutoPlacer] OnEnable: itemRules数量已齐，自动开始自动摆放...");
+//                 AutoArrange();
+//                 hasArranged = true;
+//             }
+//             else
+//             {
+//                 Debug.Log("[AutoPlacer] OnEnable: itemRules数量与可摆放模型数量不符，建议检查数据。");
+//             }
+//         }
 
-    // 新增：同步ItemRule的position和rotation
-    void UpdateRuleTransform(string objName, Vector3 pos, Vector3 euler)
-    {
-        var rule = GetRule(objName);
-        if (rule != null)
+        private int GetPlacableModelCount()
         {
-            rule.position = pos;
-            rule.rotation = euler;
+            var root = GameObject.Find("GameObjectRoot");
+            if (root == null) return 0;
+            int count = 0;
+            foreach (Transform child in root.transform)
+            {
+                var rule = GetRule(child.gameObject.name);
+                if (rule != null && !string.IsNullOrEmpty(rule.parentKeyword) && rule.keyword == rule.parentKeyword)
+                    continue; // 跳过基准物体
+                count++;
+            }
+            return count;
         }
+
+#if UNITY_EDITOR
+        private int lastChildCount = -1;
+        private EditorCoroutine autoArrangeCoroutine;
+
+        private void OnDisable()
+        {
+            EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+        }
+
+        private void OnValidate()
+        {
+            if (Application.isPlaying) return; // 只在编辑器下
+            hasArranged = false;
+            int placableCount = GetPlacableModelCount();
+            if (itemRules.Count < placableCount)
+            {
+                Debug.Log("[AutoPlacer] OnValidate: 检测到itemRules数量不足，自动启动AI分析...");
+                AnalyzeAllWithAI();
+            }
+            else if (itemRules.Count == placableCount)
+            {
+                Debug.Log("[AutoPlacer] OnValidate: itemRules数量已齐，自动开始自动摆放...");
+                AutoArrange();
+                hasArranged = true;
+            }
+        }
+
+        private void OnHierarchyChanged()
+        {
+            var root = GameObject.Find("GameObjectRoot");
+            if (root == null) return;
+            int currentCount = GetPlacableModelCount();
+            if (currentCount != lastChildCount)
+            {
+                Debug.Log($"[AutoPlacer] 检测到GameObjectRoot子物体数量变化: {lastChildCount} → {currentCount}，自动重新分析与摆放");
+                lastChildCount = currentCount;
+                hasArranged = false;
+                itemRules.Clear();
+                AnalyzeAllWithAI();
+            }
+        }
+
+        // 新增：只统计可摆放物体的itemRules条目
+        private int GetPlacableItemRuleCount()
+        {
+            int count = 0;
+            foreach (var kv in itemRules)
+            {
+                var rule = kv.Value;
+                if (rule != null && !(rule.keyword == rule.parentKeyword))
+                    count++;
+            }
+            return count;
+        }
+
+        private IEnumerator WaitForItemRulesAndAutoArrange()
+        {
+            while (true)
+            {
+                int placableCount = GetPlacableModelCount();
+                int placableRuleCount = GetPlacableItemRuleCount();
+                Debug.Log($"[AutoPlacer][协程] itemRules.Count={itemRules.Count}, placableRuleCount={placableRuleCount}, placableCount={placableCount}, hasArranged={hasArranged}");
+                if (placableRuleCount == placableCount && !hasArranged)
+                {
+                    Debug.Log("[AutoPlacer][协程] 检测到可摆放itemRules数量齐全，自动开始自动摆放...");
+                    AutoArrange();
+                    hasArranged = true;
+                    break;
+                }
+                yield return new EditorWaitForSeconds(0.2f);
+            }
+        }
+#endif
+        #endregion
+
+        private bool hasArranged = false;
     }
-}
+
 }

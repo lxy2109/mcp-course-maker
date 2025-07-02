@@ -1,0 +1,8 @@
+==== GLB批量转换报告 ====
+总文件数: 4
+总用时: 0.00秒
+
+- 实验桌_simplify.glb | 大小: 145KB | Prefab: 是
+- 实验记录本.glb | 大小: 2672KB | Prefab: 是
+- 标准照明灯.glb | 大小: 4393KB | Prefab: 是
+- 色盲测试卡.glb | 大小: 3551KB | Prefab: 是

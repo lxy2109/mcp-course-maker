@@ -1,32 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Xml.Serialization;
 
 public class CanvasButtonListener : MonoBehaviour
 {
     private EventManager eventManager;
-    private Button[] button = new Button[3];
-    private Camera camera;
-    private Vector3 cameraOriginalPosition;
-    private Quaternion cameraOriginalRotation;
-    
-
+    private Button[] button = new Button[5];
+    private Text currentHighlightText;
+    private Text currentOutlineText;
 
     private void Awake()
     {
         button[0] = transform.GetChild(0).GetChild(0).GetComponent<Button>();
         button[1] = transform.GetChild(0).GetChild(1).GetComponent<Button>();
-        button[2] = transform.GetChild(1).GetComponentInChildren<Button>();
-
-        camera = Camera.main;
-        
-        // 保存摄像机的初始位置和旋转值
-        if (camera != null)
-        {
-            cameraOriginalPosition = camera.transform.position;
-            cameraOriginalRotation = camera.transform.rotation;
-            Debug.Log($"摄像机初始位置已保存: {cameraOriginalPosition}");
-        }
+        button[2] = transform.GetChild(0).GetChild(2).GetComponent<Button>();
+        button[3] = transform.GetChild(0).GetChild(4).GetComponent<Button>();
+        button[4] = transform.GetChild(1).GetComponentInChildren<Button>();
+        currentHighlightText = transform.GetChild(0).GetChild(3).GetComponentInChildren<Text>();
+        currentOutlineText = transform.GetChild(0).GetChild(4).GetComponentInChildren<Text>();
        
     }
 
@@ -47,7 +39,9 @@ public class CanvasButtonListener : MonoBehaviour
 
         button[0].onClick.AddListener(CameraReSet);
         button[1].onClick.AddListener(ReStartExp);
-        button[2].onClick.AddListener(StartExp);
+        button[2].onClick.AddListener(SwitchHighlightType);
+        button[3].onClick.AddListener(SwitchOutlineType);
+        button[4].onClick.AddListener(StartExp);
     }
 
     /// <summary>
@@ -64,20 +58,45 @@ public class CanvasButtonListener : MonoBehaviour
 
     private void CameraReSet()
     {
-        if (camera != null)
-        {
-            camera.transform.position = cameraOriginalPosition;
-            camera.transform.rotation = cameraOriginalRotation;
-            Debug.Log($"摄像机已重置到初始位置: {cameraOriginalPosition}");
-        }
-        else
-        {
-            Debug.LogError("Camera is null!");
-        }
+        eventManager.ResetCameraPos();
     }
 
     private void ReStartExp()
     {
-        EventManager.instance.ResetAndRestartExperiment();
+        eventManager.ResetAndRestartExperiment();
+    }
+
+
+    private void SwitchHighlightType()
+    {
+        eventManager.highlightService.NextHighlightType();
+        currentHighlightText.text = eventManager.highlightService.GetHighlightType() switch
+        {
+            HighlightType.Prompt => "标识符",
+            HighlightType.OutLine => "外缘线",
+            HighlightType.Both => "共用",
+            _ => "标识符"
+        };
+        var outpanel = button[3].transform.gameObject;
+        if(currentHighlightText.text == "标识符")
+        {
+            outpanel.SetActive(false);
+        }
+        else
+        {
+            outpanel.SetActive(true);
+        }
+    }
+
+    private void SwitchOutlineType()
+    {
+        eventManager.highlightService.NextOutlineType();
+        currentOutlineText.text = eventManager.highlightService.GetOutlineType() switch
+        {
+            OutlineType.None => "无特效",
+            OutlineType.WidthBreathing => "呼吸灯",
+            OutlineType.ColorBlinking => "闪烁",
+            _ => "无特效"
+        };
     }
 }
