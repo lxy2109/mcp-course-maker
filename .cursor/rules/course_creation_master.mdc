@@ -9,6 +9,7 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
              ★ 已集成 *[RULE] modeling_flow.mdc* 的六步标准化建模流程 ★
 
 ***规则内容***
+
 - 所有课程制作必须严格按照八阶段流程执行，不允许跳过任何阶段。
 - 每个阶段进行前需进行详细分析，并告知用户。
 - 每个阶段完成后必须中断，检测阶段性输出结果，并询问用户是否继续。
@@ -23,37 +24,37 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
 - **[MCP] mcp_FileSimp_to_absolute_path**
 - 音频、模型、timeline采用批量生成策略，如有多个流程，则批量逐一进行流程
 
-
 ***八阶段完整流程***
+
 - [阶段1：课程名称标准化处理与目录创建]
-  * 输入：用户输入的课程名称（2-20字符）
-  * 处理：去除特殊字符，确保文件系统兼容性
-  * 目录创建：在Assets下创建{课程名称}文件夹
-  * 输出：标准化课程名称，Assets/{课程名称}/
-  * 验证：检查重名，确认命名规范，确认目录创建成功
+  - 输入：用户输入的课程名称（2-20字符）
+  - 处理：去除特殊字符，确保文件系统兼容性
+  - 目录创建：在Assets下创建{课程名称}文件夹
+  - 输出：标准化课程名称，Assets/{课程名称}/
+  - 验证：检查重名，确认命名规范，确认目录创建成功
 
 - [阶段2：智能课程类型分析]
-  * 输入：标准化课程名称
-  * 分析：基于关键词识别课程类型（例如医学护理、理化实验、生物实验、工程技术）
-  * 输出：课程类型、实验框架模板、器材清单
-  * 验证：确认课程类型准确性
+  - 输入：标准化课程名称
+  - 分析：基于关键词识别课程类型（例如医学护理、理化实验、生物实验、工程技术）
+  - 输出：课程类型、实验框架模板、器材清单
+  - 验证：确认课程类型准确性
 
 - [阶段3：Excel模板自动生成]
-  * 输入：课程类型和框架模板
-  * 遵循：严格遵守 *[RULE] excel_prompt.mdc* 规则内容
-  * 位置：Assets/{课程名称}/ 目录下
-  * 生成：14列标准结构Excel文件（实验步骤(FlowGraph)实验逻辑部分|实验动作(EventName)具体动作事件|引导文本(阶段文案 UI引导提示)|手部提示（当前需要点击的物品名称）|虚拟交互Enter(进入事件时进行的Event名称)|交互内容Enter(进入事件时进行的Event内容)|虚拟交互Exit(离开事件时进行的Event名称)|交互内容Exit(离开事件时进行的Event名内容)|配音脚本名称(进入事件时播放的音频名称)|配音脚本内容(进入事件时播放的音频文案内容)|镜头timeline名称|镜头timeline内容|物体timeline名称|物体timeline内容
-  * 工具：**[MCP] mcp_excel_create_workbook**、**[MCP] mcp_excel_create_worksheet**、**[MCP] mcp_excel_write_data_to_excel**
-  * 验证：检查14列完整性，4个Sheet结构
+  - 输入：课程类型和框架模板
+  - 遵循：严格遵守 *[RULE] excel_prompt.mdc* 规则内容
+  - 位置：Assets/{课程名称}/ 目录下
+  - 生成：14列标准结构Excel文件（实验步骤(FlowGraph)实验逻辑部分|实验动作(EventName)具体动作事件|引导文本(阶段文案 UI引导提示)|手部提示（当前需要点击的物品名称）|虚拟交互Enter(进入事件时进行的Event名称)|交互内容Enter(进入事件时进行的Event内容)|虚拟交互Exit(离开事件时进行的Event名称)|交互内容Exit(离开事件时进行的Event名内容)|配音脚本名称(进入事件时播放的音频名称)|配音脚本内容(进入事件时播放的音频文案内容)|镜头timeline名称|镜头timeline内容|物体timeline名称|物体timeline内容
+  - 工具：**[MCP] mcp_excel_create_workbook**、**[MCP] mcp_excel_create_worksheet**、**[MCP] mcp_excel_write_data_to_excel**
+  - 验证：检查14列完整性，4个Sheet结构
 
 - [阶段4：课程子目录结构创建]
-  * 输入：生成的Excel文件，已存在的Assets/{课程名称}/
-  * 目标：在 **[PATH] Assets/{课程名称}/** 下创建完整子目录结构
-  * 结构：{课程名称}.xlsx、Audio/、Timeline/、Models/、Materials/、Textures/、Prefabs/、Scripts/
-  * 验证：确认子目录结构完整，Excel文件正确保存
+  - 输入：生成的Excel文件，已存在的Assets/{课程名称}/
+  - 目标：在 **[PATH] Assets/{课程名称}/** 下创建完整子目录结构
+  - 结构：{课程名称}.xlsx、Audio/、Timeline/、Models/、Materials/、Textures/、Prefabs/、Scripts/
+  - 验证：确认子目录结构完整，Excel文件正确保存
 
 - [阶段5：音频与3D模型生成并即时导入]
-  * 音频生成与导入：基于智能需求分析的音频生成系统
+  - 音频生成与导入：基于智能需求分析的音频生成系统
       · 严格遵循 *[RULE] tts.mdc* 规则内容
       · 需要分析出适合课程讲解的音色，并调用 **[MCP] mcp_DoubaoTTS_list_voice** 或 **[MCP] mcp_MiniMax_list_voices** 或 **[MCP] mcp_ElevenLabs_voice_manage** 进行音色查找匹配
       · 发音准确性检查：专业术语、数字、单位的正确发音
@@ -61,19 +62,19 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
       · 音频格式标准化：统一输出为适合Unity的音频格式
       · 立即导入Unity：音频生成完成后，分析 **[PATH] Assets/{课程名称}/Audio/** 的绝对路径，直接导入
       · 文件命名规范：按Excel中的配音脚本名称命名
-  * 音频生成前需要分析并查找合适的声音
-  * 逐一生成所有所需音频
+  - 音频生成前需要分析并查找合适的声音
+  - 逐一生成所有所需音频
 
-  * 3D模型生成：基于modeling_flow.mdc的六步标准化建模流程
+  - 3D模型生成：基于modeling_flow.mdc的六步标准化建模流程
     **流程说明**：严格按照六步骤执行，每步完成后进行阶段性输出展示，询问用户是否继续
     · 严格遵循 *[RULE] modeling_flow.mdc* 规则内容
     · 立即导入Unity：模型减面完成后调用 **[MCP] mcp_FileSimp_to_absolute_path** 获取 **[PATH] Assets/{课程名称}/Models/** 的绝对路径，直接导入
     · 文件命名规范：按Excel中的物品名称命名
     · 需要多个模型生成时，按步骤同时进行多个模型的建模流程
-    
+
 - [阶段6：模型实例化与场景布局]
-  * 输入：Excel中的相关信息、Assets/{课程名称}/Models
-  * 调用 **[MCP] mcp_unityMCP_new_scene** 新建场景，命名为{课程名称}
+  - 输入：Excel中的相关信息、Assets/{课程名称}/Models
+  - 调用 **[MCP] mcp_unityMCP_new_scene** 新建场景，命名为{课程名称}
     - 场景保存在Assets/{课程名称} 目录下
     - 新场景中需要调用 **[MCP] mcp_unityMCP_create_object** 创建Directional Light 和 Main Camera
     - 设置Main Camera的tag为MainCamera
@@ -82,46 +83,46 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
     1. [具体学习目标内容]
     2. [具体学习目标内容]
     一并传入。
-  * 调用 **[MCP] mcp_unityMCP_glb_batch_convert** ("Assets/{课程名称}")
+  - 调用 **[MCP] mcp_unityMCP_glb_batch_convert** ("Assets/{课程名称}")
     - 工具实现代码为"GLBToPrefabBatchConverter.cs"
     - 预制件存储位置为 **[PATH] Assets/{课程名称}/Prefabs**
     - 转换时默认应用转换设置中选项
     - 玻璃材质存储位置为 **[PATH] Assets/{课程名称}/Materials**
-  * 读取分析excel中各个物品的相关信息，将场景中物体进行合理的transform调整
+  - 读取分析excel中各个物品的相关信息，将场景中物体进行合理的transform调整
     - 布局需严格遵守 *[RULE] posset.mdc* 规则内容
     - 每个模型的位置需要分析excel来设定
-  * 验证：布局完成后输出各个模型所在的position
+  - 验证：布局完成后输出各个模型所在的position
 
 - [阶段7：基于场景布局的Timeline动画生成]
-  * 输入：Excel中的Timeline描述、场景中已实例化的模型位置信息
-  * Timeline生成策略：
+  - 输入：Excel中的Timeline描述、场景中已实例化的模型位置信息
+  - Timeline生成策略：
     - 严格遵循 *[RULE] timeline.mdc* 规则内容
-  * Timeline资产保存：
+  - Timeline资产保存：
     - 保存路径：**[PATH] Assets/{课程名称}/Timeline/**
     - 命名规范：按Excel中timeline名称命名
     - 自动关联：Timeline自动引用场景中对应的游戏对象
-  * 验证：确认Timeline文件生成成功，动画轨迹合理，无碰撞冲突
+  - 验证：确认Timeline文件生成成功，动画轨迹合理，无碰撞冲突
 
 - [阶段8：NodeGraph创建]
-  * 输入：课程名称
-  * 创建：空的{课程名称}.asset文件
-  * 工具：**[MCP] mcp_unityMCP_create_empty_nodegraph**
-  * 路径：**[PATH] Assets/{课程名称}/{课程名称}.asset**
-  * 验证：确认NodeGraph文件创建成功
+  - 输入：课程名称
+  - 创建：空的{课程名称}.asset文件
+  - 工具：**[MCP] mcp_unityMCP_create_empty_nodegraph**
+  - 路径：**[PATH] Assets/{课程名称}/{课程名称}.asset**
+  - 验证：确认NodeGraph文件创建成功
 
 - [阶段9：完整资产关联到节点]
-  * 输入：Excel数据和对应课程空的nodegraph
-  * 关联策略：
-  * 工具1：**[MCP] mcp_unityMCP_import_excel_to_nodegraph**
+  - 输入：Excel数据和对应课程空的nodegraph
+  - 关联策略：
+  - 工具1：**[MCP] mcp_unityMCP_import_excel_to_nodegraph**
     - 首先使用该工具把excel导入到nodegraph当中并注册该nodegraph
     - 数据完整性验证：确保Excel中每行数据都能找到对应的资产引用
-  * 工具2： **[MCP] mcp_unityMCP_flow_event_forth**
+  - 工具2： **[MCP] mcp_unityMCP_flow_event_forth**
     - 输入：当前的课程名称
-  * 智能匹配算法：
+  - 智能匹配算法：
     - 精确匹配：优先按名称精确匹配资产
     - 模糊匹配：支持部分名称匹配和关键词匹配
     - 路径解析：自动解析相对路径和绝对路径
-  * 验证：检查资产关联率>90%，节点功能完整，所有引用有效
+  - 验证：检查资产关联率>90%，节点功能完整，所有引用有效
 
 ---
 
@@ -155,11 +156,12 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
   · 安全距离控制：热源、化学试剂与其他器材保持规定安全距离
   · 操作便利性：高频使用物品放置在易取位置，符合人体工程学
   · 美观协调性：整体布局视觉协调，避免大小物品分布失衡
+
 - *精确贴合算法执行*：按照posset.mdc严格执行物理贴合计算
   · *强制单体计算*：绝不允许简化或批量处理，每个物体必须单独精确计算
   · *主轴贴合公式*：严格使用完整posset公式，考虑bounds.center和scale的完整影响
-    - A物体上表面 = A.position.y + A.bounds.center.y * A.scale.y + (A.bounds.size.y / 2) * A.scale.y
-    - B物体贴合A上表面：B.position.y = A.position.y + (A.bounds.center.y - B.bounds.center.y) * B.scale.y + ((A.bounds.size.y + B.bounds.size.y) / 2) * B.scale.y
+  - A物体上表面 = A.position.y + A.bounds.center.y *A.scale.y + (A.bounds.size.y / 2)* A.scale.y
+  - B物体贴合A上表面：B.position.y = A.position.y + (A.bounds.center.y - B.bounds.center.y) *B.scale.y + ((A.bounds.size.y + B.bounds.size.y) / 2)* B.scale.y
   · *非主轴防穿模*：在其他两个轴上严格检查包围盒交集，确保无重叠、无穿模
   · *旋转处理*：如有rotation，先归零再计算bounds，确保与世界坐标系一致
   · *多层递归贴合*：支持多个物体依次贴合的递归计算，逐层精确处理
@@ -169,6 +171,7 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
 ---
 
 ***关键MCP工具映射***
+
 - **[MCP] mcp_FileSimp_to_absolute_path**
 - **[MCP] mcp_excel_create_workbook**
 - **[MCP] mcp_excel_create_worksheet**
@@ -212,6 +215,7 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
 ---
 
 ***错误处理策略***
+
 - 任何阶段失败必须记录详细错误信息
 - 支持从任意阶段重新开始流程
 - 资源生成失败时自动切换备用工具
@@ -231,6 +235,7 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
 ---
 
 ***目标效果***
+
 - 一键式课程生成，用户只需输入课程名称
 - 标准化输出，确保所有课程质量一致
 - 自动化程度>95%，最小化人工干预
@@ -239,8 +244,3 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
 禁止跳过任何阶段或简化流程。
 允许后续扩展新的课程类型和资源生成工具，但需补充相应的识别规则和工具映射。
 </cursorrules_course_creation>
-
-
-
-
-

@@ -140,6 +140,16 @@
         "PYTHONUNBUFFERED": "1",
         "BLENDER_PATH": "YOUR_BLENDER3.6_PATH"
       }
+    },
+
+    "polyhaven": {
+      "command": "python",
+      "args": [
+        "your_abs_dir/polyhaven-mcp-server/src/server.py"
+      ],
+      "env": {
+        "DOWNLOAD_PATH": "your_abs_dir/Assets/Skybox"
+      }
     }
   }
 }

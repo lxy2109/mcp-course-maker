@@ -74,6 +74,11 @@ namespace UnityMCP.Editor.Commands
 
             // MaterialCommandHandler
             { "SET_MATERIAL", parameters => MaterialCommandHandler.SetMaterial(parameters) },
+
+            // SkyboxCommandHandler
+            { "SET_SKYBOX", parameters => SkyboxCommandHandler.SetSkybox(parameters) },
+            { "CLEAR_SKYBOX", parameters => SkyboxCommandHandler.ClearSkybox(parameters) },
+            { "CREATE_SKYBOX_MATERIAL", parameters => SkyboxCommandHandler.CreateSkyboxMaterial(parameters) },
             
             // NodeGraphTool commands
             // CreateEmptyNodeGraph

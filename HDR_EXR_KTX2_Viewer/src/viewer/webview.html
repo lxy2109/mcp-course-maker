@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>HDR/EXR/KTX2 预览</title>
+  <style>
+    html, body { margin:0; padding:0; width:100vw; height:100vh; background:#23272e; }
+    #canvas {
+      width:100vw; height:100vh; display:block;
+      border-radius: 18px;
+      box-shadow: 0 4px 32px 0 rgba(0,0,0,0.25), 0 1.5px 8px 0 rgba(0,0,0,0.10);
+      background: #181a20;
+      transition: box-shadow 0.2s;
+    }
+    #canvas:active {
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.18);
+    }
+    #info {
+      position:fixed; top:18px; left:18px;
+      color:#fff;
+      font-size:1.15rem;
+      font-weight:500;
+      background:rgba(30,34,40,0.65);
+      padding:8px 18px;
+      border-radius:10px;
+      box-shadow:0 2px 12px 0 rgba(0,0,0,0.18);
+      backdrop-filter: blur(6px);
+      letter-spacing:0.5px;
+      z-index:10;
+      user-select: text;
+      transition: background 0.2s;
+    }
+    /* 曝光控件卡片风格 */
+    #exposure-card, .exposure-card {
+      position:fixed; top:18px; right:18px;
+      background:rgba(30,34,40,0.7);
+      color:#fff;
+      padding:8px 18px;
+      border-radius:10px;
+      box-shadow:0 2px 12px 0 rgba(0,0,0,0.18);
+      font-size:1rem;
+      z-index:12;
+      display:flex; align-items:center; gap:8px;
+      backdrop-filter: blur(6px);
+      user-select: none;
+    }
+    #exposure-slider {
+      accent-color: #4caf50;
+      width: 90px;
+      margin: 0 6px;
+    }
+    #exposure-value {
+      min-width: 2.5em;
+      display:inline-block;
+      text-align:right;
+    }
+    @media (max-width: 600px) {
+      #info, #exposure-card, .exposure-card { font-size:0.95rem; padding:6px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="info">加载中...</div>
+  <canvas id="canvas"></canvas>
+  <!-- three.js -->
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+  <!-- parse-exr 本地版 -->
+  <script src="PARSE_EXR_PATH"></script>
+  <!-- ktx-parse -->
+  <script src="KTX_PARSE_PATH"></script>
+   <!-- hdr.js -->
+   <script src="HDR_JS_PATH"></script>
+  <script>
+    window.FILE_BASE64 = "{{BASE64}}";
+    window.FILE_TYPE = "{{TYPE}}";
+    window.WORKER_URL = "{{WORKER_URL}}";
+    document.getElementById('info').textContent += ' [html变量注入OK]';
+  </script>
+  <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
+  <script>
+    document.getElementById('info').textContent += ' [lodash:' + (typeof _ !== 'undefined') + ']';
+  </script>
+  <script>
+    document.getElementById('info').textContent += ' [parseExr:' + (typeof window.parseExr) + ']';
+  </script>
+  <script src="VIEWER_JS_PATH"></script>
+</body>
+</html> 

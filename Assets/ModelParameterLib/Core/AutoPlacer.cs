@@ -27,7 +27,7 @@ namespace ModelParameterLib.Core{
         [BoxGroup("基础参数")]
         [LabelText("网格分布间距 (X/Z)")]
         [MinValue(0.01f)]
-        public Vector2 gridSpacing = new Vector2(0.2f, 0.2f);
+        public Vector2 gridSpacing = new Vector2(0.3f, 0.2f);
 
         [BoxGroup("基础参数")]
         [LabelText("是否自动Y轴贴合父物体表面")]

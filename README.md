@@ -706,6 +706,72 @@
 
 ---
 
+### 🌄 14. polyhaven-mcp-server（Poly Haven 天空盒/模型/材质下载）
+
+**参考：[polyhaven-mcp-server 文档](https://github.com/lxy2109/polyhaven-mcp-server)**
+
+1. **✨ 功能简介**
+   - 支持从 [Poly Haven](https://polyhaven.com/) 自动搜索和下载高质量的天空盒（HDRI）、3D模型、材质、贴图等资源。
+   - 支持类型：`models`（3D模型）、`materials`（材质）、`hdris`（天空盒）、`textures`（贴图）。
+   - 支持关键词、分类、标签等多条件本地筛选，自动评分优选。
+   - 下载的资源自动保存到指定目录，支持自动重命名和归档。
+   - 适用于Unity、Blender等3D引擎的场景搭建和美术资源管理。
+
+2. **🔧 安装与依赖**
+   - Python 3.8+，依赖见 `polyhaven-mcp-server/requirements.txt`。
+   - 进入 `polyhaven-mcp-server` 目录，执行：
+
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+3. **⚙️ 配置 MCP Server**
+   - 在 MCP 客户端（如 Cursor）配置 `mcp.json`，添加如下内容：
+
+     ```json
+     "polyhaven": {
+       "command": "python",
+       "args": [
+         "your_abs_dir/polyhaven-mcp-server/src/server.py"
+       ],
+       "env": {
+         "DOWNLOAD_PATH": "your_abs_dir/Assets/Skybox"
+       }
+     }
+     ```
+
+   - 说明：
+     - `DOWNLOAD_PATH`：所有 Poly Haven 资源的下载保存目录，建议设置为 Unity 项目下的 `Assets/Skybox` 或其他资源目录，需为绝对路径。
+
+4. **🛠️ 工具注册与调用示例**
+
+   - **搜索资产**（search_assets）：
+     - 支持按类型（models/materials/hdris/textures）、关键词、分类、标签等条件搜索。
+     - 返回符合条件的资产列表及详细信息。
+
+   - **下载资产**（download_asset）：
+     - 输入资产类型、slug、格式等参数，自动下载到 `DOWNLOAD_PATH`。
+     - 支持自动重命名，避免重名冲突。
+
+   - **本地评分优选**：
+     - 搜索结果可自动调用图像识别工具进行评分，优选最符合需求的资源。
+
+   - **示例**：
+     - 搜索并下载一个4K分辨率的HDR天空盒：
+
+       ```
+       搜索关键词"sunny field"的天空盒，优选评分最高的，下载4K分辨率到Assets/Skybox目录
+       ```
+
+5. **🚀 启动服务**
+   - MCP 客户端会自动调用上述命令启动服务。
+
+6. **🌐 资源管理与规范**
+   - 下载的所有资源均自动归档到 `DOWNLOAD_PATH`，并按类型/分类自动归类。
+   - 支持与Unity等引擎的无缝集成，下载后可直接在项目中引用。
+
+---
+
 ## 🖥️ 三、MCP Host 客户端配置（以 Cursor 为例）
 
 1. 打开 Cursor 设置 → Features → MCP Servers → Add new MCP server
@@ -753,3 +819,34 @@
 ---
 
 如有具体服务启动报错、API Key 配置、依赖安装等问题，可根据上述文档和本地日志进行排查，或进一步咨询相关开源项目社区。
+
+---
+
+## 🧩 推荐/使用的 Cursor 插件
+
+为提升本项目的开发与内容制作体验，建议在 Cursor/VSCode 环境中安装以下插件：
+
+1. **3D Viewer for VSCode**
+   - 支持直接在编辑器中预览和旋转常见3D模型（如OBJ、FBX、STL等），便于快速检查模型效果。
+   - 可在 Cursor 内置应用商店通过名称搜索并安装。
+
+2. **Excel Viewer**
+   - 允许在编辑器中直接预览和编辑Excel文件（.xlsx/.xls），适合课程流程表、物品清单等的快速查看与修改。
+   - 可在 Cursor 内置应用商店通过名称搜索并安装。
+
+3. **glTF Model Viewer**
+   - 专为glTF/GLB格式3D模型设计的可视化插件，支持PBR材质、动画等特性，适合AI建模流程的模型预览。
+   - 可在 Cursor 内置应用商店通过名称搜索并安装。
+
+4. **HDR/EXR/KTX2 Viewer**
+   - 支持HDR、EXR、KTX2等高动态范围贴图和天空盒格式的可视化，方便美术资源和天空盒的快速预览。
+   - **本项目已自带本地插件**，位于 `HDR_EXR_KTX2_Viewer` 文件夹，可直接通过 VSCode 插件管理器安装本地 `.vsix` 文件（`HDR_EXR_KTX2_Viewer/hdr-exr-ktx2-viewer-0.0.1.vsix`）。
+   - 该插件未在应用商店发布，仅支持本地安装。
+
+5. **SpecStory**
+   - 用于交互式流程规范、需求文档和自动化脚本的可视化与管理，适合课程制作流程的规范化管理。
+   - 可在 Cursor 内置应用商店通过名称搜索并安装。
+
+---
+
+建议在使用本项目时，提前安装上述插件，以获得最佳的开发、预览和管理体验。

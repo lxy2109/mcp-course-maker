@@ -1,0 +1,21 @@
+---
+alwaysApply: true
+---
+<cursorrules_skybox_generate_rules>
+type: Always
+decription: 规范AI生成天空盒原则。
+
+规则内容：
+- PolyHaven无法搜索到相关天空盒时，启用AI生成天空盒图片
+- 天空盒生成设置
+  - 生成360度天空盒，确保有正确的扭曲效果
+  - 生成的图片尺寸选用21:9
+  - 场景应保持空旷，室内环境中不应该存在室内摆设
+
+
+ 
+
+
+
+
+</cursorrules_skybox_generate_rules>

@@ -2,6 +2,7 @@ from mcp.server.fastmcp import FastMCP, Context
 from typing import List, Dict, Any, Optional
 import json
 from unity_connection import get_unity_connection
+import os
 
 def register_scene_tools(mcp: FastMCP):
     """Register all scene-related tools with the MCP server."""
@@ -329,4 +330,71 @@ def register_scene_tools(mcp: FastMCP):
             result = unity.send_command("DELETE_OBJECT", {"name": name})
             return f"Deleted game object: {name}"
         except Exception as e:
-            return f"Error deleting game object: {str(e)}" 
+            return f"Error deleting game object: {str(e)}"
+
+    @mcp.tool()
+    def set_skybox(ctx: Context, material_path: str) -> str:
+        """设置当前场景的天空盒材质。
+        Args:
+            material_path: 天空盒材质的完整路径（如"Assets/Skybox/SunnyDay.mat"）
+        Returns:
+            str: 成功消息或错误详情
+        """
+        try:
+            unity = get_unity_connection()
+            result = unity.send_command("SET_SKYBOX", {"material_path": material_path})
+            return result.get("message", result)
+        except Exception as e:
+            return f"Error setting skybox: {str(e)}"
+
+    @mcp.tool()
+    def clear_skybox(ctx: Context) -> str:
+        """清除当前场景的天空盒（设为null）。
+        Returns:
+            str: 成功消息或错误详情
+        """
+        try:
+            unity = get_unity_connection()
+            result = unity.send_command("CLEAR_SKYBOX", {})
+            return result.get("message", result)
+        except Exception as e:
+            return f"Error clearing skybox: {str(e)}"
+
+    @mcp.tool()
+    def create_skybox_material(ctx: Context, image_path: str, material_path: str, skybox_type: str = "Panoramic") -> str:
+        """由HDR/EXR图片创建天空盒材质球。
+        Args:
+            image_path: 图片资源路径（如Assets/Skybox/xxx.exr或xxx.hdr）
+            material_path: 输出材质路径（如Assets/Skybox/xxx.mat）
+            skybox_type: 天空盒类型（Panoramic, 6 Sided, Cubemap），默认Panoramic
+        Returns:
+            str: 成功消息或错误详情
+        """
+        try:
+            unity = get_unity_connection()
+            # 先尝试原始路径
+            result = unity.send_command("CREATE_SKYBOX_MATERIAL", {
+                "image_path": image_path,
+                "material_path": material_path,
+                "skybox_type": skybox_type
+            })
+            if result.get("success"):
+                return result.get("message", result)
+            # 如果失败且是exr，尝试hdr
+            base, ext = os.path.splitext(image_path)
+            if ext.lower() == ".exr":
+                alt_path = base + ".hdr"
+            elif ext.lower() == ".hdr":
+                alt_path = base + ".exr"
+            else:
+                return result.get("error", result)
+            result2 = unity.send_command("CREATE_SKYBOX_MATERIAL", {
+                "image_path": alt_path,
+                "material_path": material_path,
+                "skybox_type": skybox_type
+            })
+            if result2.get("success"):
+                return result2.get("message", result2)
+            return result2.get("error", result2)
+        except Exception as e:
+            return f"Error creating skybox material: {str(e)}" 

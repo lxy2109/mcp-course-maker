@@ -356,7 +356,9 @@ namespace UnityMCP.Editor
                     "SET_TRANSFORM_ROTATION" => ObjectCommandHandler.SetTransformRotation(command.@params),
                     "SET_TRANSFORM_SCALE" => ObjectCommandHandler.SetTransformScale(command.@params),
                     
-                    
+                    "SET_SKYBOX" => SkyboxCommandHandler.SetSkybox(command.@params),
+                    "CLEAR_SKYBOX" => SkyboxCommandHandler.ClearSkybox(command.@params),
+                    "CREATE_SKYBOX_MATERIAL" => SkyboxCommandHandler.CreateSkyboxMaterial(command.@params),
                     
                     _ => throw new Exception($"Unknown command type: {command.type}")
                 };
