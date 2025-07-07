@@ -1,11 +1,9 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
 <cursorrules_course_creation>
 type: Always
-description: Unity虚拟实验课程制作完整自动化流程，实现从课程名称输入到完成制作的八阶段标准化流程。
+description: Unity虚拟实验课程制作完整自动化流程，实现从课程名称输入到完成制作的九阶段标准化流程。
              ★ 已集成 *[RULE] modeling_flow.mdc* 的六步标准化建模流程 ★
 
 ***规则内容***
@@ -50,7 +48,7 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
 - [阶段4：课程子目录结构创建]
   - 输入：生成的Excel文件，已存在的Assets/{课程名称}/
   - 目标：在 **[PATH] Assets/{课程名称}/** 下创建完整子目录结构
-  - 结构：{课程名称}.xlsx、Audio/、Timeline/、Models/、Materials/、Textures/、Prefabs/、Scripts/
+  - 结构：{课程名称}.xlsx、Audio/、Timeline/、Models/、Materials/、Textures/、Prefabs/、Scripts/、Skybox/
   - 验证：确认子目录结构完整，Excel文件正确保存
 
 - [阶段5：音频与3D模型生成并即时导入]
@@ -92,25 +90,20 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
     - 布局需严格遵守 *[RULE] posset.mdc* 规则内容
     - 每个模型的位置需要分析excel来设定
   - 验证：布局完成后输出各个模型所在的position
+  - 天空盒生成与导入：基于 *[RULE] polyhaven_search.mdc* 和 *[RULE] skybox_genearte.mdc*的规范生成并导入天空盒
+    · 严格按照规范流程，首先在polyhaven中进行搜索 **[MCP] mcp_Polyhaven_search_assets**，若未找到结果或返回的结果识图评分低于0.75，则调用MiniMax生成天空盒。生成规则严格按照 *[RULE] skybox_genearte.mdc*执行
+    · 通过polyhaven进行下载天空盒 **[MCP] mcp_Polyhaven_download_asset**时，仅通过slug赋值url进行下载
+    - 保存位置： **[PATH] Assets/{课程名称}/Skybox/** 
+    · 将天空盒图片下载到本地后，导入unity调用工具 **[MCP] mcp_unityMCP_set_skybox**创建天空盒材质，并设置场景天空盒
 
-- [阶段7：基于场景布局的Timeline动画生成]
-  - 输入：Excel中的Timeline描述、场景中已实例化的模型位置信息
-  - Timeline生成策略：
-    - 严格遵循 *[RULE] timeline.mdc* 规则内容
-  - Timeline资产保存：
-    - 保存路径：**[PATH] Assets/{课程名称}/Timeline/**
-    - 命名规范：按Excel中timeline名称命名
-    - 自动关联：Timeline自动引用场景中对应的游戏对象
-  - 验证：确认Timeline文件生成成功，动画轨迹合理，无碰撞冲突
-
-- [阶段8：NodeGraph创建]
+- [阶段7：NodeGraph创建]
   - 输入：课程名称
   - 创建：空的{课程名称}.asset文件
   - 工具：**[MCP] mcp_unityMCP_create_empty_nodegraph**
   - 路径：**[PATH] Assets/{课程名称}/{课程名称}.asset**
   - 验证：确认NodeGraph文件创建成功
 
-- [阶段9：完整资产关联到节点]
+- [阶段8：完整资产关联到节点]
   - 输入：Excel数据和对应课程空的nodegraph
   - 关联策略：
   - 工具1：**[MCP] mcp_unityMCP_import_excel_to_nodegraph**
@@ -123,6 +116,17 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
     - 模糊匹配：支持部分名称匹配和关键词匹配
     - 路径解析：自动解析相对路径和绝对路径
   - 验证：检查资产关联率>90%，节点功能完整，所有引用有效
+
+- [阶段9：基于场景布局的Timeline动画生成]
+  - 输入：Excel中的Timeline描述、场景中已实例化的模型位置信息
+  - Timeline生成策略：
+    - 严格遵循 *[RULE] timeline-prompt.mdc* 规则内容
+  - Timeline资产保存：
+    - 工具：**[MCP] mcp_unityMCP_create_empty_nodegraph**
+    - 保存路径：**[PATH] Assets/{课程名称}/Timeline/**
+    - 命名规范：按Excel中timeline名称命名
+    - 自动关联：Timeline自动引用场景中对应的游戏对象
+  - 验证：确认Timeline文件生成成功，动画轨迹合理，无碰撞冲突
 
 ---
 

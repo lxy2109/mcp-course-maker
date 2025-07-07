@@ -351,7 +351,8 @@ namespace UnityMCP.Editor
                     "ADD_GRAPH_POOL" => NodeGraphCommandHandler.AddGraphPool(command.@params),
                     "CREATE_BASE" => EventCommandHandler.CreateBase(command.@params),
                     // "ADD_EVENT" => EventCommandHandler.AddEvent(),
-                    "ADD_EVENT_OBJECT" => EventCommandHandler.AddEventObject(command.@params),
+                    "ADD_EVENT_OBJECT" => command.@params == null ? EventCommandHandler.AddEventObject(new JObject()) : EventCommandHandler.AddEventObject(command.@params),
+                    "ADD_EVENT_OBJECT_NO_PARAM" => EventCommandHandler.AddEventObject(new JObject()),
                     "SET_TRANSFORM_POSITION" => ObjectCommandHandler.SetTransformPosition(command.@params),
                     "SET_TRANSFORM_ROTATION" => ObjectCommandHandler.SetTransformRotation(command.@params),
                     "SET_TRANSFORM_SCALE" => ObjectCommandHandler.SetTransformScale(command.@params),
@@ -360,6 +361,14 @@ namespace UnityMCP.Editor
                     "CLEAR_SKYBOX" => SkyboxCommandHandler.ClearSkybox(command.@params),
                     "CREATE_SKYBOX_MATERIAL" => SkyboxCommandHandler.CreateSkyboxMaterial(command.@params),
                     
+                    "GET_OBJECT_BOUNDS" => ObjectCommandHandler.GetObjectBounds(command.@params),
+                    "GET_COMBINED_BOUNDS" => ObjectCommandHandler.GetCombinedBounds(command.@params),
+                    "POSITION_CAMERA_TO_FRAME_OBJECTS" => ObjectCommandHandler.PositionCameraToFrameObjects(command.@params),
+                    "AUTO_POSITION_CAMERA_TO_OBJECTS" => ObjectCommandHandler.AutoPositionCameraToObjects(command.@params),
+
+                    // 兼容无参数调用
+                    "CREATE_UNITY_EVENT" => command.@params == null ? EventCommandHandler.CreateUnityEvent(new JObject()) : EventCommandHandler.CreateUnityEvent(command.@params),
+
                     _ => throw new Exception($"Unknown command type: {command.type}")
                 };
 

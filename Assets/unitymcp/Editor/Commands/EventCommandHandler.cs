@@ -82,6 +82,16 @@ namespace UnityMCP.Editor.Commands
             EventAutoMatcher.AutoMatch();
             EventScriptGenerator.CreateUnityEvent();
         }
+
+        /// <summary>
+        /// 兼容注册表调用：生成Unity事件监听器脚本
+        /// </summary>
+        public static object CreateUnityEvent(JObject parameters)
+        {
+            // 允许传参（如课程名），如无则用默认
+            string nodegraphname = parameters != null && parameters["nodegraphname"] != null ? (string)parameters["nodegraphname"] : "默认";
+            return EventScriptGenerator.CreateUnityEvent(nodegraphname);
+        }
     }
 
     //把当前所有要添加的物品自动添加到场景上并给予组件

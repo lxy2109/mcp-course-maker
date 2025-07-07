@@ -5,6 +5,17 @@ import re
 from unity_connection import get_unity_connection
 import math
 
+# CLIP2函数注册字典
+CLIP2_FUNCTIONS = {
+    "pour_liquid": None,
+    "default_bounce_animation": None,
+    "insert_power_cable": None,  # 新增：插入电源线动画
+    "wear_gloves": None,  # 新增：戴手套动画
+    "notebook_writing": None,  # 新增：笔记本做笔记动画
+    "move_object_into": None,  # 新增：将物体移动到另一个物体中
+    "camera_focus_only": None  # 新增：纯相机聚焦，无物体动画
+}
+
 def register_animation_tools(mcp):
     """注册动画相关工具"""
     
@@ -713,167 +724,303 @@ def camera_sweep_animation(
 def camera_closeup_animation(
         ctx: Context,
         camera_name: str = "Main Camera",
-        target_object_name: str = None,
-        closeup_distance: float = 5.0,  # 特写距离，默认为前方5个单位
-        pitch_angle: float = 10.0,  # 俯仰视角度，正值向下看
-        horizontal_angle: float = 60.0,  # 水平扫视范围角度
-        duration: float = 10.0,  # 只表示从左前方移动到右前方的时间
+        target_object_name: str = None,  # 支持单个物体名称或逗号分隔的多个物体名称
+        duration: float = 6.0,  # 总动画时长
         timeline_asset_name: str = "CameraCloseup",
-        move_speed: float = 5.0,  # 相机移动速度，单位：米/秒
         move_to_start: bool = True,
         return_to_origin: bool = False
 ) -> str:
     """
-    创建相机特写动画，镜头从原位置移动到目标物体周围进行特写，然后回到原始位置。
-
-    动画流程：
-    1. 镜头从原位置移动到物体的左前方（时间根据距离和速度自动计算）
-    2. 镜头从左前方缓慢移动到右前方（使用指定的duration时间）
-    3. 镜头从右前方回到原来位置（时间根据距离和速度自动计算）
-
+    重构版：使用AutoPositionCameraToObjects算法计算最佳聚焦位置，然后创建特写动画。
+    
+    支持单个或多个物体观察：
+    - 单个物体：移动轨迹为 原位置 → 最佳位置左侧 → 最佳位置右侧 → 原位置
+    - 多个物体：按顺序依次观察每个物体，使用距离计算移动时间，最后返回原位置
+    
+    新增功能：
+    - 自动过滤桌子类物体（实验桌、桌子、台等）
+    - 基于两点间距离动态计算移动时间
+    - 优化多物体间的聚焦切换
+    
+    使用AutoPositionCameraToObjects的智能算法进行相机定位计算，基于目标物体的bounds动态调整移动距离。
+    
     参数：
-        ctx: MCP 上下文
-        camera_name: 相机对象名称，默认为"Main Camera"
-        target_object_name: 目标物体名称，必须指定
-        closeup_distance: 特写时与目标物体的距离
-        pitch_angle: 特写时的俯仰角度
-        horizontal_angle: 水平扫视范围角度
-        duration: 从左前方移动到右前方的时间（秒）
-        timeline_asset_name: Timeline资产名称
-        move_speed: 相机移动速度（米/秒），用于计算其他阶段的时间
-        move_to_start: 是否在timeline开始前将相机从当前位置移动到动画起始位置
-        return_to_origin: 是否在timeline结束后将相机从结束位置移回原始位置
-
-    返回值：
-        str: 成功消息或错误详情
+        target_object_name: 支持单个物体名称或逗号分隔的多个物体名称（如"物体1,物体2,物体3"）
+        duration: 总动画时长，会根据物体数量和距离自动分配时间
+    
+    智能物体选择提醒：
+    - 当target_object_name为None或空时，AI应该：
+      1. 获取场景中所有物体列表
+      2. 智能识别实验桌、工作台、桌子等类似物体
+      3. 优先选择名称包含"实验桌"、"桌"、"台"、"desk"、"table"、"workbench"等关键词的物体
+      4. 如果没有找到，选择体积较大的平面物体作为观测目标
+      5. 避免选择小型器具或工具作为观测目标
     """
+    
+    def calculate_distance(pos1, pos2):
+        """计算两个3D位置之间的欧几里得距离"""
+        import math
+        dx = pos1["x"] - pos2["x"]
+        dy = pos1["y"] - pos2["y"]
+        dz = pos1["z"] - pos2["z"]
+        return math.sqrt(dx*dx + dy*dy + dz*dz)
+    
+    def is_table_object(obj_name):
+        """检查物体名称是否为桌子类物体"""
+        table_keywords = ["实验桌", "桌子", "台", "desk", "table", "workbench", "桌", "台子"]
+        obj_name_lower = obj_name.lower()
+        return any(keyword.lower() in obj_name_lower for keyword in table_keywords)
+    
     try:
-        # 检查目标物体是否存在
-        if target_object_name is None:
-            return "目标物体名称不能为空"
-
-        # 获取相机信息
+        # 解析目标物体名称，支持单个或多个物体
+        if not target_object_name:
+            return "错误：必须指定目标物体名称"
+        
+        # 分割物体名称（支持逗号分隔的多个物体）
+        raw_objects = [obj.strip() for obj in target_object_name.split(',') if obj.strip()]
+        if not raw_objects:
+            return "错误：未找到有效的目标物体名称"
+        
+        # 过滤掉桌子类物体
+        target_objects = []
+        filtered_objects = []
+        for obj in raw_objects:
+            if is_table_object(obj):
+                filtered_objects.append(obj)
+                print(f"过滤掉桌子类物体: {obj}")
+            else:
+                target_objects.append(obj)
+        
+        if not target_objects:
+            return f"错误：过滤掉桌子类物体后没有有效的目标物体。已过滤: {filtered_objects}"
+        
+        print(f"有效目标物体列表: {target_objects}")
+        if filtered_objects:
+            print(f"已过滤的桌子类物体: {filtered_objects}")
+        
+        # 获取相机当前信息
         camera_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": camera_name})
         if not camera_info.get("success", False):
             return f"获取相机信息失败: {camera_info.get('message', '未知错误')}"
 
-        # 获取目标物体信息
-        target_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": target_object_name})
-        if not target_info.get("success", False):
-            return f"获取目标物体信息失败: {target_info.get('message', '未知错误')}"
-
-        # 提取相机当前位置和旋转信息
-        camera_position = {
+        # 记录相机原始位置和旋转
+        original_position = {
             "x": camera_info["position"][0],
             "y": camera_info["position"][1],
             "z": camera_info["position"][2]
         }
-        
-        camera_rotation = {
+        original_rotation = {
             "x": camera_info["rotation"][0],
             "y": camera_info["rotation"][1],
             "z": camera_info["rotation"][2]
         }
+        
+        print(f"相机原始位置: {original_position}")
+        print(f"相机原始旋转: {original_rotation}")
 
-        # 提取目标物体位置
-        target_position = {
-            "x": target_info["position"][0],
-            "y": target_info["position"][1],
-            "z": target_info["position"][2]
-        }
-
-        # 计算特写位置
-        # 计算左前方位置
-        left_angle_rad = math.radians(target_info["rotation"][1] - horizontal_angle/2)
-        left_position = {
-            "x": target_position["x"] + closeup_distance * math.sin(left_angle_rad),
-            "y": target_position["y"],
-            "z": target_position["z"] + closeup_distance * math.cos(left_angle_rad)
-        }
+        # 计算每个物体的最佳观察位置
+        object_positions = []
+        valid_objects = []
         
-        # 计算右前方位置
-        right_angle_rad = math.radians(target_info["rotation"][1] + horizontal_angle/2)
-        right_position = {
-            "x": target_position["x"] + closeup_distance * math.sin(right_angle_rad),
-            "y": target_position["y"],
-            "z": target_position["z"] + closeup_distance * math.cos(right_angle_rad)
-        }
-
-        # 计算各段距离
-        def calculate_distance(pos1, pos2):
-            return math.sqrt(
-                (pos1["x"] - pos2["x"]) ** 2 + 
-                (pos1["y"] - pos2["y"]) ** 2 + 
-                (pos1["z"] - pos2["z"]) ** 2
-            )
-        
-        distance_to_left = calculate_distance(camera_position, left_position)
-        distance_left_to_right = calculate_distance(left_position, right_position)
-        distance_right_to_origin = calculate_distance(right_position, camera_position)
-        
-        # 计算各段时间
-        time_to_left = distance_to_left / move_speed
-        time_left_to_right = duration  # 使用指定的duration
-        time_right_to_origin = distance_right_to_origin / move_speed
-        
-        # 计算总时间
-        total_duration = time_to_left + time_left_to_right + time_right_to_origin
-        
-        # 创建关键帧
-        points = []
-        
-        # 初始位置关键帧
-        points.append({
-            "position": camera_position,
-            "rotation": camera_rotation,
-            "time": 0
-        })
-        
-        # 计算朝向目标物体的旋转
-        def look_at_target(from_pos):
-            dx = target_position["x"] - from_pos["x"]
-            dz = target_position["z"] - from_pos["z"]
-            yaw = math.degrees(math.atan2(dx, dz))
-            return {
-                "x": pitch_angle,
-                "y": yaw,
-                "z": 0
+        for obj_name in target_objects:
+            print(f"\n计算物体 '{obj_name}' 的最佳观察位置...")
+            
+            # 获取当前物体的详细信息（包含bounds）
+            object_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": obj_name})
+            if not object_info.get("success", False):
+                print(f"警告：无法获取物体 '{obj_name}' 的信息，跳过")
+                continue
+            
+            # 使用AutoPositionCameraToObjects算法计算最佳聚焦位置
+            auto_position_response = get_unity_connection().send_command("AUTO_POSITION_CAMERA_TO_OBJECTS", {
+                "object_names": [obj_name],  # 转换为数组格式
+                "camera_name": camera_name,
+                "fov": 45.0,  # 使用45度FOV
+                "pitch_angle": 35.0,  # 使用35度俯视角
+                "padding": 1.2,  # 使用适中的边距
+                "force_reset_rotation_y": True,
+                "apply_to_camera": False  # 只计算，不应用到相机
+            })
+            
+            if not auto_position_response.get("success", False):
+                print(f"警告：无法计算物体 '{obj_name}' 的最佳相机位置，跳过")
+                continue
+            
+            # 提取计算出的最佳相机位置和旋转
+            adjusted_camera = auto_position_response.get("adjustedCamera", {})
+            optimal_position = adjusted_camera.get("position", [0, 0, 0])
+            optimal_rotation = adjusted_camera.get("rotation", [35, 0, 0])
+            
+            optimal_pos = {
+                "x": optimal_position[0],
+                "y": optimal_position[1],
+                "z": optimal_position[2]
             }
+            optimal_rot = {
+                "x": optimal_rotation[0],
+                "y": optimal_rotation[1],
+                "z": optimal_rotation[2]
+            }
+            
+            print(f"物体 '{obj_name}' 最佳相机位置: {optimal_pos}")
+            print(f"物体 '{obj_name}' 最佳相机旋转: {optimal_rot}")
+            
+            object_positions.append({
+                "name": obj_name,
+                "position": optimal_pos,
+                "rotation": optimal_rot
+            })
+            valid_objects.append(obj_name)
         
-        # 左前方关键帧
-        points.append({
-            "position": left_position,
-            "rotation": look_at_target(left_position),
-            "time": time_to_left
-        })
+        if not object_positions:
+            return "错误：没有成功计算出任何物体的观察位置"
         
-        # 右前方关键帧
-        points.append({
-            "position": right_position,
-            "rotation": look_at_target(right_position),
-            "time": time_to_left + time_left_to_right
-        })
+        # 创建所有关键帧点
+        all_points = []
+        current_time = 0.0
+        current_position = original_position
         
-        # 回到原始位置关键帧
-        points.append({
-            "position": camera_position,
-            "rotation": camera_rotation,
-            "time": total_duration
-        })
+        num_objects = len(object_positions)
         
-        # 调用create_movement_animation创建动画
-        return create_movement_animation(
+        if num_objects == 1:
+            # 单个物体：原位置 → 目标位置 → 原位置
+            target_pos = object_positions[0]["position"]
+            target_rot = object_positions[0]["rotation"]
+            
+            # 计算移动距离和时间
+            move_distance = calculate_distance(original_position, target_pos)
+            return_distance = move_distance  # 返回距离相同
+            
+            # 基于距离分配时间：移动时间 + 观察时间 + 返回时间
+            move_time_ratio = 0.3  # 30%时间用于移动
+            observe_time_ratio = 0.4  # 40%时间用于观察
+            return_time_ratio = 0.3  # 30%时间用于返回
+            
+            t1 = current_time + duration * move_time_ratio
+            t2 = current_time + duration * (move_time_ratio + observe_time_ratio)
+            t3 = current_time + duration
+            
+            all_points.extend([
+                {"position": original_position, "rotation": original_rotation, "time": current_time},
+                {"position": target_pos, "rotation": target_rot, "time": t1},
+                {"position": target_pos, "rotation": target_rot, "time": t2},
+                {"position": original_position, "rotation": original_rotation, "time": t3}
+            ])
+            
+            print(f"单物体动画路径:")
+            print(f"  距离: {move_distance:.2f}m, 移动时间: {t1:.2f}s, 观察时间: {t2-t1:.2f}s, 返回时间: {t3-t2:.2f}s")
+            
+        else:
+            # 多个物体：原位置 → 物体1 → 物体2 → ... → 原位置
+            
+            # 计算所有移动段的距离
+            move_segments = []
+            
+            # 从原位置到第一个物体
+            first_distance = calculate_distance(original_position, object_positions[0]["position"])
+            move_segments.append({
+                "from": "original",
+                "to": object_positions[0]["name"],
+                "distance": first_distance,
+                "from_pos": original_position,
+                "to_pos": object_positions[0]["position"],
+                "to_rot": object_positions[0]["rotation"]
+            })
+            
+            # 物体间的移动
+            for i in range(len(object_positions) - 1):
+                distance = calculate_distance(object_positions[i]["position"], object_positions[i+1]["position"])
+                move_segments.append({
+                    "from": object_positions[i]["name"],
+                    "to": object_positions[i+1]["name"],
+                    "distance": distance,
+                    "from_pos": object_positions[i]["position"],
+                    "to_pos": object_positions[i+1]["position"],
+                    "to_rot": object_positions[i+1]["rotation"]
+                })
+            
+            # 从最后一个物体回到原位置
+            last_distance = calculate_distance(object_positions[-1]["position"], original_position)
+            move_segments.append({
+                "from": object_positions[-1]["name"],
+                "to": "original",
+                "distance": last_distance,
+                "from_pos": object_positions[-1]["position"],
+                "to_pos": original_position,
+                "to_rot": original_rotation
+            })
+            
+            # 计算总距离
+            total_distance = sum(segment["distance"] for segment in move_segments)
+            print(f"总移动距离: {total_distance:.2f}m")
+            
+            # 分配时间：70%用于移动，30%用于观察
+            total_move_time = duration * 0.7
+            total_observe_time = duration * 0.3
+            observe_time_per_object = total_observe_time / num_objects
+            
+            # 根据距离比例分配移动时间
+            for segment in move_segments:
+                if total_distance > 0:
+                    segment["time"] = (segment["distance"] / total_distance) * total_move_time
+                else:
+                    segment["time"] = total_move_time / len(move_segments)
+            
+            print(f"移动段详情:")
+            for i, segment in enumerate(move_segments):
+                print(f"  {i+1}. {segment['from']} → {segment['to']}: 距离={segment['distance']:.2f}m, 时间={segment['time']:.2f}s")
+            
+            # 生成关键帧
+            # 起始点
+            all_points.append({"position": original_position, "rotation": original_rotation, "time": current_time})
+            
+            # 遍历每个物体
+            for i, obj_info in enumerate(object_positions):
+                # 移动到物体位置
+                current_time += move_segments[i]["time"]
+                all_points.append({
+                    "position": obj_info["position"],
+                    "rotation": obj_info["rotation"],
+                    "time": current_time
+                })
+                
+                # 在物体位置观察
+                current_time += observe_time_per_object
+                all_points.append({
+                    "position": obj_info["position"],
+                    "rotation": obj_info["rotation"],
+                    "time": current_time
+                })
+                
+                print(f"  物体 '{obj_info['name']}': 到达时间={current_time-observe_time_per_object:.2f}s, 观察结束={current_time:.2f}s")
+            
+            # 返回原位置
+            current_time += move_segments[-1]["time"]
+            all_points.append({
+                "position": original_position,
+                "rotation": original_rotation,
+                "time": current_time
+            })
+            
+            print(f"返回原位置时间: {current_time:.2f}s")
+        
+        print(f"\n创建多物体相机特写动画轨迹 (共{len(all_points)}个关键帧):")
+        for i, point in enumerate(all_points):
+            print(f"  {i+1}. 位置: ({point['position']['x']:.2f}, {point['position']['y']:.2f}, {point['position']['z']:.2f}) 时间: {point['time']:.2f}s")
+        
+        # 使用create_multipoint_animation创建动画
+        return create_multipoint_animation(
             ctx=ctx,
             name=camera_name,
-            points=points,
-            duration=total_duration,
+            points=all_points,
+            duration=current_time,  # 使用实际计算出的总时间
             timeline_asset_name=timeline_asset_name,
             include_rotation=True,
-            path_type="curve",  # 使用曲线路径让移动更平滑
+            path_type="curve",  # 使用曲线插值确保平滑运动
             move_to_start=move_to_start,
             return_to_origin=return_to_origin
         )
-
+        
     except Exception as e:
         return f"创建相机特写动画时出错：{str(e)}"
 
@@ -1038,36 +1185,323 @@ def generate_separate_timelines(
 def generate_combined_timeline(
     ctx: Context,
     timeline_name: str,
-    camera_timeline_content: str,
-    object_timeline_content: str,
-    target_object_name: str,
+    target_object_name: str,  # 支持单个物体名称或逗号分隔的多个物体名称
+    clip2_function_name: str,  # 新增：用于存储生成clip2的函数名
+    interaction_objects: List[str],  # 新增：需要交互的物体列表
     camera_name: str = "Main Camera",
-    clip_duration: float = 5.0
+    clip_duration: float = 5.0,
+    operation_object_name: str = None,  # 新增：操作物体名称
+    enable_smart_positioning: bool = True,  # 新增：是否启用智能定位
+    desk_object_name: str = "实验桌",  # 新增：实验桌名称
+    fov: float = 45.0,  # 修改：相机FOV，默认45度
+    pitch_angle: float = 35.0,  # 新增：俯视角度，默认35度（自动限制在30-40度范围内）
+    padding: float = 1.0,  # 新增：边距系数，默认3倍间距
+    force_reset_rotation_y: bool = True  # 新增：是否强制重置Y轴旋转
 ) -> str:
     """
-    生成组合的单个timeline，包含3个clip：镜头移动到物体前 -> 物体动画 -> 镜头移回初始位置
+    生成智能三段式timeline：标准观察位置 -> 多物体操作位置 -> 返回标准位置
+    
+    强制要求：调用此函数前必须通过Cursor AI进行参数验证！
+    
+    请在调用函数前，先通过Cursor AI分析以下问题：
+    
+    AI验证提示词：
+    请分析以下实验动画操作的合理性：
+    
+    动画类型：{clip2_function_name}
+    物体顺序：{target_object_name}
+    交互物体：{interaction_objects}
+    
+         验证规则：
+     核心原则：第一项必须是需要移动/操作的物体，其他是参照物/目标物体
+     
+     1. insert_power_cable（插电源线）：
+        - 第一项：需要插入的物体（电源线）
+        - 其他项：被插入的目标设备（分光仪等）
+        - 合理："电源线,紫外可见光分光仪" - 电源线（移动物体）插入分光仪（参照物）
+        - 不合理："紫外可见光分光仪,电源线" - 分光仪不是移动物体
+        - 原理：电源线是主动移动的操作物体，设备是静止的参照物
+     
+     2. pour_liquid（倾倒液体）：
+        - 第一项：需要倾倒液体的容器（被移动的容器）
+        - 其他项：接收液体的容器（参照物/目标）
+        - 合理："比色皿1,废液烧杯" - 比色皿1（移动物体）倾倒液体到废液烧杯（参照物）
+        - 需要分析："废液烧杯,比色皿1" - 废液烧杯（移动物体）倾倒到比色皿1（参照物）
+        - 关键：分析哪个容器需要被拿起并倾倒，哪个是静止的接收目标
+     
+     3. move_object_into（物体移入）：
+        - 第一项：需要移动的物体
+        - 其他项：目标容器（参照物）
+        - 合理："比色皿3,塑料洗瓶" - 比色皿3（移动物体）移入塑料洗瓶（参照物）
+        - 不合理："塑料洗瓶,比色皿3" - 塑料洗瓶通常不会移入小的比色皿
+    
+    4. wear_gloves（戴手套）：
+       - 第一项：需要移动的手套
+       - 通常只涉及手套一个物体，顺序不是问题
+    
+    5. notebook_writing（笔记本书写）：
+       - 第一项：需要操作的笔记本
+       - 通常只涉及笔记本一个物体，顺序不是问题
+    
+    6. clip2_function_name验证：
+       - 必须是以下之一：pour_liquid, default_bounce_animation, insert_power_cable, 
+         wear_gloves, notebook_writing, move_object_into, camera_focus_only
+    
+    请基于实验操作的物理合理性和逻辑合理性进行判断，而不是简单的关键词匹配。
+    如果发现问题，请提供具体的修正建议。
+    只有确认参数完全正确后，才可以调用此函数。
+    
+    集成AutoPositionCameraToObjects实现智能相机定位：
+    1. Clip1: 相机从标准实验桌观察位置移动到多物体操作观察位置
+    2. Clip2: 执行物体操作动画（通过clip2_function_name指定的函数生成）
+    3. Clip3: 相机从操作位置返回到标准实验桌观察位置
+    
+    使用AutoPositionCameraToObjects基于目标物体的bounds自动计算最佳相机位置、角度和距离，
+    确保所有物体完全在视野内且观察角度最佳。支持多个物体的合并bounds计算。
+    
+    可用的CLIP2函数：
+    - "pour_liquid": 倾倒液体动画
+    - "default_bounce_animation": 默认弹跳动画  
+    - "insert_power_cable": 插入电源线动画
+    - "wear_gloves": 戴手套动画
+    - "notebook_writing": 笔记本书写动画
+    - "move_object_into": 物体移入动画
+    - "camera_focus_only": 纯相机聚焦动画
+    
+    关键参数顺序要求：
+    1. target_object_name: 必须将需要移动/操作的物体放在第一位，其他是参照物！
+       
+       核心原则：第一项 = 移动物体，其他项 = 参照物/目标
+       
+       正确示例：
+       - "电源线,紫外可见光分光仪" (电源线需要移动插入，分光仪是静止参照物)
+       - "比色皿 1,废液烧杯" (比色皿1需要拿起倾倒，废液烧杯是接收参照物)
+       - "比色皿3,塑料洗瓶" (比色皿3需要移动放入，塑料洗瓶是容器参照物)
+       - "手套" (手套需要移动戴上，是唯一操作物体)
+       
+       错误示例：
+       - "紫外可见光分光仪,电源线" (分光仪是静止的，不应在第一位)
+       - "废液烧杯,比色皿 1" (废液烧杯通常是静止接收容器，不应在第一位)
+       - "塑料洗瓶,比色皿3" (塑料洗瓶是容器参照物，不应在第一位)
+    
+    2. interaction_objects: 应与target_object_name中的物体保持一致
+    3. operation_object_name: 如不指定，自动使用interaction_objects[0]
     
     参数：
         ctx: MCP 上下文
         timeline_name: 组合timeline名称
-        camera_timeline_content: 镜头timeline内容描述
-        object_timeline_content: 物体timeline内容描述
-        target_object_name: 目标物体名称
+        target_object_name: 目标物体名称（支持单个物体或逗号分隔的多个物体，如"比色皿3,废液烧杯"）
+                           需要移动/操作的物体必须放在第一位，其他是参照物！
+        clip2_function_name: 用于生成clip2的函数名，从预定义的CLIP2_FUNCTIONS中选择
+        interaction_objects: 需要交互的物体列表，传递给clip2生成函数
         camera_name: 相机名称，默认为"Main Camera"
         clip_duration: 每个clip的基础持续时间
+        operation_object_name: 操作物体名称（如果不指定，使用interaction_objects[0]）
+        enable_smart_positioning: 是否启用智能相机定位
+        desk_object_name: 实验桌名称，用于计算标准观察位置
+        fov: 相机视野角度（度），默认45度
+        pitch_angle: 俯视角度（度），默认35度（自动限制在30-40度范围内）
+        padding: 边距系数（倍数），默认3倍间距
+        force_reset_rotation_y: 是否强制重置Y轴旋转为0
         
     返回值：
-        str: 生成结果信息
+        str: 生成结果信息，包含bounds分析和相机计算详情
+        
+    使用示例：
+        # 1. 通过Cursor AI验证参数合理性
+        # 2. 确认无误后调用函数
+        generate_combined_timeline(
+            timeline_name="插电源线实验",
+            target_object_name="电源线,紫外可见光分光仪",  # 电源线(移动物体)在前，分光仪(参照物)在后
+            clip2_function_name="insert_power_cable",
+            interaction_objects=["电源线", "紫外可见光分光仪"]
+        )
     """
     try:
-        # 解析动画内容
-        camera_params = parse_timeline_description(ctx, camera_timeline_content, camera_name, target_object_name)
-        object_params = parse_timeline_description(ctx, object_timeline_content, target_object_name, target_object_name)
+        # 基本验证（保留基础检查）
+        if clip2_function_name not in CLIP2_FUNCTIONS:
+            available_functions = list(CLIP2_FUNCTIONS.keys())
+            return f"错误：clip2_function_name '{clip2_function_name}' 不在CLIP2_FUNCTIONS字典中！\n" \
+                   f"可用的函数: {available_functions}"
         
-        if "error" in camera_params:
-            return f"解析镜头内容失败: {camera_params['error']}"
-        if "error" in object_params:
-            return f"解析物体内容失败: {object_params['error']}"
+        # 显示参数信息（移除严格验证，信任Cursor AI的预验证）
+        print(f"参数信息：")
+        print(f"   - Timeline名称: {timeline_name}")
+        print(f"   - 动画类型: {clip2_function_name}")
+        print(f"   - 物体顺序: {target_object_name}")
+        print(f"   - 交互物体: {interaction_objects}")
+        print(f"   - 相机: {camera_name}")
+        
+        # 智能相机定位计算
+        if enable_smart_positioning:
+            # 1. 计算标准实验桌观察位置（使用AutoPositionCameraToObjects的自适应距离计算）
+            try:
+                # 实验桌观察位置的优化参数
+                desk_fov = min(70, fov + 5)           # 稍大FOV，确保全景观察
+                desk_pitch = min(40, pitch_angle + 5) # 稍高俯视角度，便于整体观察
+                desk_padding = max(1.5, padding * 1.2) # 增大边距，确保全面观察
+                
+                standard_pos_response = get_unity_connection().send_command("AUTO_POSITION_CAMERA_TO_OBJECTS", {
+                    "object_names": [desk_object_name],
+                    "apply_to_camera": False,  # 只计算，不应用
+                    "fov": desk_fov,
+                    "pitch_angle": desk_pitch,
+                    "padding": desk_padding 
+                })
+                
+                if not standard_pos_response.get("success", False):
+                    return f"计算标准观察位置失败: {standard_pos_response.get('message', '未知错误')}"
+                
+                standard_position = standard_pos_response.get("adjustedCamera", {})
+                standard_distance = standard_pos_response.get("calculatedDistance", 0)
+                
+            except Exception as e:
+                return f"计算标准观察位置时出错: {str(e)}"
+            
+            # 2. 确定操作物体名称
+            if operation_object_name is None:
+                # 从object_timeline_content中智能解析操作物体
+                operation_object_name = target_object_name  # 简化处理，后续可以增强解析
+            
+            # 3. 智能计算操作观察位置（使用AutoPositionCameraToObjects的自适应距离计算）
+            positioning_detail = "标准定位"  # 默认值，确保变量总是被定义
+            try:
+                # 解析目标物体名称，支持逗号分隔的多个物体
+                target_object_list = []
+                if target_object_name:
+                    if ',' in target_object_name:
+                        # 多个物体，按逗号分隔
+                        target_object_list = [name.strip() for name in target_object_name.split(',') if name.strip()]
+                    else:
+                        # 单个物体
+                        target_object_list = [target_object_name.strip()]
+                
+                # 确定要观察的物体列表
+                target_objects = []
+                
+                # 添加操作物体（如果与目标物体不同）
+                if operation_object_name and operation_object_name not in target_object_list:
+                    target_objects.append(operation_object_name)
+                
+                # 添加所有目标物体
+                target_objects.extend(target_object_list)
+                
+                # 去重，保持顺序
+                seen = set()
+                target_objects = [obj for obj in target_objects if not (obj in seen or seen.add(obj))]
+                
+                # 确定定位类型
+                if len(target_objects) == 1:
+                    positioning_type = "单物体聚焦"
+                elif len(target_objects) == 2:
+                    positioning_type = "双物体聚焦"
+                else:
+                    positioning_type = f"多物体聚焦({len(target_objects)}个物体)"
+                
+                # 智能参数计算 - 基于物体数量和类型优化
+                if len(target_objects) == 1:
+                    # 单物体：优化特写观察
+                    smart_padding = padding * 1.1   # 减小边距，但保持合理距离
+                    smart_pitch = max(30, min(40, max(15, pitch_angle - 10)))   # 限制俯视角度在30-40度范围内
+                    smart_fov = max(40, fov - 8)              # 减小FOV，更聚焦于单个物体
+                else:
+                    # 多物体：确保全部物体都在视野内
+                    smart_padding = padding * 1.5# 保持或增加边距
+                    smart_pitch = max(30, min(40, max(20, pitch_angle - 5)))    # 限制俯视角度在30-40度范围内
+                    smart_fov = min(65, fov + 8)              # 增大FOV，确保都在视野内
+                
+                # 调用AutoPositionCameraToObjects获取基于物体bounds的最佳相机位置
+                dual_pos_response = get_unity_connection().send_command("AUTO_POSITION_CAMERA_TO_OBJECTS", {
+                    "object_names": target_objects,
+                    "apply_to_camera": False,  # 只计算，不应用
+                    "fov": smart_fov,
+                    "pitch_angle": smart_pitch,
+                    "padding": smart_padding
+                })
+                
+                if not dual_pos_response.get("success", False):
+                    return f"计算操作观察位置失败: {dual_pos_response.get('message', '未知错误')}"
+                
+                dual_position = dual_pos_response.get("adjustedCamera", {})
+                calculated_distance = dual_pos_response.get("calculatedDistance", 0)
+                
+                # 添加详细的positioning信息，包含计算距离
+                positioning_detail = f"{positioning_type}(物体数:{len(target_objects)}, FOV:{smart_fov:.1f}, 俯视:{smart_pitch:.1f}°, 边距:{smart_padding:.1f}, 计算距离:{calculated_distance:.2f}m)"
+                
+            except Exception as e:
+                return f"计算操作观察位置时出错: {str(e)}"
+            
+            # 4. 生成智能相机timeline内容
+            std_pos = standard_position.get("position", [0, 2, -3])
+            std_rot = standard_position.get("rotation", [35, 0, 0])  # 确保标准旋转在30-40度范围内
+            dual_pos = dual_position.get("position", [0, 1.5, -2])
+            dual_rot = dual_position.get("rotation", [35, 0, 0])  # 确保操作旋转在30-40度范围内
+            
+            # 应用rotation.x限制到获取的旋转值
+            if len(std_rot) >= 1:
+                std_rot[0] = max(30, min(40, std_rot[0]))  # 限制在30-40度范围内
+            if len(dual_rot) >= 1:
+                dual_rot[0] = max(30, min(40, dual_rot[0]))  # 限制在30-40度范围内
+            
+            # 用户要求：额外抬高操作位置的Y轴2个单位
+            # if len(dual_pos) >= 2:
+            original_y = dual_pos[1]
+            dual_pos[1] += 2.0  # Y轴位置抬高2个单位防止穿模
+            # 同时更新dual_position字典中的position，确保传递给Unity的数据一致
+            dual_position["position"] = dual_pos
+            # print(f"调试信息: Y轴抬高 {original_y:.3f} -> {dual_pos[1]:.3f} (+2.0)")
+            
+            smart_camera_content = (
+                f"相机从标准观察位置{std_pos}(旋转{std_rot})平滑移动到操作观察位置{dual_pos}(旋转{dual_rot})，"
+                f"停留观察操作过程，然后平滑回到标准观察位置{std_pos}(旋转{std_rot})"
+            )
+            
+            # 使用智能生成的相机内容
+            final_camera_content = smart_camera_content
+            
+            # 添加智能定位信息到返回消息
+            positioning_info = (
+                f"\n智能定位信息:\n"
+                f"   标准观察位置: {std_pos}, 旋转: {std_rot}, 距离: {standard_distance:.2f}m\n"
+                f"   操作观察位置: {dual_pos}, 旋转: {dual_rot}, 距离: {calculated_distance:.2f}m (+2.0 Y轴抬高)\n"
+                f"   定位模式: {positioning_detail}\n"
+                f"   聚焦物体列表: {target_objects}\n"
+                f"   操作物体: {operation_object_name}, 目标物体: {target_object_name}"
+            )
+            
+        else:
+            # 使用默认的相机内容（因为取消了用户提供的参数）
+            final_camera_content = f"相机从标准位置移动到{target_object_name}观察位置，然后返回标准位置"
+            positioning_info = ""
+        
+        # === 使用新的clip2函数生成方式 ===
+        # 调用指定的clip2生成函数获取关键帧数据
+        clip2_keyframes = safe_call_clip2_function(clip2_function_name, interaction_objects)
+        
+        # 计算clip2的实际时长
+        clip2_duration = calculate_clip2_duration(clip2_function_name, interaction_objects, clip2_keyframes)
+        
+        # 直接使用计算出的数据，不进行解析
+        camera_params = {
+            "content": final_camera_content,
+            "object_name": camera_name,
+            "target_object_name": target_object_name
+        }
+        object_params = {
+            "keyframes": clip2_keyframes,  # 使用生成的关键帧数据
+            "object_name": interaction_objects[0] if interaction_objects else operation_object_name,
+            "target_object_name": target_object_name,
+            "function_name": clip2_function_name  # 记录使用的函数名
+        }
+        
+        # 添加智能定位数据到参数
+        if enable_smart_positioning:
+            camera_params["smart_positioning"] = {
+                "standard_position": standard_position,
+                "dual_position": dual_position,
+                "operation_object": operation_object_name,
+                "target_object": target_object_name
+            }
         
         # 发送命令到Unity创建组合timeline
         response = get_unity_connection().send_command("CREATE_COMBINED_TIMELINE", {
@@ -1076,19 +1510,31 @@ def generate_combined_timeline(
             "target_object_name": target_object_name,
             "camera_params": camera_params,
             "object_params": object_params,
-            "clip_duration": clip_duration
+            "clip_duration": clip_duration,  # clip1和clip3使用原clip_duration
+            "clip2_duration": clip2_duration,  # clip2使用计算出的实际时长
+            "enable_smart_positioning": enable_smart_positioning,
+            # 新增clip2函数相关参数
+            "clip2_function_name": clip2_function_name,
+            "interaction_objects": interaction_objects,
+            # 新增AutoPositionCameraToObjects参数
+            "fov": fov,
+            "pitch_angle": pitch_angle,
+            "padding": padding,
+            "force_reset_rotation_y": force_reset_rotation_y
         })
         
         success = response.get("success", False)
         message = response.get("message", "未知状态")
         
         if success:
-            return f"成功生成组合timeline: {message}"
+            # 添加clip2时长信息到返回消息
+            clip_info = f"\nClip时长分配: Clip1={clip_duration}s, Clip2={clip2_duration}s ({clip2_function_name}), Clip3={clip_duration}s"
+            return f"成功生成智能三段式timeline: {message}{positioning_info}{clip_info}"
         else:
-            return f"生成组合timeline失败: {message}"
+            return f"生成智能timeline失败: {message}"
 
     except Exception as e:
-        return f"生成组合timeline时出错：{str(e)}"
+        return f"生成智能timeline时出错：{str(e)}"
 
 
 def parse_timeline_description(
@@ -1561,4 +2007,824 @@ def create_safe_camera_movement(
             timeline_asset_name="SafeCameraSweep"
         )
     else:
-        return f"不支持的移动类型: {movement_type}，或缺少必要的目标物体参数" 
+        return f"不支持的移动类型: {movement_type}，或缺少必要的目标物体参数"
+
+
+# =============== CLIP2动画生成函数系列 ===============
+
+
+
+
+def generate_pour_animation(objects: List[str], pour_duration: float = 3.0, pour_height: float = 0.2) -> List[Dict[str, Any]]:
+    """
+    生成倾倒液体的动画关键帧
+    根据目标容器的bounds计算倒液体高度，使用X轴旋转进行倾倒
+    
+    参数：
+        objects: 物体名称列表，objects[0]为容器，objects[1]为目标容器
+        pour_duration: 倾倒持续时间
+        pour_height: 倾倒时的高度（备用参数，优先使用bounds计算）
+        
+    返回值：
+        List[Dict]: 关键帧数据列表
+    """
+    if len(objects) < 2:
+        return []
+    
+    try:
+        # 获取源容器信息
+        source_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[0]})
+        if not source_info.get("success", False):
+            return []
+        
+        # 获取目标容器信息
+        target_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[1]})
+        if not target_info.get("success", False):
+            return []
+        
+        source_pos = {
+            "x": source_info["position"][0],
+            "y": source_info["position"][1],
+            "z": source_info["position"][2]
+        }
+        
+        # 获取当前旋转信息作为基础旋转
+        current_rot = {
+            "x": source_info["rotation"][0],
+            "y": source_info["rotation"][1],
+            "z": source_info["rotation"][2]
+        }
+        
+        # 获取目标容器的bounds信息来计算倒液体高度
+        target_bounds = target_info.get("bounds", {}).get("renderer", {})
+        source_bounds = source_info.get("bounds", {}).get("renderer", {})
+        
+        if target_bounds.get("exists", False):
+            # 使用目标容器bounds在Y方向上的长度作为倾倒高度基准
+            target_height = target_bounds["size"][1]
+            print(f"[generate_pour_animation] 目标容器bounds高度: {target_height}米")
+            
+            # 如果源容器也有bounds信息，计算更精确的倾倒高度
+            if source_bounds.get("exists", False):
+                source_height = source_bounds["size"][1]
+                print(f"[generate_pour_animation] 源容器bounds高度: {source_height}米")
+                # 计算精确倾倒高度：目标高度 + 源容器高度的一半 + 安全距离
+                calculated_pour_height = target_height + source_height * 0.5 + 0.2
+            else:
+                calculated_pour_height = target_height + 0.3  # 默认安全距离
+            
+            pour_height = calculated_pour_height
+            print(f"[generate_pour_animation] 最终计算的倾倒高度: {pour_height}米")
+        else:
+            print(f"[generate_pour_animation] 无法获取目标容器bounds，使用默认高度: {pour_height}米")
+        
+        # 计算倾倒位置：目标容器位置上方pour_height的距离
+        target_pos = {
+            "x": target_info["position"][0],
+            "y": target_info["position"][1] + pour_height,
+            "z": target_info["position"][2]
+        }
+        
+        # 计算防穿模的提升位置：在原始位置基础上Y轴+2
+        lift_pos = {
+            "x": source_pos["x"],
+            "y": source_pos["y"] + 2.0,  # Y轴提高2个单位防止穿模
+            "z": source_pos["z"]
+        }
+        
+        lifted_target_pos = {
+            "x": target_pos["x"],
+            "y": target_pos["y"], 
+            "z": target_pos["z"]
+        }
+        
+        print(f"[generate_pour_animation] 原始位置: ({source_pos['x']:.3f}, {source_pos['y']:.3f}, {source_pos['z']:.3f})")
+        print(f"[generate_pour_animation] 防穿模提升位置: ({lift_pos['x']:.3f}, {lift_pos['y']:.3f}, {lift_pos['z']:.3f})")
+        print(f"[generate_pour_animation] 目标位置: ({target_pos['x']:.3f}, {target_pos['y']:.3f}, {target_pos['z']:.3f})")
+        print(f"[generate_pour_animation] 提升后目标位置: ({lifted_target_pos['x']:.3f}, {lifted_target_pos['y']:.3f}, {lifted_target_pos['z']:.3f})")
+        
+        # 倾倒动画：先提升防穿模，移动到目标容器上方，X轴旋转倾倒，复位，返回
+        keyframes = [
+            {"position": source_pos, "rotation": current_rot, "time": 0.0},
+            {"position": lift_pos, "rotation": current_rot, "time": 0.3},  # 先提升2个单位防穿模
+            {"position": lifted_target_pos, "rotation": current_rot, "time": 1.3},  # 移动到提升后的目标上方
+            # X轴旋转-90度开始倾倒
+            {"position": lifted_target_pos, "rotation": {"x": current_rot["x"] - 90, "y": current_rot["y"], "z": current_rot["z"]}, "time": 1.8},  
+            # 保持倾斜状态倒液体
+            {"position": lifted_target_pos, "rotation": {"x": current_rot["x"] - 90, "y": current_rot["y"], "z": current_rot["z"]}, "time": 1.8 + pour_duration},  
+            # X轴旋转+90度复位（回到原始旋转）
+            {"position": lifted_target_pos, "rotation": current_rot, "time": 2.8 + pour_duration},  
+            {"position": lift_pos, "rotation": current_rot, "time": 3.8 + pour_duration},  # 先回到提升位置
+            {"position": source_pos, "rotation": current_rot, "time": 4.1 + pour_duration}  # 最后回到原位
+        ]
+        
+        return keyframes
+        
+    except Exception as e:
+        print(f"生成倾倒动画关键帧时出错: {str(e)}")
+        return []
+
+
+def generate_insert_power_cable_animation(objects: List[str], insert_duration: float = 2.0) -> List[Dict[str, Any]]:
+    """
+    生成插入电源线的动画关键帧
+    电源线先向后移动，再移动到电器后面，然后从后方向前插入电器，插入后保持在插好的位置
+    
+    参数：
+        objects: 物体名称列表，objects[0]为电源线，objects[1]为电器设备
+        insert_duration: 插入操作持续时间
+        
+    返回值：
+        List[Dict]: 关键帧数据列表
+    """
+    if len(objects) < 2:
+        return []
+    
+    try:
+        # 获取电源线信息
+        cable_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[0]})
+        if not cable_info.get("success", False):
+            print(f"[generate_insert_power_cable_animation] 无法获取电源线信息: {objects[0]}")
+            return []
+        
+        # 获取电器设备信息
+        device_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[1]})
+        if not device_info.get("success", False):
+            print(f"[generate_insert_power_cable_animation] 无法获取电器设备信息: {objects[1]}")
+            return []
+        
+        # 提取电源线的初始位置和旋转
+        cable_original_pos = {
+            "x": cable_info["position"][0],
+            "y": cable_info["position"][1],
+            "z": cable_info["position"][2]
+        }
+        
+        cable_original_rot = {
+            "x": cable_info["rotation"][0],
+            "y": cable_info["rotation"][1],
+            "z": cable_info["rotation"][2]
+        }
+        
+        # 提取电器设备的位置和bounds
+        device_pos = {
+            "x": device_info["position"][0],
+            "y": device_info["position"][1],
+            "z": device_info["position"][2]
+        }
+        
+        # 获取电器设备的bounds信息用于计算插入位置
+        device_bounds = device_info.get("bounds", {}).get("renderer", {})
+        cable_bounds = cable_info.get("bounds", {}).get("renderer", {})
+        
+        # 计算插入位置：电器设备的后侧偏下位置
+        insert_offset_x = 0.0  # X轴保持与设备中心对齐
+        insert_offset_y = -0.1  # Y轴稍微向下偏移
+        insert_offset_z = 0.5   # Z轴向后偏移，模拟插入到设备后面
+        
+        # 如果有bounds信息，使用更精确的计算
+        if device_bounds.get("exists", False):
+            device_width = device_bounds["size"][0]   # X轴宽度
+            device_height = device_bounds["size"][1]  # Y轴高度
+            device_depth = device_bounds["size"][2]   # Z轴深度
+            
+            print(f"[generate_insert_power_cable_animation] 电器设备bounds尺寸: {device_width:.3f} x {device_height:.3f} x {device_depth:.3f}")
+            
+            # 更精确的插入位置计算：设备后侧中下部
+            insert_offset_x = 0.0  # 保持X轴中心对齐
+            insert_offset_y = -device_height * 0.3  # Y轴向下偏移30%设备高度
+            insert_offset_z = device_depth * 0.6     # Z轴向后偏移60%设备深度
+            
+        # 计算关键位置点
+        # 1. 后退位置：电源线先向Z轴正方向移动5米，到达设备远后方
+        backward_pos = {
+            "x": cable_original_pos["x"],
+            "y": cable_original_pos["y"],  # 保持原始Y值不变
+            "z": cable_original_pos["z"] + 5.0  # 向Z轴正方向移动5米，到达设备远后方
+        }
+        
+        # 2. 设备后方准备位置：移动到设备后方，准备插入
+        behind_device_pos = {
+            "x": device_pos["x"] + insert_offset_x,
+            "y": cable_original_pos["y"],  # 保持原始Y值不变
+            "z": device_pos["z"] + insert_offset_z + 3.0  # 在设备后方1米作为准备位置（Z轴正方向）
+        }
+        
+        # 3. 最终插入位置：电器设备的插口位置
+        final_insert_pos = {
+            "x": device_pos["x"] + insert_offset_x,
+            "y": cable_original_pos["y"],  # 保持原始Y值不变
+            "z": device_pos["z"] + insert_offset_z + 1.5  # 插入到设备的插口位置
+        }
+        
+        # 保持原始旋转角度不变
+        insert_rot = {
+            "x": cable_original_rot["x"],  # 保持原始X旋转
+            "y": cable_original_rot["y"],  # 保持原始Y旋转
+            "z": cable_original_rot["z"]   # 保持原始Z旋转
+        }
+        
+        print(f"[generate_insert_power_cable_animation] 电源线原位置: ({cable_original_pos['x']:.3f}, {cable_original_pos['y']:.3f}, {cable_original_pos['z']:.3f})")
+        print(f"[generate_insert_power_cable_animation] 电源线原旋转: ({cable_original_rot['x']:.1f}, {cable_original_rot['y']:.1f}, {cable_original_rot['z']:.1f})")
+        print(f"[generate_insert_power_cable_animation] 设备位置: ({device_pos['x']:.3f}, {device_pos['y']:.3f}, {device_pos['z']:.3f})")
+        print(f"[generate_insert_power_cable_animation] 远后方位置(Z+5): ({backward_pos['x']:.3f}, {backward_pos['y']:.3f}, {backward_pos['z']:.3f})")
+        print(f"[generate_insert_power_cable_animation] 设备后方位置: ({behind_device_pos['x']:.3f}, {behind_device_pos['y']:.3f}, {behind_device_pos['z']:.3f})")
+        print(f"[generate_insert_power_cable_animation] 最终插入位置: ({final_insert_pos['x']:.3f}, {final_insert_pos['y']:.3f}, {final_insert_pos['z']:.3f})")
+        print(f"[generate_insert_power_cable_animation] 注意：整个过程中rotation和Y轴位置保持不变")
+        
+        # 生成插入电源线的动画关键帧
+        # 动画流程：原位置 -> 向Z轴正方向移动5米 -> 移动到设备后方 -> 从后方向前插入 -> 完全插入并保持
+        # 注意：整个过程中rotation和Y轴位置保持不变
+        keyframes = [
+            # 1. 起始位置
+            {"position": cable_original_pos, "rotation": cable_original_rot, "time": 0.0},
+            
+            # 2. 向Z轴正方向移动5米，到达设备远后方（保持原始rotation和Y值）
+            {"position": backward_pos, "rotation": cable_original_rot, "time": 0.8},
+            
+            # 3. 移动到设备正后方准备位置（保持原始rotation和Y值）
+            {"position": behind_device_pos, "rotation": cable_original_rot, "time": 1.8},
+            
+            # 4. 从后方向前移动开始插入（保持原始rotation和Y值）
+            {"position": {
+                "x": final_insert_pos["x"],
+                "y": cable_original_pos["y"],  # 保持原始Y值
+                "z": final_insert_pos["z"] + 0.3  # 在插口后方0.3米，准备插入
+            }, "rotation": cable_original_rot, "time": 2.3},
+            
+            # 5. 完全插入到位（保持原始rotation和Y值）
+            {"position": final_insert_pos, "rotation": cable_original_rot, "time": 2.3 + insert_duration},
+            
+            # 6. 保持插好的位置（保持原始rotation和Y值）
+            {"position": final_insert_pos, "rotation": cable_original_rot, "time": 3.0 + insert_duration}
+        ]
+        
+        return keyframes
+        
+    except Exception as e:
+        print(f"生成插入电源线动画关键帧时出错: {str(e)}")
+        return []
+
+
+def generate_wear_gloves_animation(objects: List[str], bounce_duration: float = 1.0, disappear_duration: float = 1.0) -> List[Dict[str, Any]]:
+    """
+    生成戴手套的动画关键帧
+    手套先简单弹跳，然后将position.z减30，确保不会出现在相机视线范围内
+    
+    参数：
+        objects: 物体名称列表，objects[0]为手套
+        bounce_duration: 弹跳持续时间
+        disappear_duration: 消失移动持续时间
+        
+    返回值：
+        List[Dict]: 关键帧数据列表
+    """
+    if len(objects) < 1:
+        return []
+    
+    try:
+        # 获取手套信息
+        gloves_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[0]})
+        if not gloves_info.get("success", False):
+            print(f"[generate_wear_gloves_animation] 无法获取手套信息: {objects[0]}")
+            return []
+        
+        # 提取手套的初始位置和旋转
+        gloves_original_pos = {
+            "x": gloves_info["position"][0],
+            "y": gloves_info["position"][1],
+            "z": gloves_info["position"][2]
+        }
+        
+        gloves_original_rot = {
+            "x": gloves_info["rotation"][0],
+            "y": gloves_info["rotation"][1],
+            "z": gloves_info["rotation"][2]
+        }
+        
+        # 计算弹跳位置：Y轴向上偏移0.5米
+        bounce_pos = {
+            "x": gloves_original_pos["x"],
+            "y": gloves_original_pos["y"] + 0.5,
+            "z": gloves_original_pos["z"]
+        }
+        
+        # 计算最终消失位置：Z轴减30
+        final_pos = {
+            "x": gloves_original_pos["x"],
+            "y": gloves_original_pos["y"] + 5.0,
+            "z": gloves_original_pos["z"] - 15.0  # Z轴减20，确保不在相机视线范围内
+        }
+
+        # 计算最终消失位置：Z轴减30
+        final_pos1 = {
+            "x": gloves_original_pos["x"],
+            "y": gloves_original_pos["y"] + 10.0,  # 回到原始Y位置
+            "z": gloves_original_pos["z"] - 20.0  # Z轴减50，确保不在相机视线范围内
+        }
+        
+        print(f"[generate_wear_gloves_animation] 手套原位置: ({gloves_original_pos['x']:.3f}, {gloves_original_pos['y']:.3f}, {gloves_original_pos['z']:.3f})")
+        print(f"[generate_wear_gloves_animation] 手套原旋转: ({gloves_original_rot['x']:.1f}, {gloves_original_rot['y']:.1f}, {gloves_original_rot['z']:.1f})")
+        print(f"[generate_wear_gloves_animation] 弹跳位置: ({bounce_pos['x']:.3f}, {bounce_pos['y']:.3f}, {bounce_pos['z']:.3f})")
+        print(f"[generate_wear_gloves_animation] 最终消失位置: ({final_pos['x']:.3f}, {final_pos['y']:.3f}, {final_pos['z']:.3f})")
+        print(f"[generate_wear_gloves_animation] 注意：整个过程中rotation保持不变")
+        
+        # 生成戴手套的动画关键帧
+        # 动画流程：原位置 -> 弹跳上升 -> 回到原位置 -> 向Z轴负方向移动30米消失
+        # 注意：整个过程中rotation保持不变
+        keyframes = [
+            # 1. 起始位置
+            {"position": gloves_original_pos, "rotation": gloves_original_rot, "time": 0.0},
+            
+            # 2. 弹跳上升（保持原始rotation）
+            {"position": bounce_pos, "rotation": gloves_original_rot, "time": bounce_duration / 2},
+            
+            # 3. 弹跳回到原位置（保持原始rotation）
+            {"position": gloves_original_pos, "rotation": gloves_original_rot, "time": bounce_duration},
+            
+            # 4. 向Z轴负方向移动20米，消失在相机视线外（保持原始rotation）
+            {"position": final_pos, "rotation": gloves_original_rot, "time": bounce_duration + disappear_duration - 0.1},
+
+            # 5. 向Z轴负方向移动50米，消失在相机视线外（保持原始rotation）
+            {"position": final_pos1, "rotation": gloves_original_rot, "time": bounce_duration + disappear_duration}
+        ]
+        
+        return keyframes
+        
+    except Exception as e:
+        print(f"生成戴手套动画关键帧时出错: {str(e)}")
+        return []
+
+
+def default_bounce_animation(object_name: str) -> List[Dict[str, Any]]:
+    """
+    默认的弹跳动画（降级方案）
+    
+    参数：
+        object_name: 物体名称
+        
+    返回值：
+        List[Dict]: 关键帧数据列表
+    """
+    try:
+        object_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": object_name})
+        if not object_info.get("success", False):
+            return []
+        
+        current_pos = {
+            "x": object_info["position"][0],
+            "y": object_info["position"][1],
+            "z": object_info["position"][2]
+        }
+        
+        # 获取当前旋转信息，保持原有旋转
+        current_rot = {
+            "x": object_info["rotation"][0],
+            "y": object_info["rotation"][1],
+            "z": object_info["rotation"][2]
+        }
+        
+        # 简单弹跳动画，保持原有旋转
+        keyframes = [
+            {"position": current_pos, "rotation": current_rot, "time": 0.0},
+            {"position": {"x": current_pos["x"], "y": current_pos["y"] + 0.5, "z": current_pos["z"]}, "rotation": current_rot, "time": 1.0},
+            {"position": current_pos, "rotation": current_rot, "time": 2.0}
+        ]
+        
+        return keyframes
+        
+    except Exception as e:
+        print(f"生成默认弹跳动画关键帧时出错: {str(e)}")
+        return []
+
+
+def safe_call_clip2_function(function_name: str, objects: List[str]) -> List[Dict[str, Any]]:
+    """
+    安全调用clip2生成函数
+    
+    参数：
+        function_name: 函数名称
+        objects: 物体列表
+        
+    返回值：
+        List[Dict]: 关键帧数据列表
+    """
+    try:
+        if function_name not in CLIP2_FUNCTIONS:
+            print(f"警告：未知的clip2函数 '{function_name}'，使用默认弹跳动画")
+            return default_bounce_animation(objects[0] if objects else "DefaultObject")
+        
+        # 验证所有物体存在
+        for obj_name in objects:
+            obj_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": obj_name})
+            if not obj_info.get("success", False):
+                print(f"错误：物体 '{obj_name}' 不存在")
+                return default_bounce_animation(objects[0] if objects else "DefaultObject")
+        
+        # 调用对应的生成函数
+        if function_name == "pour_liquid":
+            return generate_pour_animation(objects)
+        elif function_name == "default_bounce_animation":
+            return default_bounce_animation(objects[0] if objects else "DefaultObject")
+        elif function_name == "insert_power_cable":
+            return generate_insert_power_cable_animation(objects)
+        elif function_name == "wear_gloves":
+            return generate_wear_gloves_animation(objects)
+        elif function_name == "notebook_writing":
+            return generate_notebook_writing_animation(objects)
+        elif function_name == "move_object_into":
+            return generate_move_object_into_animation(objects)
+        elif function_name == "camera_focus_only":
+            return generate_camera_focus_only_animation(objects)
+        else:
+            return default_bounce_animation(objects[0] if objects else "DefaultObject")
+            
+    except Exception as e:
+        print(f"Clip2生成失败: {e}")
+        return default_bounce_animation(objects[0] if objects else "DefaultObject")
+
+
+
+def generate_notebook_writing_animation(objects: List[str], shake_duration: float = 0.5, shake_count: int = 2) -> List[Dict[str, Any]]:
+    """
+    生成在笔记本上做笔记的动画关键帧
+    笔记本在position.z方向进行抖动，抖动距离为bounds大小的0.1倍，抖动2次
+    
+    参数：
+        objects: 物体名称列表，objects[0]为笔记本
+        shake_duration: 单次抖动持续时间
+        shake_count: 抖动次数
+        
+    返回值：
+        List[Dict]: 关键帧数据列表
+    """
+    if len(objects) < 1:
+        return []
+    
+    try:
+        # 获取笔记本信息
+        notebook_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[0]})
+        if not notebook_info.get("success", False):
+            print(f"[generate_notebook_writing_animation] 无法获取笔记本信息: {objects[0]}")
+            return []
+        
+        # 提取笔记本的初始位置和旋转
+        notebook_original_pos = {
+            "x": notebook_info["position"][0],
+            "y": notebook_info["position"][1],
+            "z": notebook_info["position"][2]
+        }
+        
+        notebook_original_rot = {
+            "x": notebook_info["rotation"][0],
+            "y": notebook_info["rotation"][1],
+            "z": notebook_info["rotation"][2]
+        }
+        
+        # 获取笔记本的bounds信息来计算抖动距离
+        notebook_bounds = notebook_info.get("bounds", {}).get("renderer", {})
+        
+        # 计算抖动距离：bounds在Z轴方向的0.1倍
+        shake_distance = 0.1  # 默认抖动距离
+        if notebook_bounds.get("exists", False):
+            bounds_z_size = notebook_bounds["size"][2]  # Z轴方向的bounds大小
+            shake_distance = bounds_z_size * 0.1  # 抖动距离为bounds的0.1倍
+            print(f"[generate_notebook_writing_animation] 笔记本Z轴bounds大小: {bounds_z_size:.3f}米")
+            print(f"[generate_notebook_writing_animation] 计算的抖动距离: {shake_distance:.3f}米")
+        else:
+            print(f"[generate_notebook_writing_animation] 无法获取笔记本bounds，使用默认抖动距离: {shake_distance:.3f}米")
+        
+        print(f"[generate_notebook_writing_animation] 笔记本原位置: ({notebook_original_pos['x']:.3f}, {notebook_original_pos['y']:.3f}, {notebook_original_pos['z']:.3f})")
+        print(f"[generate_notebook_writing_animation] 笔记本原旋转: ({notebook_original_rot['x']:.1f}, {notebook_original_rot['y']:.1f}, {notebook_original_rot['z']:.1f})")
+        print(f"[generate_notebook_writing_animation] 抖动次数: {shake_count}, 单次抖动时长: {shake_duration:.1f}秒")
+        print(f"[generate_notebook_writing_animation] 注意：整个过程中rotation保持不变，只在Z轴方向抖动")
+        
+        # 生成做笔记的动画关键帧
+        # 动画流程：原位置 -> 抖动1 -> 回原位 -> 抖动2 -> 回原位
+        # 注意：整个过程中rotation保持不变，只在Z轴方向抖动
+        keyframes = []
+        
+        # 1. 起始位置
+        keyframes.append({"position": notebook_original_pos, "rotation": notebook_original_rot, "time": 0.0})
+        
+        current_time = 0.0
+        
+        # 生成指定次数的抖动
+        for i in range(shake_count):
+            # 每次抖动：向前 -> 向后 -> 回原位
+            current_time += shake_duration / 3  # 向前移动
+            shake_forward_pos = {
+                "x": notebook_original_pos["x"],
+                "y": notebook_original_pos["y"],
+                "z": notebook_original_pos["z"] + shake_distance
+            }
+            keyframes.append({"position": shake_forward_pos, "rotation": notebook_original_rot, "time": current_time})
+            
+            current_time += shake_duration / 3  # 向后移动
+            shake_backward_pos = {
+                "x": notebook_original_pos["x"],
+                "y": notebook_original_pos["y"],
+                "z": notebook_original_pos["z"] - shake_distance
+            }
+            keyframes.append({"position": shake_backward_pos, "rotation": notebook_original_rot, "time": current_time})
+            
+            current_time += shake_duration / 3  # 回到原位
+            keyframes.append({"position": notebook_original_pos, "rotation": notebook_original_rot, "time": current_time})
+        
+        # 最后保持在原位置一小段时间
+        current_time += 0.2
+        keyframes.append({"position": notebook_original_pos, "rotation": notebook_original_rot, "time": current_time})
+        
+        return keyframes
+        
+    except Exception as e:
+        print(f"生成笔记本做笔记动画关键帧时出错: {str(e)}")
+        return []
+
+
+def generate_move_object_into_animation(objects: List[str], move_duration: float = 3.0, lift_height: float = 1.0) -> List[Dict[str, Any]]:
+    """
+    生成将一个物体移动到另一个物体中的动画关键帧
+    物体先提升，移动到目标物体上方，然后下降进入目标物体内部
+    
+    参数：
+        objects: 物体名称列表，objects[0]为要移动的物体，objects[1]为目标容器
+        move_duration: 移动操作持续时间
+        lift_height: 提升高度（米）
+        
+    返回值：
+        List[Dict]: 关键帧数据列表
+    """
+    if len(objects) < 2:
+        return []
+    
+    try:
+        # 获取移动物体信息
+        moving_object_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[0]})
+        if not moving_object_info.get("success", False):
+            print(f"[generate_move_object_into_animation] 无法获取移动物体信息: {objects[0]}")
+            return []
+        
+        # 获取目标容器信息
+        target_container_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[1]})
+        if not target_container_info.get("success", False):
+            print(f"[generate_move_object_into_animation] 无法获取目标容器信息: {objects[1]}")
+            return []
+        
+        # 提取移动物体的初始位置和旋转
+        moving_object_original_pos = {
+            "x": moving_object_info["position"][0],
+            "y": moving_object_info["position"][1],
+            "z": moving_object_info["position"][2]
+        }
+        
+        moving_object_original_rot = {
+            "x": moving_object_info["rotation"][0],
+            "y": moving_object_info["rotation"][1],
+            "z": moving_object_info["rotation"][2]
+        }
+        
+        # 提取目标容器的位置
+        target_container_pos = {
+            "x": target_container_info["position"][0],
+            "y": target_container_info["position"][1],
+            "z": target_container_info["position"][2]
+        }
+        
+        # 获取目标容器的bounds信息用于计算插入位置
+        target_bounds = target_container_info.get("bounds", {}).get("renderer", {})
+        moving_bounds = moving_object_info.get("bounds", {}).get("renderer", {})
+        
+        # 计算插入位置：目标容器的中心位置
+        insert_position = {
+            "x": target_container_pos["x"],
+            "y": target_container_pos["y"],
+            "z": target_container_pos["z"]
+        }
+        
+        # 如果有bounds信息，进行更精确的计算
+        if target_bounds.get("exists", False) and moving_bounds.get("exists", False):
+            target_height = target_bounds["size"][1]  # 目标容器高度
+            moving_height = moving_bounds["size"][1]  # 移动物体高度
+            
+            print(f"[generate_move_object_into_animation] 目标容器bounds高度: {target_height:.3f}米")
+            print(f"[generate_move_object_into_animation] 移动物体bounds高度: {moving_height:.3f}米")
+            
+            # 计算最终插入位置：目标容器底部稍微向上一点
+            insert_position["y"] = target_container_pos["y"] - target_height * 0.3  # 插入到容器下部
+            
+        else:
+            print(f"[generate_move_object_into_animation] 无法获取bounds信息，使用默认插入位置")
+            # 默认插入位置：目标容器位置稍微向下
+            insert_position["y"] = target_container_pos["y"] - 0.2
+        
+        # 计算关键位置点
+        # 1. 提升位置：在原位置基础上Y轴提升
+        lift_pos = {
+            "x": moving_object_original_pos["x"],
+            "y": moving_object_original_pos["y"] + lift_height,
+            "z": moving_object_original_pos["z"]
+        }
+        
+        # 2. 目标上方位置：在目标容器上方准备下降
+        above_target_pos = {
+            "x": target_container_pos["x"],
+            "y": target_container_pos["y"] + lift_height,
+            "z": target_container_pos["z"]
+        }
+        
+        # 3. 最终插入位置
+        final_insert_pos = insert_position
+        
+        # 保持原始旋转角度不变
+        insert_rot = {
+            "x": moving_object_original_rot["x"],
+            "y": moving_object_original_rot["y"],
+            "z": moving_object_original_rot["z"]
+        }
+        
+        print(f"[generate_move_object_into_animation] 移动物体原位置: ({moving_object_original_pos['x']:.3f}, {moving_object_original_pos['y']:.3f}, {moving_object_original_pos['z']:.3f})")
+        print(f"[generate_move_object_into_animation] 移动物体原旋转: ({moving_object_original_rot['x']:.1f}, {moving_object_original_rot['y']:.1f}, {moving_object_original_rot['z']:.1f})")
+        print(f"[generate_move_object_into_animation] 目标容器位置: ({target_container_pos['x']:.3f}, {target_container_pos['y']:.3f}, {target_container_pos['z']:.3f})")
+        print(f"[generate_move_object_into_animation] 提升位置: ({lift_pos['x']:.3f}, {lift_pos['y']:.3f}, {lift_pos['z']:.3f})")
+        print(f"[generate_move_object_into_animation] 目标上方位置: ({above_target_pos['x']:.3f}, {above_target_pos['y']:.3f}, {above_target_pos['z']:.3f})")
+        print(f"[generate_move_object_into_animation] 最终插入位置: ({final_insert_pos['x']:.3f}, {final_insert_pos['y']:.3f}, {final_insert_pos['z']:.3f})")
+        print(f"[generate_move_object_into_animation] 注意：整个过程中rotation保持不变")
+        
+        # 生成将物体移动到另一个物体中的动画关键帧
+        # 动画流程：原位置 -> 提升 -> 移动到目标上方 -> 下降插入 -> 完全插入并保持
+        # 注意：整个过程中rotation保持不变
+        keyframes = [
+            # 1. 起始位置
+            {"position": moving_object_original_pos, "rotation": moving_object_original_rot, "time": 0.0},
+            
+            # 2. 提升到指定高度（保持原始rotation）
+            {"position": lift_pos, "rotation": moving_object_original_rot, "time": 0.8},
+            
+            # 3. 水平移动到目标容器上方（保持原始rotation）
+            {"position": above_target_pos, "rotation": moving_object_original_rot, "time": 1.8},
+            
+            # 4. 开始下降，准备插入（保持原始rotation）
+            {"position": {
+                "x": final_insert_pos["x"],
+                "y": final_insert_pos["y"] + 0.3,  # 在插入位置上方0.3米，准备最后插入
+                "z": final_insert_pos["z"]
+            }, "rotation": moving_object_original_rot, "time": 2.3},
+            
+            # 5. 完全插入到位（保持原始rotation）
+            {"position": final_insert_pos, "rotation": moving_object_original_rot, "time": 2.3 + move_duration},
+            
+            # 6. 保持插入位置（保持原始rotation）
+            {"position": final_insert_pos, "rotation": moving_object_original_rot, "time": 3.0 + move_duration}
+        ]
+        
+        return keyframes
+        
+    except Exception as e:
+        print(f"生成物体移动到容器动画关键帧时出错: {str(e)}")
+        return []
+
+
+def generate_camera_focus_only_animation(objects: List[str], focus_duration: float = 3.0) -> List[Dict[str, Any]]:
+    """
+    生成纯相机聚焦的动画关键帧
+    相机聚焦在目标物体上停留指定时间，目标物体保持完全静止
+    
+    参数：
+        objects: 物体名称列表，objects[0]为目标物体
+        focus_duration: 聚焦停留时间
+        
+    返回值：
+        List[Dict]: 关键帧数据列表（物体保持静止的关键帧）
+    """
+    if len(objects) < 1:
+        return []
+    
+    try:
+        # 获取目标物体信息，确保物体存在
+        target_info = get_unity_connection().send_command("GET_OBJECT_INFO", {"name": objects[0]})
+        if not target_info.get("success", False):
+            print(f"[generate_camera_focus_only_animation] 无法获取目标物体信息: {objects[0]}")
+            return []
+        
+        # 提取目标物体的当前位置和旋转信息
+        target_pos = {
+            "x": target_info["position"][0],
+            "y": target_info["position"][1],
+            "z": target_info["position"][2]
+        }
+        
+        target_rot = {
+            "x": target_info["rotation"][0],
+            "y": target_info["rotation"][1],
+            "z": target_info["rotation"][2]
+        }
+        
+        print(f"[generate_camera_focus_only_animation] 目标物体: {objects[0]}")
+        print(f"[generate_camera_focus_only_animation] 目标位置: ({target_pos['x']:.3f}, {target_pos['y']:.3f}, {target_pos['z']:.3f})")
+        print(f"[generate_camera_focus_only_animation] 目标旋转: ({target_rot['x']:.1f}, {target_rot['y']:.1f}, {target_rot['z']:.1f})")
+        print(f"[generate_camera_focus_only_animation] 聚焦停留时间: {focus_duration:.1f}秒")
+        print(f"[generate_camera_focus_only_animation] 注意：物体在整个时间内保持完全静止")
+        
+        # 生成物体保持静止的关键帧序列
+        # 物体在整个focus_duration时间内保持在当前位置和旋转不变
+        keyframes = [
+            # 起始位置：物体保持当前位置和旋转
+            {"position": target_pos, "rotation": target_rot, "time": 0.0},
+            
+            # 结束位置：物体保持完全相同的位置和旋转
+            {"position": target_pos, "rotation": target_rot, "time": focus_duration}
+        ]
+        
+        return keyframes
+        
+    except Exception as e:
+        print(f"生成纯相机聚焦动画关键帧时出错: {str(e)}")
+        return []
+
+
+# 更新CLIP2_FUNCTIONS字典
+CLIP2_FUNCTIONS.update({
+    "pour_liquid": generate_pour_animation,
+    "default_bounce_animation": default_bounce_animation,
+    "insert_power_cable": generate_insert_power_cable_animation,
+    "wear_gloves": generate_wear_gloves_animation,
+    "notebook_writing": generate_notebook_writing_animation,
+    "move_object_into": generate_move_object_into_animation,
+    "camera_focus_only": generate_camera_focus_only_animation
+}) 
+
+def calculate_clip2_duration(function_name: str, objects: List[str], keyframes: List[Dict[str, Any]] = None) -> float:
+    """
+    根据clip2函数类型和物体数量计算动画时长
+    
+    参数：
+        function_name: clip2函数名称
+        objects: 物体列表
+        keyframes: 关键帧数据（如果有的话）
+    
+    返回值：
+        float: 计算出的动画时长（秒）
+    """
+    # 根据函数名称返回预设的时长
+    duration_map = {
+        "pour_liquid": 7.1,
+        "default_bounce_animation": 2.0,
+        "insert_power_cable": 5.0,
+        "wear_gloves": 2.0,
+        "notebook_writing": 1.2,
+        "move_object_into": 6.0,
+        "camera_focus_only": 3.0
+    }
+    
+    # 获取基础时长
+    base_duration = duration_map.get(function_name, 4.0)
+    
+    # 根据物体数量适当调整时长
+    if len(objects) > 2:
+        base_duration *= 1.3  # 多物体交互时间稍长
+    elif len(objects) == 1:
+        base_duration *= 0.9  # 单物体操作时间稍短
+    
+    # 如果有关键帧数据，可以根据关键帧数量调整
+    if keyframes:
+        keyframe_count = len(keyframes)
+        if keyframe_count > 5:
+            base_duration *= 1.2
+    
+    return round(base_duration, 1)
+
+# validate_target_object_order函数已移除
+# 验证逻辑现在通过Cursor AI在调用generate_combined_timeline前进行
+# 请参考generate_combined_timeline函数文档字符串中的AI验证提示词
+
+def get_clip2_functions_info() -> str:
+    """
+    获取CLIP2_FUNCTIONS字典的详细信息
+    
+    返回值：
+        str: 包含所有clip2函数信息的字符串
+    """
+    info_lines = ["📋 CLIP2_FUNCTIONS 可用函数列表："]
+    
+    function_descriptions = {
+        "pour_liquid": "倾倒液体动画 - 模拟从一个容器向另一个容器倾倒液体的动作",
+        "default_bounce_animation": "默认弹跳动画 - 简单的上下弹跳动作",
+        "insert_power_cable": "插入电源线动画 - 模拟将电源线插入设备的动作",
+        "wear_gloves": "戴手套动画 - 模拟戴上实验手套的动作",
+        "notebook_writing": "笔记本书写动画 - 模拟在笔记本上书写的动作",
+        "move_object_into": "物体移入动画 - 将一个物体移动到另一个物体中",
+        "camera_focus_only": "纯相机聚焦动画 - 仅相机移动，无物体动画"
+    }
+    
+    for func_name in CLIP2_FUNCTIONS.keys():
+        description = function_descriptions.get(func_name, "未知功能")
+        info_lines.append(f"  - \"{func_name}\": {description}")
+    
+    info_lines.append("\n⚠️ 使用提示：")
+    info_lines.append("1. 必须先查看此字典再使用generate_combined_timeline")
+    info_lines.append("2. 确保target_object_name中主要操作物体在第一位")
+    info_lines.append("3. interaction_objects应与target_object_name中的物体保持一致")
+    
+    return "\n".join(info_lines)
+

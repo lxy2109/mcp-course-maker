@@ -1,6 +1,4 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
 你是一个Unity 3D场景的智能助手。请根据如下要求,利用物体的bounds信息,自动计算并设置物体的位置，确保物体之间在指定轴上严丝合缝贴合，在其余轴上不穿模、不重叠：

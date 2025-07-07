@@ -708,7 +708,7 @@
 
 ### 🌄 14. polyhaven-mcp-server（Poly Haven 天空盒/模型/材质下载）
 
-**参考：[polyhaven-mcp-server 文档](https://github.com/lxy2109/polyhaven-mcp-server)**
+**参考：[polyhaven-mcp-server 文档]**
 
 1. **✨ 功能简介**
    - 支持从 [Poly Haven](https://polyhaven.com/) 自动搜索和下载高质量的天空盒（HDRI）、3D模型、材质、贴图等资源。
@@ -729,7 +729,7 @@
    - 在 MCP 客户端（如 Cursor）配置 `mcp.json`，添加如下内容：
 
      ```json
-     "polyhaven": {
+     "Polyhaven": {
        "command": "python",
        "args": [
          "your_abs_dir/polyhaven-mcp-server/src/server.py"
@@ -769,6 +769,56 @@
 6. **🌐 资源管理与规范**
    - 下载的所有资源均自动归档到 `DOWNLOAD_PATH`，并按类型/分类自动归类。
    - 支持与Unity等引擎的无缝集成，下载后可直接在项目中引用。
+
+---
+
+### 🖼️ 15. realesrgan-mcp（图像超分辨率增强）
+
+**参考：[realesrgan-mcp 文档]**
+
+1. **✨ 功能简介**
+   - 图像超分辨率放大与去噪（如提升天空盒、贴图、照片等分辨率），适用于AI生成图片、天空盒等的分辨率增强。
+   - 可自动提升AI生成图片、天空盒、贴图等资源的分辨率至4K或更高。
+   - 支持与PolyHaven、MiniMax等图片生成工具配合，实现自动化高质量资源流转。
+
+2. **🔧 安装与依赖**
+   - Python 3.8+，依赖见 `realesrgan-mcp` 目录下的相关说明。
+   - 进入 `realesrgan-mcp` 目录，执行：
+
+     ```bash
+     pip install -r requirements.txt  # 如有
+     # 或直接安装主程序
+     pip install -e .
+     ```
+
+   - 确保 `mcp_realesrgan_server.py` 位于 `realesrgan-mcp` 目录下。
+
+3. **⚙️ 配置 MCP Server**
+   - 在 MCP 客户端（如 Cursor）配置 `mcp.json`，添加如下内容：
+
+     ```json
+     "Realesrgan": {
+       "command": "python",
+       "args": [
+         "your_abs_dir/realesrgan-mcp/mcp_realesrgan_server.py"
+       ]
+     }
+     ```
+
+     > 其中 `your_abs_dir` 替换为你的实际项目绝对路径。
+
+4. **🛠️ 工具注册与调用示例**
+   - 可通过 MCP 工具集自动调用超分辨率增强功能，无需额外 API Key。
+   - 推荐将下载的高分辨率图片保存到 Unity 项目资源目录（如 `Assets/Skybox`），以便后续自动导入。
+   - 常见用法：
+     - AI生成的天空盒、贴图、照片等分辨率不够时，自动调用该服务提升至4K或更高分辨率。
+     - 可与 PolyHaven、MiniMax 等图片生成工具配合使用，实现自动化高质量资源流转。
+
+5. **🚀 启动服务**
+   - MCP 客户端会自动调用上述命令启动服务。
+
+6. **🌐 资源管理与规范**
+   - 建议将增强后的图片资源统一保存到项目资源目录，便于后续自动化流程调用和管理。
 
 ---
 

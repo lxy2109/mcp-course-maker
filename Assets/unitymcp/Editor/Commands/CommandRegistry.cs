@@ -76,9 +76,9 @@ namespace UnityMCP.Editor.Commands
             { "SET_MATERIAL", parameters => MaterialCommandHandler.SetMaterial(parameters) },
 
             // SkyboxCommandHandler
-            { "SET_SKYBOX", parameters => SkyboxCommandHandler.SetSkybox(parameters) },
-            { "CLEAR_SKYBOX", parameters => SkyboxCommandHandler.ClearSkybox(parameters) },
-            { "CREATE_SKYBOX_MATERIAL", parameters => SkyboxCommandHandler.CreateSkyboxMaterial(parameters) },
+            { "SET_SKYBOX", parameters => SkyboxCommandHandler.SetSkybox(parameters) },
+            { "CLEAR_SKYBOX", parameters => SkyboxCommandHandler.ClearSkybox(parameters) },
+            { "CREATE_SKYBOX_MATERIAL", parameters => SkyboxCommandHandler.CreateSkyboxMaterial(parameters) },
             
             // NodeGraphTool commands
             // CreateEmptyNodeGraph
@@ -104,6 +104,8 @@ namespace UnityMCP.Editor.Commands
             { "FLOW_EVENT_FORTH",parameters => EventCommandHandler.FlowEventForth(parameters)},
             {"ADD_EVENT_OBJECT", parameters => EventCommandHandler.AddEventObject(parameters)},
             {"CREATE_BASE" , parameters => EventCommandHandler.CreateBase(parameters)},
+            // 兼容无参数调用（如旧版脚本调用）
+            { "ADD_EVENT_OBJECT_NO_PARAM", _ => EventCommandHandler.AddEventObject(new JObject()) },
             //Event control commands
             { "ADD_GRAPH_POOL", parameters => NodeGraphCommandHandler.AddGraphPool(parameters)},
             // { "ADD_EVENT", _ => EventCommandHandler.AddEvent()},

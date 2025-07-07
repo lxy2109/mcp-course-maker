@@ -58,13 +58,14 @@ def create_empty_nodegraph(
 def get_nodegraph_info(
         ctx: Context,
         name: str,
-        path: str = "Assets/NodeGraphTool/Test"
+        path: str = ""
 ) -> str:
     """获取NodeGraph文件的详细信息。
 
     参数：
         ctx: MCP上下文
-        node_graph_path: NodeGraph文件的完整路径，如"Assets/NodeGraphTool/Test/myGraph.asset"
+        node_graph_path: NodeGraph文件的完整路径，如"Assets/myGraph.asset"
+        默认的path为"Assets/{课程名称}/{节点图名称}.asset"
 
     返回值：
         str: NodeGraph的详细信息

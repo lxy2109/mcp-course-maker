@@ -25,14 +25,24 @@ namespace UnityMCP.Editor.Commands
             string name = (string)@params["name"] ?? throw new Exception("Parameter 'name' is required.");
             // 在场景中查找指定名称的游戏对象，如果找不到则抛出异常
             var obj = GameObject.Find(name) ?? throw new Exception($"Object '{name}' not found.");
-            // 返回包含对象名称、位置、旋转和缩放信息的匿名对象
+            
+            // 获取bounds信息
+            var rendererBounds = GetRendererBounds(obj);
+            var colliderBounds = GetColliderBounds(obj);
+            
+            // 返回包含对象名称、位置、旋转、缩放和bounds信息的匿名对象
             return new
             {
                 success = true,
                 obj.name,                     // 对象名称
                 position = new[] { obj.transform.position.x, obj.transform.position.y, obj.transform.position.z },  // 对象位置坐标数组
                 rotation = new[] { obj.transform.eulerAngles.x, obj.transform.eulerAngles.y, obj.transform.eulerAngles.z },  // 对象旋转角度数组
-                scale = new[] { obj.transform.localScale.x, obj.transform.localScale.y, obj.transform.localScale.z }  // 对象缩放比例数组
+                scale = new[] { obj.transform.localScale.x, obj.transform.localScale.y, obj.transform.localScale.z },  // 对象缩放比例数组
+                bounds = new
+                {
+                    renderer = rendererBounds,    // 渲染器边界框信息
+                    collider = colliderBounds     // 碰撞体边界框信息
+                }
             };
         }
 
@@ -891,5 +901,518 @@ namespace UnityMCP.Editor.Commands
         
         
         
+        /// <summary>
+        /// 获取指定对象的边界框信息，包括Renderer和Collider的bounds
+        /// </summary>
+        public static object GetObjectBounds(JObject @params)
+        {
+            string name = (string)@params["name"] ?? throw new Exception("Parameter 'name' is required.");
+            var obj = GameObject.Find(name) ?? throw new Exception($"Object '{name}' not found.");
+
+            var result = new
+            {
+                obj.name,
+                rendererBounds = GetRendererBounds(obj),
+                colliderBounds = GetColliderBounds(obj),
+                transformInfo = new
+                {
+                    position = new[] { obj.transform.position.x, obj.transform.position.y, obj.transform.position.z },
+                    rotation = new[] { obj.transform.eulerAngles.x, obj.transform.eulerAngles.y, obj.transform.eulerAngles.z },
+                    scale = new[] { obj.transform.localScale.x, obj.transform.localScale.y, obj.transform.localScale.z }
+                }
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取多个对象的合并边界框
+        /// </summary>
+        public static object GetCombinedBounds(JObject @params)
+        {
+            var objectNames = @params["object_names"]?.ToObject<string[]>() ?? 
+                throw new Exception("Parameter 'object_names' is required and must be an array of strings.");
+
+            if (objectNames.Length == 0)
+                throw new Exception("At least one object name is required.");
+
+            var objects = new List<GameObject>();
+            var notFoundObjects = new List<string>();
+
+            // 查找所有对象
+            foreach (string name in objectNames)
+            {
+                var obj = GameObject.Find(name);
+                if (obj != null)
+                    objects.Add(obj);
+                else
+                    notFoundObjects.Add(name);
+            }
+
+            if (objects.Count == 0)
+                throw new Exception($"None of the specified objects were found: {string.Join(", ", notFoundObjects)}");
+
+            // 计算合并的bounds
+            var combinedBounds = CalculateCombinedBounds(objects);
+
+            return new
+            {
+                foundObjects = objects.Select(o => o.name).ToArray(),
+                notFoundObjects = notFoundObjects.ToArray(),
+                totalObjectsFound = objects.Count,
+                combinedBounds = new
+                {
+                    center = new[] { combinedBounds.center.x, combinedBounds.center.y, combinedBounds.center.z },
+                    size = new[] { combinedBounds.size.x, combinedBounds.size.y, combinedBounds.size.z },
+                    min = new[] { combinedBounds.min.x, combinedBounds.min.y, combinedBounds.min.z },
+                    max = new[] { combinedBounds.max.x, combinedBounds.max.y, combinedBounds.max.z }
+                }
+            };
+        }
+
+        // 辅助方法：获取Renderer的bounds
+        private static object GetRendererBounds(GameObject obj)
+        {
+            var renderer = obj.GetComponent<Renderer>();
+            if (renderer == null)
+            {
+                return new { exists = false, message = "No Renderer component found" };
+            }
+
+            var bounds = renderer.bounds;
+            return new
+            {
+                exists = true,
+                center = new[] { bounds.center.x, bounds.center.y, bounds.center.z },
+                size = new[] { bounds.size.x, bounds.size.y, bounds.size.z },
+                min = new[] { bounds.min.x, bounds.min.y, bounds.min.z },
+                max = new[] { bounds.max.x, bounds.max.y, bounds.max.z }
+            };
+        }
+
+        // 辅助方法：获取Collider的bounds
+        private static object GetColliderBounds(GameObject obj)
+        {
+            var collider = obj.GetComponent<Collider>();
+            if (collider == null)
+            {
+                return new { exists = false, message = "No Collider component found" };
+            }
+
+            var bounds = collider.bounds;
+            return new
+            {
+                exists = true,
+                center = new[] { bounds.center.x, bounds.center.y, bounds.center.z },
+                size = new[] { bounds.size.x, bounds.size.y, bounds.size.z },
+                min = new[] { bounds.min.x, bounds.min.y, bounds.min.z },
+                max = new[] { bounds.max.x, bounds.max.y, bounds.max.z }
+            };
+        }
+
+        // 辅助方法：计算多个对象的合并bounds
+        private static Bounds CalculateCombinedBounds(List<GameObject> objects)
+        {
+            bool boundsInitialized = false;
+            Bounds combinedBounds = new Bounds();
+
+            foreach (var obj in objects)
+            {
+                // 尝试从Renderer获取bounds
+                var renderer = obj.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    if (!boundsInitialized)
+                    {
+                        combinedBounds = renderer.bounds;
+                        boundsInitialized = true;
+                    }
+                    else
+                    {
+                        combinedBounds.Encapsulate(renderer.bounds);
+                    }
+                    continue;
+                }
+
+                // 如果没有Renderer，尝试从Collider获取bounds
+                var collider = obj.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    if (!boundsInitialized)
+                    {
+                        combinedBounds = collider.bounds;
+                        boundsInitialized = true;
+                    }
+                    else
+                    {
+                        combinedBounds.Encapsulate(collider.bounds);
+                    }
+                    continue;
+                }
+
+                // 如果既没有Renderer也没有Collider，使用Transform位置
+                if (!boundsInitialized)
+                {
+                    combinedBounds = new Bounds(obj.transform.position, Vector3.zero);
+                    boundsInitialized = true;
+                }
+                else
+                {
+                    combinedBounds.Encapsulate(obj.transform.position);
+                }
+            }
+
+            return combinedBounds;
+        }
+
+        /// <summary>
+        /// 智能定位相机以框住指定的物体
+        /// </summary>
+        public static object PositionCameraToFrameObjects(JObject @params)
+        {
+            // 获取参数
+            string cameraName = (string)@params["camera_name"] ?? "Main Camera";
+            var objectNames = @params["object_names"]?.ToObject<string[]>() ?? 
+                throw new Exception("Parameter 'object_names' is required and must be an array of strings.");
+            
+            float padding = @params.ContainsKey("padding") ? (float)@params["padding"] : 3.0f; // 默认3倍边距
+            string frameMode = (string)@params["frame_mode"] ?? "fit"; // fit, fill, custom
+            var customDirection = @params.ContainsKey("view_direction") ? 
+                Vector3Helper.ParseVector3((JArray)@params["view_direction"]) : Vector3.forward;
+
+            // 查找相机
+            var camera = GameObject.Find(cameraName);
+            if (camera == null)
+                throw new Exception($"Camera '{cameraName}' not found.");
+
+            var cameraComponent = camera.GetComponent<Camera>();
+            if (cameraComponent == null)
+                throw new Exception($"Object '{cameraName}' does not have a Camera component.");
+
+            // 查找目标对象并计算合并bounds
+            var objects = new List<GameObject>();
+            var notFoundObjects = new List<string>();
+
+            foreach (string name in objectNames)
+            {
+                var obj = GameObject.Find(name);
+                if (obj != null)
+                    objects.Add(obj);
+                else
+                    notFoundObjects.Add(name);
+            }
+
+            if (objects.Count == 0)
+                throw new Exception($"None of the specified objects were found: {string.Join(", ", notFoundObjects)}");
+
+            // 计算目标bounds
+            var targetBounds = CalculateCombinedBounds(objects);
+            
+            // 计算相机的新位置和旋转
+            var cameraPositioning = CalculateCameraPositioning(targetBounds, cameraComponent, padding, frameMode, customDirection);
+
+            // 应用新的相机位置和旋转
+            camera.transform.position = cameraPositioning.position;
+            camera.transform.rotation = cameraPositioning.rotation;
+
+            return new
+            {
+                success = true,
+                camera = cameraName,
+                targetObjects = objects.Select(o => o.name).ToArray(),
+                notFoundObjects = notFoundObjects.ToArray(),
+                targetBounds = new
+                {
+                    center = new[] { targetBounds.center.x, targetBounds.center.y, targetBounds.center.z },
+                    size = new[] { targetBounds.size.x, targetBounds.size.y, targetBounds.size.z }
+                },
+                cameraPosition = new[] { camera.transform.position.x, camera.transform.position.y, camera.transform.position.z },
+                cameraRotation = new[] { camera.transform.eulerAngles.x, camera.transform.eulerAngles.y, camera.transform.eulerAngles.z },
+                cameraSettings = new
+                {
+                    fieldOfView = cameraComponent.fieldOfView,
+                    distance = Vector3.Distance(camera.transform.position, targetBounds.center),
+                    frameMode = frameMode,
+                    padding = padding
+                }
+            };
+        }
+
+        // 辅助方法：计算相机定位
+        private static (Vector3 position, Quaternion rotation) CalculateCameraPositioning(
+            Bounds targetBounds, Camera camera, float padding, string frameMode, Vector3 customDirection)
+        {
+            Vector3 boundsCenter = targetBounds.center;
+            Vector3 boundsSize = targetBounds.size;
+
+            // 计算实际需要框住的尺寸（包含边距）
+            float paddedWidth = boundsSize.x * padding;
+            float paddedHeight = boundsSize.y * padding;
+            float paddedDepth = boundsSize.z * padding;
+
+            // 获取相机的FOV（转换为弧度）
+            float fovRadians = camera.fieldOfView * Mathf.Deg2Rad;
+            
+            // 计算相机距离（基于最大尺寸确保完全覆盖）
+            float maxDimension = Mathf.Max(paddedWidth, paddedDepth); // 忽略高度，因为俯视
+            float distance = maxDimension / (2f * Mathf.Tan(fovRadians / 2f));
+            
+            // 确保最小距离，避免相机太近
+            distance = Mathf.Max(distance, 1.0f);
+
+            // 解析俯视角度（从customDirection计算，强制Y轴为0）
+            float pitchAngle = 30f; // 默认30度俯视
+            if (customDirection != Vector3.forward)
+            {
+                // 从customDirection提取俯视角度
+                // 将方向向量投影到XZ平面，然后计算与Y轴的角度
+                Vector3 dirNormalized = customDirection.normalized;
+                
+                // 计算俯视角度：使用Y分量和水平距离的反正切
+                float horizontalDistance = Mathf.Sqrt(dirNormalized.x * dirNormalized.x + dirNormalized.z * dirNormalized.z);
+                if (horizontalDistance > 0.001f) // 避免除零
+                {
+                    pitchAngle = Mathf.Atan2(dirNormalized.y, horizontalDistance) * Mathf.Rad2Deg;
+                    // 确保是俯视角度（正值）
+                    pitchAngle = Mathf.Abs(pitchAngle);
+                }
+            }
+
+            // 限制俯视角度范围（30-40度）
+            pitchAngle = Mathf.Clamp(pitchAngle, 30f, 40f);
+
+            // 强制相机位于物体正后方（X=center.x, Y轴旋转=0）
+            // 基于俯视角度计算相机位置（确保Z为负值，X居中）
+            float yOffset = distance * Mathf.Sin(pitchAngle * Mathf.Deg2Rad);
+            float zOffset = -distance * Mathf.Cos(pitchAngle * Mathf.Deg2Rad); // 负数，相机在后方
+
+            Vector3 cameraPosition = new Vector3(
+                boundsCenter.x,  // X轴居中，确保rotation.y为0
+                boundsCenter.y + yOffset,
+                boundsCenter.z + zOffset
+            );
+
+            // 创建旋转（强制Y和Z轴为0，只设置X轴俯视角度）
+            Quaternion cameraRotation = Quaternion.Euler(pitchAngle, 0f, 0f);
+
+            return (cameraPosition, cameraRotation);
+        }
+
+        /// <summary>
+        /// 智能相机自动定位：综合bounds分析和相机定位的一站式解决方案
+        /// 自动获取指定物体的边界，计算合适的相机位置，可选择是否应用到相机
+        /// </summary>
+        public static object AutoPositionCameraToObjects(JObject @params)
+        {
+            // 获取参数
+            var objectNames = @params["object_names"]?.ToObject<string[]>() ?? 
+                throw new Exception("Parameter 'object_names' is required and must be an array of strings.");
+            
+            string cameraName = (string)@params["camera_name"] ?? "Main Camera";
+            float fov = @params.ContainsKey("fov") ? (float)@params["fov"] : 45f; // 默认45度
+                            float pitchAngle = @params.ContainsKey("pitch_angle") ? (float)@params["pitch_angle"] : 35f; // 默认35度俯视
+            float padding = @params.ContainsKey("padding") ? (float)@params["padding"] : 3.0f; // 默认3倍边距
+            bool forceResetRotationY = @params.ContainsKey("force_reset_rotation_y") ? (bool)@params["force_reset_rotation_y"] : true;
+            bool applyToCamera = @params.ContainsKey("apply_to_camera") ? (bool)@params["apply_to_camera"] : true; // 新增参数：是否应用到相机
+
+            if (objectNames.Length == 0)
+                throw new Exception("At least one object name is required.");
+
+            // 查找相机
+            var camera = GameObject.Find(cameraName);
+            if (camera == null)
+                throw new Exception($"Camera '{cameraName}' not found.");
+
+            var cameraComponent = camera.GetComponent<Camera>();
+            if (cameraComponent == null)
+                throw new Exception($"Object '{cameraName}' does not have a Camera component.");
+
+            // 步骤1：查找目标对象
+            var foundObjects = new List<GameObject>();
+            var notFoundObjects = new List<string>();
+
+            foreach (string name in objectNames)
+            {
+                var obj = GameObject.Find(name);
+                if (obj != null)
+                {
+                    foundObjects.Add(obj);
+                }
+                else
+                {
+                    notFoundObjects.Add(name);
+                }
+            }
+
+            if (foundObjects.Count == 0)
+                throw new Exception($"None of the specified objects were found: {string.Join(", ", notFoundObjects)}");
+
+            // 步骤2：收集每个对象的bounds信息
+            var individualObjectBounds = foundObjects.Select(obj => new
+            {
+                name = obj.name,
+                rendererBounds = GetRendererBounds(obj),
+                colliderBounds = GetColliderBounds(obj),
+                position = new[] { obj.transform.position.x, obj.transform.position.y, obj.transform.position.z },
+                scale = new[] { obj.transform.localScale.x, obj.transform.localScale.y, obj.transform.localScale.z }
+            }).ToList();
+
+            // 步骤3：计算合并bounds
+            var combinedBounds = CalculateCombinedBounds(foundObjects);
+
+            // 计算带边距的bounds信息
+            Vector3 paddedSize = combinedBounds.size * padding;
+            Bounds paddedBounds = new Bounds(combinedBounds.center, paddedSize);
+
+            // 步骤4：计算相机位置和旋转
+            var cameraPositioning = CalculateSmartCameraPositioning(combinedBounds, fov, pitchAngle, padding, foundObjects.Count);
+
+            // 步骤5：强制重置rotation.y为0（如果需要）
+            Vector3 finalRotation = cameraPositioning.rotation.eulerAngles;
+            if (forceResetRotationY)
+            {
+                finalRotation.y = 0f;
+            }
+
+            // 记录当前相机状态（调整前）
+            var originalCameraState = new
+            {
+                position = new[] { camera.transform.position.x, camera.transform.position.y, camera.transform.position.z },
+                rotation = new[] { camera.transform.eulerAngles.x, camera.transform.eulerAngles.y, camera.transform.eulerAngles.z },
+                fieldOfView = cameraComponent.fieldOfView
+            };
+
+            // 步骤6：是否应用相机设置
+            if (applyToCamera)
+            {
+                cameraComponent.fieldOfView = fov;
+                camera.transform.position = cameraPositioning.position;
+                camera.transform.rotation = Quaternion.Euler(finalRotation);
+            }
+
+            // 记录调整后的相机状态
+            var adjustedCameraState = new
+            {
+                position = new[] { cameraPositioning.position.x, cameraPositioning.position.y, cameraPositioning.position.z },
+                rotation = new[] { finalRotation.x, finalRotation.y, finalRotation.z },
+                fieldOfView = fov
+            };
+
+            // 计算一些有用的统计信息
+            float calculatedDistance = Vector3.Distance(cameraPositioning.position, combinedBounds.center);
+            float maxDimension = Mathf.Max(paddedSize.x, paddedSize.z);
+            float fovRadians = fov * Mathf.Deg2Rad;
+            float theoreticalDistance = maxDimension / (2f * Mathf.Tan(fovRadians / 2f));
+
+            // 返回详细的结果，包含bounds信息
+            return new
+            {
+                success = true,
+                applied = applyToCamera,
+                cameraName = cameraName,
+                targetObjectsFound = foundObjects.Count,
+                targetObjectsNotFound = notFoundObjects.Count,
+                notFoundObjectNames = notFoundObjects.ToArray(),
+                originalCamera = originalCameraState,
+                adjustedCamera = adjustedCameraState,
+                // 新增：详细的bounds信息
+                boundsAnalysis = new
+                {
+                    // 单个对象的bounds信息
+                    individualObjects = individualObjectBounds,
+                    // 合并后的原始bounds
+                    combinedBounds = new
+                    {
+                        center = new[] { combinedBounds.center.x, combinedBounds.center.y, combinedBounds.center.z },
+                        size = new[] { combinedBounds.size.x, combinedBounds.size.y, combinedBounds.size.z },
+                        min = new[] { combinedBounds.min.x, combinedBounds.min.y, combinedBounds.min.z },
+                        max = new[] { combinedBounds.max.x, combinedBounds.max.y, combinedBounds.max.z }
+                    },
+                    // 应用边距后的bounds
+                    paddedBounds = new
+                    {
+                        center = new[] { paddedBounds.center.x, paddedBounds.center.y, paddedBounds.center.z },
+                        size = new[] { paddedBounds.size.x, paddedBounds.size.y, paddedBounds.size.z },
+                        min = new[] { paddedBounds.min.x, paddedBounds.min.y, paddedBounds.min.z },
+                        max = new[] { paddedBounds.max.x, paddedBounds.max.y, paddedBounds.max.z }
+                    },
+                    // 计算统计信息
+                    statistics = new
+                    {
+                        totalVolume = combinedBounds.size.x * combinedBounds.size.y * combinedBounds.size.z,
+                        largestDimension = Mathf.Max(combinedBounds.size.x, combinedBounds.size.y, combinedBounds.size.z),
+                        smallestDimension = Mathf.Min(combinedBounds.size.x, combinedBounds.size.y, combinedBounds.size.z),
+                        aspectRatioXY = combinedBounds.size.x / Mathf.Max(combinedBounds.size.y, 0.001f),
+                        aspectRatioXZ = combinedBounds.size.x / Mathf.Max(combinedBounds.size.z, 0.001f)
+                    }
+                },
+                // 新增：相机计算详情
+                cameraCalculation = new
+                {
+                    inputParameters = new
+                    {
+                        fov = fov,
+                        pitchAngle = pitchAngle,
+                        padding = padding,
+                        forceResetRotationY = forceResetRotationY
+                    },
+                    calculatedDistance = calculatedDistance,
+                    theoreticalDistance = theoreticalDistance,
+                    distanceOffset = calculatedDistance - theoreticalDistance,
+                    maxDimensionUsed = maxDimension,
+                    viewFrustumInfo = new
+                    {
+                        fovRadians = fovRadians,
+                        halfFovTangent = Mathf.Tan(fovRadians / 2f),
+                        viewportWidthAtDistance = 2f * calculatedDistance * Mathf.Tan(fovRadians / 2f)
+                    }
+                }
+            };
+        }
+
+        // 辅助方法：智能相机定位计算（专门为AutoPositionCameraToObjects优化）
+        private static (Vector3 position, Quaternion rotation) CalculateSmartCameraPositioning(
+            Bounds targetBounds, float fov, float pitchAngle, float padding, int objectCount)
+        {
+            Vector3 boundsCenter = targetBounds.center;
+            Vector3 boundsSize = targetBounds.size;
+
+            // 计算带边距的尺寸
+            float paddedWidth = boundsSize.x * padding;
+            float paddedDepth = boundsSize.z * padding;
+
+            // 基于FOV计算所需距离 - 使用理论距离，并设置2.5米最小值
+            float fovRadians = fov * Mathf.Deg2Rad;
+            float maxDimension = Mathf.Max(paddedWidth, paddedDepth);
+            float theoreticalDistance = maxDimension / (2f * Mathf.Tan(fovRadians / 2f)); // 计算理论距离
+            float distance = Mathf.Max(theoreticalDistance, 2.5f); // 设置2.5米最小距离限制
+            
+            // 调试信息：确认距离计算
+            UnityEngine.Debug.Log($"[AutoPosition] 距离计算: maxDimension={maxDimension}, theoreticalDistance={theoreticalDistance}, finalDistance={distance} (最小值2.5m)");
+
+            // 限制俯视角度范围（30-40度）
+            pitchAngle = Mathf.Clamp(pitchAngle, 30f, 40f);
+
+            // 计算相机位置（强制Y轴旋转为0，X轴居中）
+            float yOffset = distance * Mathf.Sin(pitchAngle * Mathf.Deg2Rad);
+            float zOffset = -distance * Mathf.Cos(pitchAngle * Mathf.Deg2Rad); // 负数，相机在后方
+
+            // 多物体场景时，提高相机Y轴位置1.2米
+            float multiObjectYBoost = (objectCount > 1) ? 1.2f : 0f;
+
+            Vector3 cameraPosition = new Vector3(
+                boundsCenter.x,  // X轴居中
+                boundsCenter.y + yOffset + multiObjectYBoost,  // 多物体时额外提高1.2米
+                boundsCenter.z + zOffset  // Z轴负值
+            );
+            
+            // 调试信息：确认计算的相机位置
+            UnityEngine.Debug.Log($"[AutoPosition] 相机位置计算: center={boundsCenter}, yOffset={yOffset}, zOffset={zOffset}, final={cameraPosition}");
+
+            // 创建旋转（严格限制Y和Z轴为0）
+            Quaternion cameraRotation = Quaternion.Euler(pitchAngle, 0f, 0f);
+
+            return (cameraPosition, cameraRotation);
+        }
     }
 }

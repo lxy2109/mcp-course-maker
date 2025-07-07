@@ -272,6 +272,9 @@ namespace UnityMCP.Editor.Commands
                 // 创建动画轨道
                 var animTrack = timelineAsset.CreateTrack<AnimationTrack>(null, targetObject.name);  // 在Timeline中创建动画轨道
                 animTrack.trackOffset = TrackOffset.ApplyTransformOffsets;    // 设置轨道偏移模式为应用变换偏移
+                // 设置Hold模式为Infinity
+                animTrack.infiniteClipPreExtrapolation = TimelineClip.ClipExtrapolation.Hold;
+                animTrack.infiniteClipPostExtrapolation = TimelineClip.ClipExtrapolation.Hold;
 
                 // 清除轨道上可能存在的默认clip
                 if (animTrack.GetClips().Any())
@@ -356,6 +359,9 @@ namespace UnityMCP.Editor.Commands
                 // 刷新资产数据库
                 AssetDatabase.SaveAssets();                                  // 保存所有资产更改
                 AssetDatabase.Refresh();                                     // 刷新资产数据库
+
+                // 修改playable文件中的m_RemoveStartOffset参数为0
+                SetRemoveStartOffsetToZero(assetPath);
 
                 // 选择TimelineManager对象
                 Selection.activeObject = director.gameObject;                        // 在编辑器中选择包含PlayableDirector的对象
@@ -603,24 +609,147 @@ namespace UnityMCP.Editor.Commands
                 JObject cameraParams = (JObject)@params["camera_params"];
                 JObject objectParams = (JObject)@params["object_params"];
                 float clipDuration = @params["clip_duration"] != null ? (float)@params["clip_duration"] : 5.0f;
+                float clip2Duration = @params["clip2_duration"] != null ? (float)@params["clip2_duration"] : clipDuration;
+                
+                Debug.Log($"Clip Duration Parameters: clipDuration={clipDuration}, clip2Duration={clip2Duration}");
 
-                // 获取相机和目标物体
+                // 提取新的clip2函数相关参数
+                string clip2FunctionName = (string)@params["clip2_function_name"] ?? "default_bounce_animation";
+                JArray interactionObjects = @params["interaction_objects"] as JArray;
+
+                Debug.Log($"使用Clip2函数: {clip2FunctionName}");
+                if (interactionObjects != null)
+                {
+                    Debug.Log($"交互物体数量: {interactionObjects.Count}");
+                    for (int i = 0; i < interactionObjects.Count; i++)
+                    {
+                        Debug.Log($"  交互物体[{i}]: {interactionObjects[i]}");
+                    }
+                }
+
+                // 提取AutoPositionCameraToObjects参数
+                float fov = @params["fov"] != null ? (float)@params["fov"] : 45.0f;
+                float pitchAngle = @params["pitch_angle"] != null ? (float)@params["pitch_angle"] : 35.0f;
+                float padding = @params["padding"] != null ? (float)@params["padding"] : 3.0f;
+                bool forceResetRotationY = @params["force_reset_rotation_y"] != null ? (bool)@params["force_reset_rotation_y"] : true;
+
+                // 解析目标物体名称，支持逗号分隔的多个物体
+                Debug.Log($"原始目标物体名称: '{targetObjectName}'");
+                string[] targetObjectNames;
+                if (targetObjectName.Contains(","))
+                {
+                    // 多个物体，按逗号分隔
+                    targetObjectNames = targetObjectName.Split(',').Select(name => name.Trim()).Where(name => !string.IsNullOrEmpty(name)).ToArray();
+                    Debug.Log($"解析为多个物体: [{string.Join(", ", targetObjectNames.Select(n => $"'{n}'"))}]");
+                }
+                else
+                {
+                    // 单个物体
+                    targetObjectNames = new string[] { targetObjectName.Trim() };
+                    Debug.Log($"解析为单个物体: '{targetObjectNames[0]}'");
+                }
+
+                // 获取相机
                 GameObject cameraObject = GameObject.Find(cameraName);
-                GameObject targetObject = GameObject.Find(targetObjectName);
-
                 if (cameraObject == null)
                 {
                     return new { success = false, message = $"无法找到相机 '{cameraName}'" };
                 }
 
-                if (targetObject == null)
+                // 验证所有目标物体是否存在
+                GameObject targetObject = null;  // 用于后续兼容性
+                foreach (string objName in targetObjectNames)
                 {
-                    return new { success = false, message = $"无法找到目标物体 '{targetObjectName}'" };
+                    GameObject targetObj = GameObject.Find(objName);
+                    if (targetObj == null)
+                    {
+                        return new { success = false, message = $"无法找到目标物体 '{objName}'" };
+                    }
+                    if (targetObject == null)
+                    {
+                        targetObject = targetObj;  // 设置第一个物体作为主要目标物体（用于后续兼容性）
+                    }
                 }
 
                 // 记录初始位置
                 Vector3 cameraInitialPosition = cameraObject.transform.position;
                 Vector3 cameraInitialRotation = cameraObject.transform.eulerAngles;
+
+                // 使用AutoPositionCameraToObjects计算最佳相机位置（支持多个物体）
+                Debug.Log($"调用AutoPositionCameraToObjects计算目标物体 '{string.Join(", ", targetObjectNames)}' 的最佳相机位置");
+                
+                var autoPositionParams = new JObject
+                {
+                    ["object_names"] = new JArray(targetObjectNames),  // 支持多个物体
+                    ["camera_name"] = cameraName,
+                    ["fov"] = fov,
+                    ["pitch_angle"] = pitchAngle,
+                    ["padding"] = padding,
+                    ["force_reset_rotation_y"] = forceResetRotationY,
+                    ["apply_to_camera"] = false  // 只计算，不应用到相机
+                };
+
+                var autoPositionResult = ObjectCommandHandler.AutoPositionCameraToObjects(autoPositionParams);
+                
+                // 检查AutoPositionCameraToObjects的结果
+                var resultType = autoPositionResult.GetType();
+                bool autoPositionSuccess = (bool)resultType.GetProperty("success").GetValue(autoPositionResult);
+                
+                Vector3 cameraTargetPosition;
+                Vector3 cameraTargetRotation;
+                object boundsAnalysis = null;
+                object cameraCalculation = null;
+                
+                if (autoPositionSuccess)
+                {
+                    Debug.Log("AutoPositionCameraToObjects计算成功");
+                    
+                    // 提取计算结果
+                    var adjustedCamera = resultType.GetProperty("adjustedCamera").GetValue(autoPositionResult);
+                    var adjustedCameraType = adjustedCamera.GetType();
+                    
+                    var positionArray = (float[])adjustedCameraType.GetProperty("position").GetValue(adjustedCamera);
+                    var rotationArray = (float[])adjustedCameraType.GetProperty("rotation").GetValue(adjustedCamera);
+                    
+                    cameraTargetPosition = new Vector3(positionArray[0], positionArray[1], positionArray[2]);
+                    cameraTargetRotation = new Vector3(rotationArray[0], rotationArray[1], rotationArray[2]);
+                    
+                    // 获取详细的bounds分析和相机计算信息
+                    boundsAnalysis = resultType.GetProperty("boundsAnalysis").GetValue(autoPositionResult);
+                    cameraCalculation = resultType.GetProperty("cameraCalculation").GetValue(autoPositionResult);
+                    
+                    Debug.Log($"计算出的相机目标位置: {cameraTargetPosition}, 目标旋转: {cameraTargetRotation}");
+                }
+                else
+                {
+                    Debug.LogWarning("AutoPositionCameraToObjects计算失败，使用默认位置");
+                    
+                    // 降级到原始计算方法 - 计算多个物体的中心点
+                    Vector3 centerPosition = Vector3.zero;
+                    int validObjectCount = 0;
+                    
+                    foreach (string objName in targetObjectNames)
+                    {
+                        GameObject obj = GameObject.Find(objName);
+                        if (obj != null)
+                        {
+                            centerPosition += obj.transform.position;
+                            validObjectCount++;
+                        }
+                    }
+                    
+                    if (validObjectCount > 0)
+                    {
+                        centerPosition /= validObjectCount;  // 计算平均位置
+                    }
+                    else
+                    {
+                        centerPosition = targetObject.transform.position;  // 回退到第一个物体位置
+                    }
+                    
+                    cameraTargetPosition = centerPosition + Vector3.forward * -3.0f + Vector3.up * 1.5f;
+                    cameraTargetRotation = new Vector3(pitchAngle, 0, 0);
+                }
 
                 // 确保Timeline目录存在
                 if (!AssetDatabase.IsValidFolder("Assets/Timeline"))
@@ -642,43 +771,97 @@ namespace UnityMCP.Editor.Commands
                 // 创建相机动画轨道
                 var cameraTrack = timelineAsset.CreateTrack<AnimationTrack>(null, $"{cameraName}_Track");
                 cameraTrack.trackOffset = TrackOffset.ApplyTransformOffsets;
+                cameraTrack.infiniteClipPreExtrapolation = TimelineClip.ClipExtrapolation.Hold;
+                cameraTrack.infiniteClipPostExtrapolation = TimelineClip.ClipExtrapolation.Hold;
 
-                // 创建物体动画轨道
-                var objectTrack = timelineAsset.CreateTrack<AnimationTrack>(null, $"{targetObjectName}_Track");
+                // 创建物体动画轨道（使用第一个物体的名称作为轨道名）
+                var objectTrack = timelineAsset.CreateTrack<AnimationTrack>(null, $"{targetObjectNames[0]}_Track");
                 objectTrack.trackOffset = TrackOffset.ApplyTransformOffsets;
+                objectTrack.infiniteClipPreExtrapolation = TimelineClip.ClipExtrapolation.Hold;
+                objectTrack.infiniteClipPostExtrapolation = TimelineClip.ClipExtrapolation.Hold;
 
-                // 计算目标位置（物体前方3米处）
-                Vector3 targetPosition = targetObject.transform.position;
-                Vector3 cameraTargetPosition = targetPosition + Vector3.forward * -3.0f + Vector3.up * 1.5f;
+                // 创建4个动画片段并保存为资产
 
-                // 创建3个动画片段
+                // Clip 0: 初始状态保持（确保从当前位置开始）
+                var cameraClip0 = CreateStaticStateClip(cameraInitialPosition, cameraInitialRotation, 0.01f);
+                
+                // 保存初始状态剪辑为资产
+                string cameraClip0Path = assetPath.Replace(".playable", "_CameraClip0.anim");
+                AssetDatabase.CreateAsset(cameraClip0, cameraClip0Path);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                var savedCameraClip0 = AssetDatabase.LoadAssetAtPath<AnimationClip>(cameraClip0Path);
+                
+                var timelineClip0 = cameraTrack.CreateClip(savedCameraClip0);
+                timelineClip0.start = 0;
+                timelineClip0.duration = 0.01;
+                timelineClip0.displayName = "相机初始状态";
 
-                // Clip 1: 相机移动到物体前（0-clipDuration秒）
+                // Clip 1: 相机移动到物体前（0.01-clipDuration+0.01秒）
                 var cameraClip1 = CreateCameraMovementClip(cameraInitialPosition, cameraTargetPosition, 
-                    cameraInitialRotation, LookAtRotation(cameraTargetPosition, targetPosition), clipDuration);
-                var timelineClip1 = cameraTrack.CreateClip(cameraClip1);
-                timelineClip1.start = 0;
+                    cameraInitialRotation, cameraTargetRotation, clipDuration);
+                
+                // 保存第一个相机动画剪辑为资产
+                string cameraClip1Path = assetPath.Replace(".playable", "_CameraClip1.anim");
+                AssetDatabase.CreateAsset(cameraClip1, cameraClip1Path);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                var savedCameraClip1 = AssetDatabase.LoadAssetAtPath<AnimationClip>(cameraClip1Path);
+                
+                var timelineClip1 = cameraTrack.CreateClip(savedCameraClip1);
+                timelineClip1.start = 0.01;
                 timelineClip1.duration = clipDuration;
                 timelineClip1.displayName = "相机移动到物体前";
 
-                // Clip 2: 物体动画（clipDuration到2*clipDuration秒）
-                var objectClip = CreateObjectAnimationClip(objectParams, clipDuration);
-                var timelineClip2 = objectTrack.CreateClip(objectClip);
-                timelineClip2.start = clipDuration;
-                timelineClip2.duration = clipDuration;
+                                // 为物体创建初始状态剪辑
+                var objectClip0 = CreateStaticStateClip(targetObject.transform.position, targetObject.transform.rotation.eulerAngles, 0.01f);
+                
+                // 保存物体初始状态剪辑为资产
+                string objectClip0Path = assetPath.Replace(".playable", "_ObjectClip0.anim");
+                AssetDatabase.CreateAsset(objectClip0, objectClip0Path);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                var savedObjectClip0 = AssetDatabase.LoadAssetAtPath<AnimationClip>(objectClip0Path);
+                
+                var objectTimelineClip0 = objectTrack.CreateClip(savedObjectClip0);
+                objectTimelineClip0.start = 0;
+                objectTimelineClip0.duration = 0.01;
+                objectTimelineClip0.displayName = "物体初始状态";
+
+                // Clip 2: 物体动画（0.01+clipDuration到0.01+clipDuration+clip2Duration秒）
+                var objectClip = CreateObjectAnimationClip(objectParams, clip2Duration);
+                
+                // 保存物体动画剪辑为资产
+                string objectClipPath = assetPath.Replace(".playable", "_ObjectClip.anim");
+                AssetDatabase.CreateAsset(objectClip, objectClipPath);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                var savedObjectClip = AssetDatabase.LoadAssetAtPath<AnimationClip>(objectClipPath);
+                
+                var timelineClip2 = objectTrack.CreateClip(savedObjectClip);
+                timelineClip2.start = 0.01 + clipDuration;
+                timelineClip2.duration = clip2Duration;
                 timelineClip2.displayName = "物体动画";
 
-                // Clip 3: 相机返回初始位置（2*clipDuration到3*clipDuration秒）
+                // Clip 3: 相机返回初始位置（0.01+clipDuration+clip2Duration到0.01+2*clipDuration+clip2Duration秒）
                 var cameraClip3 = CreateCameraMovementClip(cameraTargetPosition, cameraInitialPosition,
-                    LookAtRotation(cameraTargetPosition, targetPosition), cameraInitialRotation, clipDuration);
-                var timelineClip3 = cameraTrack.CreateClip(cameraClip3);
-                timelineClip3.start = 2 * clipDuration;
+                    cameraTargetRotation, cameraInitialRotation, clipDuration);
+                
+                // 保存第三个相机动画剪辑为资产
+                string cameraClip3Path = assetPath.Replace(".playable", "_CameraClip3.anim");
+                AssetDatabase.CreateAsset(cameraClip3, cameraClip3Path);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                var savedCameraClip3 = AssetDatabase.LoadAssetAtPath<AnimationClip>(cameraClip3Path);
+                
+                var timelineClip3 = cameraTrack.CreateClip(savedCameraClip3);
+                timelineClip3.start = 0.01 + clipDuration + clip2Duration;
                 timelineClip3.duration = clipDuration;
                 timelineClip3.displayName = "相机返回初始位置";
 
                 // 设置总持续时间
                 timelineAsset.durationMode = TimelineAsset.DurationMode.FixedLength;
-                timelineAsset.fixedDuration = 3 * clipDuration;
+                timelineAsset.fixedDuration = 0.01 + 2 * clipDuration + clip2Duration;
 
                 // 创建轨道绑定字典
                 var trackBindings = new Dictionary<TrackAsset, GameObject>
@@ -695,25 +878,45 @@ namespace UnityMCP.Editor.Commands
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
+                // 修改playable文件中的m_RemoveStartOffset参数为0
+                SetRemoveStartOffsetToZero(assetPath);
+
                 Selection.activeObject = director.gameObject;
 
                 return new
                 {
                     success = true,
-                    message = $"成功创建组合Timeline '{timelineName}'，包含3个连续clip",
+                    message = $"成功创建组合Timeline '{timelineName}'，包含3个连续clip，使用AutoPositionCameraToObjects计算{targetObjectNames.Length}个物体的最佳相机位置",
                     timeline_path = assetPath,
                     director_object = director.gameObject.name,
                     bindings = new[] { 
                         $"{cameraTrack.name} -> {cameraObject.name}",
                         $"{objectTrack.name} -> {targetObject.name}"
                     },
-                    total_duration = 3 * clipDuration,
+                    total_duration = 0.01 + 2 * clipDuration + clip2Duration,
                     clips = new object[]
                     {
-                        new { name = "相机移动到物体前", start = 0, duration = clipDuration },
-                        new { name = "物体动画", start = clipDuration, duration = clipDuration },
-                        new { name = "相机返回初始位置", start = 2 * clipDuration, duration = clipDuration }
-                    }
+                        new { name = "相机初始状态", start = 0, duration = 0.01 },
+                        new { name = "相机移动到物体前", start = 0.01, duration = clipDuration },
+                        new { name = "物体动画", start = 0.01 + clipDuration, duration = clip2Duration },
+                        new { name = "相机返回初始位置", start = 0.01 + clipDuration + clip2Duration, duration = clipDuration }
+                    },
+                    // 新增：AutoPositionCameraToObjects的计算结果
+                    auto_position_used = autoPositionSuccess,
+                    target_objects = targetObjectNames,  // 新增：显示所有目标物体
+                    target_object_count = targetObjectNames.Length,  // 新增：物体数量
+                    camera_calculation = new
+                    {
+                        initial_position = new float[] { cameraInitialPosition.x, cameraInitialPosition.y, cameraInitialPosition.z },
+                        initial_rotation = new float[] { cameraInitialRotation.x, cameraInitialRotation.y, cameraInitialRotation.z },
+                        target_position = new float[] { cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z },
+                        target_rotation = new float[] { cameraTargetRotation.x, cameraTargetRotation.y, cameraTargetRotation.z },
+                        fov = fov,
+                        pitch_angle = pitchAngle,
+                        padding = padding
+                    },
+                    bounds_analysis = boundsAnalysis,
+                    detailed_camera_calculation = cameraCalculation
                 };
             }
             catch (Exception ex)
@@ -728,6 +931,41 @@ namespace UnityMCP.Editor.Commands
         }
 
         /// <summary>
+        /// 创建静态状态保持剪辑（用于维持当前Transform状态）
+        /// </summary>
+        private static AnimationClip CreateStaticStateClip(Vector3 position, Vector3 rotation, float duration)
+        {
+            var animClip = new AnimationClip();
+            animClip.legacy = false;
+
+            // 创建恒定值曲线，确保在整个clip期间维持相同的Transform值
+            AnimationCurve curvePosX = AnimationCurve.Constant(0, duration, position.x);
+            AnimationCurve curvePosY = AnimationCurve.Constant(0, duration, position.y);
+            AnimationCurve curvePosZ = AnimationCurve.Constant(0, duration, position.z);
+
+            animClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", curvePosX);
+            animClip.SetCurve("", typeof(Transform), "m_LocalPosition.y", curvePosY);
+            animClip.SetCurve("", typeof(Transform), "m_LocalPosition.z", curvePosZ);
+
+            // 旋转曲线 - 确保即使是静态状态也有正确的俯视角度
+            Vector3 rotationToUse = rotation;
+            if (rotation == Vector3.zero)
+            {
+                rotationToUse = new Vector3(35f, 0f, 0f); // 默认俯视角35度
+            }
+            
+            AnimationCurve curveRotX = AnimationCurve.Constant(0, duration, rotationToUse.x);
+            AnimationCurve curveRotY = AnimationCurve.Constant(0, duration, rotationToUse.y);
+            AnimationCurve curveRotZ = AnimationCurve.Constant(0, duration, rotationToUse.z);
+
+            animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.x", curveRotX);
+            animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.y", curveRotY);
+            animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.z", curveRotZ);
+
+            return animClip;
+        }
+
+        /// <summary>
         /// 创建相机移动动画片段
         /// </summary>
         private static AnimationClip CreateCameraMovementClip(Vector3 startPos, Vector3 endPos, 
@@ -736,23 +974,57 @@ namespace UnityMCP.Editor.Commands
             var animClip = new AnimationClip();
             animClip.legacy = false;
 
+            // 只有当移动距离或旋转角度不为零时才添加动画曲线
+            if (startPos != endPos)
+            {
             // 位置动画曲线
             AnimationCurve curvePosX = AnimationCurve.Linear(0, startPos.x, duration, endPos.x);
             AnimationCurve curvePosY = AnimationCurve.Linear(0, startPos.y, duration, endPos.y);
             AnimationCurve curvePosZ = AnimationCurve.Linear(0, startPos.z, duration, endPos.z);
 
-            animClip.SetCurve("", typeof(Transform), "localPosition.x", curvePosX);
-            animClip.SetCurve("", typeof(Transform), "localPosition.y", curvePosY);
-            animClip.SetCurve("", typeof(Transform), "localPosition.z", curvePosZ);
+                animClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", curvePosX);
+                animClip.SetCurve("", typeof(Transform), "m_LocalPosition.y", curvePosY);
+                animClip.SetCurve("", typeof(Transform), "m_LocalPosition.z", curvePosZ);
+            }
 
-            // 旋转动画曲线
-            AnimationCurve curveRotX = AnimationCurve.Linear(0, startRot.x, duration, endRot.x);
-            AnimationCurve curveRotY = AnimationCurve.Linear(0, startRot.y, duration, endRot.y);
-            AnimationCurve curveRotZ = AnimationCurve.Linear(0, startRot.z, duration, endRot.z);
+            // 始终添加旋转曲线，确保相机维持正确的俯视角度
+            // 如果起始和结束旋转相同，则创建恒定值曲线
+            AnimationCurve curveRotX, curveRotY, curveRotZ;
+            
+            if (startRot != endRot)
+            {
+                // 限制rotation.x在30-40度范围内
+                float clampedStartX = Mathf.Clamp(startRot.x, 30f, 40f);
+                float clampedEndX = Mathf.Clamp(endRot.x, 30f, 40f);
+                
+                // 旋转动画曲线
+                curveRotX = AnimationCurve.Linear(0, clampedStartX, duration, clampedEndX);
+                curveRotY = AnimationCurve.Linear(0, startRot.y, duration, endRot.y);
+                curveRotZ = AnimationCurve.Linear(0, startRot.z, duration, endRot.z);
+            }
+            else
+            {
+                // 如果起始和结束旋转相同，使用恒定值曲线确保旋转信息被正确维持
+                // 限制rotation.x在30-40度范围内，默认为35度
+                Vector3 rotationToUse = startRot;
+                if (startRot == Vector3.zero && endRot == Vector3.zero)
+                {
+                    rotationToUse = new Vector3(35f, 0f, 0f); // 默认俯视角35度
+                }
+                else
+                {
+                    // 限制rotation.x在30-40度范围内
+                    rotationToUse.x = Mathf.Clamp(rotationToUse.x, 30f, 40f);
+                }
+                
+                curveRotX = AnimationCurve.Constant(0, duration, rotationToUse.x);
+                curveRotY = AnimationCurve.Constant(0, duration, rotationToUse.y);
+                curveRotZ = AnimationCurve.Constant(0, duration, rotationToUse.z);
+            }
 
-            animClip.SetCurve("", typeof(Transform), "localEulerAngles.x", curveRotX);
-            animClip.SetCurve("", typeof(Transform), "localEulerAngles.y", curveRotY);
-            animClip.SetCurve("", typeof(Transform), "localEulerAngles.z", curveRotZ);
+            animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.x", curveRotX);
+            animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.y", curveRotY);
+            animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.z", curveRotZ);
 
             return animClip;
         }
@@ -765,10 +1037,91 @@ namespace UnityMCP.Editor.Commands
             var animClip = new AnimationClip();
             animClip.legacy = false;
 
-            // 从objectParams中提取动画参数
+            Debug.Log("=== CreateObjectAnimationClip: 开始创建物体动画片段 ===");
+
+            // 优先处理新的关键帧数据格式
+            JArray keyframes = objectParams["keyframes"] as JArray;
+            if (keyframes != null && keyframes.Count > 0)
+            {
+                Debug.Log($"使用关键帧数据创建动画，关键帧数量: {keyframes.Count}");
+                
+                // 创建动画曲线
+                AnimationCurve curvePosX = new AnimationCurve();
+                AnimationCurve curvePosY = new AnimationCurve();
+                AnimationCurve curvePosZ = new AnimationCurve();
+                AnimationCurve curveRotX = new AnimationCurve();
+                AnimationCurve curveRotY = new AnimationCurve();
+                AnimationCurve curveRotZ = new AnimationCurve();
+
+                bool hasPosition = false;
+                bool hasRotation = false;
+
+                // 处理每个关键帧
+                foreach (JObject keyframe in keyframes)
+                {
+                    float time = (float)(keyframe["time"] ?? 0f);
+                    
+                    // 处理位置关键帧
+                    if (keyframe["position"] != null)
+                    {
+                        hasPosition = true;
+                        var pos = keyframe["position"];
+                        float x = (float)(pos["x"] ?? 0f);
+                        float y = (float)(pos["y"] ?? 0f);
+                        float z = (float)(pos["z"] ?? 0f);
+                        
+                        curvePosX.AddKey(time, x);
+                        curvePosY.AddKey(time, y);
+                        curvePosZ.AddKey(time, z);
+                        
+                        Debug.Log($"添加位置关键帧 - 时间: {time}, 位置: ({x}, {y}, {z})");
+                    }
+                    
+                    // 处理旋转关键帧
+                    if (keyframe["rotation"] != null)
+                    {
+                        hasRotation = true;
+                        var rot = keyframe["rotation"];
+                        float x = (float)(rot["x"] ?? 0f);
+                        float y = (float)(rot["y"] ?? 0f);
+                        float z = (float)(rot["z"] ?? 0f);
+                        
+                        curveRotX.AddKey(time, x);
+                        curveRotY.AddKey(time, y);
+                        curveRotZ.AddKey(time, z);
+                        
+                        Debug.Log($"添加旋转关键帧 - 时间: {time}, 旋转: ({x}, {y}, {z})");
+                    }
+                }
+
+                // 应用位置动画曲线
+                if (hasPosition)
+                {
+                    animClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", curvePosX);
+                    animClip.SetCurve("", typeof(Transform), "m_LocalPosition.y", curvePosY);
+                    animClip.SetCurve("", typeof(Transform), "m_LocalPosition.z", curvePosZ);
+                    Debug.Log("应用位置动画曲线");
+                }
+
+                // 应用旋转动画曲线
+                if (hasRotation)
+                {
+                    animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.x", curveRotX);
+                    animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.y", curveRotY);
+                    animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.z", curveRotZ);
+                    Debug.Log("应用旋转动画曲线");
+                }
+
+                Debug.Log("=== 关键帧动画创建完成 ===");
+                return animClip;
+            }
+            
+            // 兼容旧的points格式
             JArray points = objectParams["points"] as JArray;
             if (points != null && points.Count > 0)
             {
+                Debug.Log($"使用旧的points格式创建动画，点数量: {points.Count}");
+                
                 // 创建基于points的动画
                 var firstPoint = points[0];
                 var startPosition = Vector3.zero;
@@ -789,9 +1142,9 @@ namespace UnityMCP.Editor.Commands
                 AnimationCurve curvePosY = AnimationCurve.Linear(0, startPosition.y, duration, endPosition.y);
                 AnimationCurve curvePosZ = AnimationCurve.Linear(0, startPosition.z, duration, endPosition.z);
 
-                animClip.SetCurve("", typeof(Transform), "localPosition.x", curvePosX);
-                animClip.SetCurve("", typeof(Transform), "localPosition.y", curvePosY);
-                animClip.SetCurve("", typeof(Transform), "localPosition.z", curvePosZ);
+                animClip.SetCurve("", typeof(Transform), "m_LocalPosition.x", curvePosX);
+                animClip.SetCurve("", typeof(Transform), "m_LocalPosition.y", curvePosY);
+                animClip.SetCurve("", typeof(Transform), "m_LocalPosition.z", curvePosZ);
 
                 // 如果有旋转参数，添加旋转动画
                 if (firstPoint["rotation"] != null)
@@ -807,20 +1160,21 @@ namespace UnityMCP.Editor.Commands
                     AnimationCurve curveRotY = AnimationCurve.Linear(0, 0, duration, endRotation.y);
                     AnimationCurve curveRotZ = AnimationCurve.Linear(0, 0, duration, endRotation.z);
 
-                    animClip.SetCurve("", typeof(Transform), "localEulerAngles.x", curveRotX);
-                    animClip.SetCurve("", typeof(Transform), "localEulerAngles.y", curveRotY);
-                    animClip.SetCurve("", typeof(Transform), "localEulerAngles.z", curveRotZ);
+                    animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.x", curveRotX);
+                    animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.y", curveRotY);
+                    animClip.SetCurve("", typeof(Transform), "m_LocalEulerAngles.z", curveRotZ);
                 }
             }
             else
             {
+                Debug.Log("使用默认弹跳动画");
                 // 默认动画：轻微上下移动
                 AnimationCurve bounceY = new AnimationCurve();
                 bounceY.AddKey(0, 0);
                 bounceY.AddKey(duration / 2, 1);
                 bounceY.AddKey(duration, 0);
 
-                animClip.SetCurve("", typeof(Transform), "localPosition.y", bounceY);
+                animClip.SetCurve("", typeof(Transform), "m_LocalPosition.y", bounceY);
             }
 
             return animClip;
@@ -1333,6 +1687,53 @@ namespace UnityMCP.Editor.Commands
             director.playableAsset = previousAsset;
             
             Debug.Log($"成功注册Timeline '{timelineAsset.name}' 的绑定信息到TimelineManager");
+        }
+
+        /// <summary>
+        /// 修改playable文件中的m_RemoveStartOffset参数为0
+        /// </summary>
+        /// <param name="assetPath">Timeline资产路径</param>
+        private static void SetRemoveStartOffsetToZero(string assetPath)
+        {
+            try
+            {
+                string fullPath = Path.Combine(Application.dataPath, "..", assetPath);
+                
+                if (!File.Exists(fullPath))
+                {
+                    Debug.LogWarning($"Timeline文件不存在: {fullPath}");
+                    return;
+                }
+
+                // 读取playable文件内容
+                string content = File.ReadAllText(fullPath);
+                
+                // 使用正则表达式查找并替换所有的m_RemoveStartOffset: 1为m_RemoveStartOffset: 0
+                string pattern = @"m_RemoveStartOffset:\s*1";
+                string replacement = "m_RemoveStartOffset: 0";
+                
+                string modifiedContent = System.Text.RegularExpressions.Regex.Replace(content, pattern, replacement);
+                
+                // 检查是否有修改
+                if (content != modifiedContent)
+                {
+                    // 写回文件
+                    File.WriteAllText(fullPath, modifiedContent);
+                    
+                    // 刷新资产数据库
+                    AssetDatabase.Refresh();
+                    
+                    Debug.Log($"成功修改Timeline文件中的m_RemoveStartOffset参数为0: {assetPath}");
+                }
+                else
+                {
+                    Debug.Log($"Timeline文件中没有需要修改的m_RemoveStartOffset参数: {assetPath}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"修改Timeline文件时出错: {ex.Message}\n{ex.StackTrace}");
+            }
         }
     }
 }
