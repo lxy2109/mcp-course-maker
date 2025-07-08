@@ -110,6 +110,7 @@
    - 进入 `Assets/excel-mcp-server` 目录，执行：
 
      ```bash
+     uv venv
      uv pip install -e .
      ```
 
