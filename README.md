@@ -219,7 +219,7 @@
 **参考：[豆包TTS文档](https://github.com/lxy2109/doubao-tts-mcp/blob/main/README.md)**
 
 1. **🐍 安装 Python 3.8+ 和依赖**  
-   - 进入 `doubaomcp/doubao-tts-mcp` 目录，执行：
+   - 进入 `doubao-tts-mcp` 目录，执行：
 
      ```bash
      pip install -r requirements.txt
@@ -273,7 +273,53 @@
 
      ```bash
      pip install -r requirements.txt
+     或
+     pip install -e ".[dev]"
      ```
+
+#### ⚠️ 常见问题：字符序列过长导致依赖安装失败
+
+在 Windows 下，使用 `pip install -e ".[dev]"` 或安装依赖时，可能会遇到如下报错：
+
+```
+ERROR: [WinError 206] 文件名或扩展名太长
+error: invalid command 'bdist_wheel'
+...
+```
+
+**原因说明**：
+
+- Windows 注册表的"命令行长度"默认限制为 2047 字符，某些依赖包（如 `pip`、`setuptools`、`wheel` 等）在安装时生成的 entry_points 超过此长度，导致写入注册表失败。
+
+**解决方法**：
+
+1. **命令行一键修复（推荐）**
+   - 以管理员身份打开 PowerShell，执行：
+
+     ```powershell
+     Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' -Name 'Path' -Value ([Environment]::GetEnvironmentVariable('Path','Machine'))
+     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" /t REG_EXPAND_SZ /d "%Path%" /f
+     ```
+
+   - 或直接将注册表项类型改为 `REG_EXPAND_SZ`：
+
+     ```powershell
+     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" /t REG_EXPAND_SZ /f
+     ```
+
+   - 执行后重启电脑或注销当前用户。
+
+2. **手动修改注册表**
+   - 按 Win+R 输入 `regedit`，回车打开注册表编辑器。
+   - 定位到：
+     `计算机\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment`
+   - 找到右侧的 `Path`，右键点击，选择"修改"，将类型改为 `REG_EXPAND_SZ`（可扩展字符串值）。
+   - 保存后重启电脑。
+
+**参考资料**：
+
+- [pip install error: [WinError 206] The filename or extension is too long](https://github.com/pypa/pip/issues/4251)
+- [StackOverflow: Windows registry Path too long](https://stackoverflow.com/questions/9546324/windows-registry-path-too-long)
 
 2. **🔑 配置 API Key 和输出目录**  
    - 在 MCP 配置的 env 字段中设置：
@@ -468,10 +514,10 @@
    - 依赖包见 [`picui-image-upload-mcp/requirements.txt`](./picui-image-upload-mcp/requirements.txt)
 
 3. **🚀 快速开始**
-   - 安装依赖：
+   - 进入 `picui-image-upload-mcp` 目录，执行：
 
     ```bash
-    pip install -r picui-image-upload-mcp/requirements.txt
+    pip install -r requirements.txt
     ```
 
    - 配置 `mcpjson`（见下方详细示例）
@@ -673,6 +719,8 @@
      pip install -e .
      ```
 
+     >如果安装失败，请检查是否安装C/C++ builder<https://www.embarcadero.com/products/cbuilder/downloads>
+
    - 确保 `Instant Meshes.exe` 放在 instant-meshes-mcp 根目录。
    - **下载并安装 Blender 3.6**：
      - 官方下载地址：[https://www.blender.org/download/releases/3-6/](https://www.blender.org/download/releases/3-6/)
@@ -782,14 +830,6 @@
    - 支持与PolyHaven、MiniMax等图片生成工具配合，实现自动化高质量资源流转。
 
 2. **🔧 安装与依赖**
-   - Python 3.8+，依赖见 `realesrgan-mcp` 目录下的相关说明。
-   - 进入 `realesrgan-mcp` 目录，执行：
-
-     ```bash
-     pip install -r requirements.txt  # 如有
-     # 或直接安装主程序
-     pip install -e .
-     ```
 
    - 确保 `mcp_realesrgan_server.py` 位于 `realesrgan-mcp` 目录下。
 

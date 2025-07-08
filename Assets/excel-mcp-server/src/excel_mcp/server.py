@@ -58,7 +58,7 @@ logger = logging.getLogger("excel-mcp")
 EXCEL_FILES_PATH = os.getenv("EXCEL_FILES_PATH")
 
 # Create the directory if it doesn't exist
-os.makedirs(EXCEL_FILES_PATH, exist_ok=True)
+EXCEL_FILES_PATH = os.environ.get("EXCEL_FILES_PATH") or os.path.join(os.path.dirname(__file__), "excel_files")
 
 # Initialize FastMCP server
 mcp = FastMCP(

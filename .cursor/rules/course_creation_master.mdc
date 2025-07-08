@@ -42,7 +42,7 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
   - 遵循：严格遵守 *[RULE] excel_prompt.mdc* 规则内容
   - 位置：Assets/{课程名称}/ 目录下
   - 生成：14列标准结构Excel文件（实验步骤(FlowGraph)实验逻辑部分|实验动作(EventName)具体动作事件|引导文本(阶段文案 UI引导提示)|手部提示（当前需要点击的物品名称）|虚拟交互Enter(进入事件时进行的Event名称)|交互内容Enter(进入事件时进行的Event内容)|虚拟交互Exit(离开事件时进行的Event名称)|交互内容Exit(离开事件时进行的Event名内容)|配音脚本名称(进入事件时播放的音频名称)|配音脚本内容(进入事件时播放的音频文案内容)|镜头timeline名称|镜头timeline内容|物体timeline名称|物体timeline内容
-  - 工具：**[MCP] mcp_excel_create_workbook**、**[MCP] mcp_excel_create_worksheet**、**[MCP] mcp_excel_write_data_to_excel**
+  - 工具：**[MCP] mcp_excel_create_workbook**、**[MCP] mcp_excel_create_worksheet**、**[MCP] mcp_excel_write_data_to_excel**、**[MCP] mcp_excel_read_data_from_excel**
   - 验证：检查14列完整性，4个Sheet结构
 
 - [阶段4：课程子目录结构创建]
@@ -59,16 +59,18 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
       · 语调自然度评估：避免机械感，确保自然流畅
       · 音频格式标准化：统一输出为适合Unity的音频格式
       · 立即导入Unity：音频生成完成后，分析 **[PATH] Assets/{课程名称}/Audio/** 的绝对路径，直接导入
-      · 文件命名规范：按Excel中的配音脚本名称命名
+      · 文件命名规范：按Excel中的配音脚本名称重命名
   - 音频生成前需要分析并查找合适的声音
   - 逐一生成所有所需音频
+  - 检查生成后的音频名称，若与Excel中的配音脚本名称不相符，则调用 **[MCP] mcp_FileSimp_rename_files**重命名
 
   - 3D模型生成：基于modeling_flow.mdc的六步标准化建模流程
     **流程说明**：严格按照六步骤执行，每步完成后进行阶段性输出展示，询问用户是否继续
     · 严格遵循 *[RULE] modeling_flow.mdc* 规则内容
     · 立即导入Unity：模型减面完成后调用 **[MCP] mcp_FileSimp_to_absolute_path** 获取 **[PATH] Assets/{课程名称}/Models/** 的绝对路径，直接导入
-    · 文件命名规范：按Excel中的物品名称命名
+    · 文件命名规范：按Excel中的物品名称重命名
     · 需要多个模型生成时，按步骤同时进行多个模型的建模流程
+    - 检查最后的模型名称，若与Excel中的物品名称不相符，则调用 **[MCP] mcp_FileSimp_rename_files**重命名
 
 - [阶段6：模型实例化与场景布局]
   - 输入：Excel中的相关信息、Assets/{课程名称}/Models
