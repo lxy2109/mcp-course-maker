@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-gen-server"
+version = "0.1.0"
+description = "基于即梦AI的图像生成MCP服务，支持文本生成图片，适配Cursor IDE。"
+authors = [
+    { name = "凌封", email = "fengin@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "fastmcp>=0.4.1",
+    "requests",
+    "python-dotenv",
+    "pydantic",
+    "httpx"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[project.scripts]
+image-gen-server = "jimeng_mcp.server:main" 

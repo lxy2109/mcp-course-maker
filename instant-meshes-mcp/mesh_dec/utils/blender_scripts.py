@@ -799,3 +799,243 @@ except Exception as e:
     write_done_flag()
     raise
 '''
+
+def get_fbx_to_obj_script(fbx_path: str, obj_path: str, output_dir: str, done_flag_path: str, blender_debug_log: str) -> str:
+    """
+    生成 FBX 转 OBJ 并提取贴图的 Blender 脚本。
+    Args:
+        fbx_path: 输入FBX文件路径
+        obj_path: 输出OBJ文件路径
+        output_dir: 输出目录路径
+        done_flag_path: 完成标记文件路径
+        blender_debug_log: 调试日志文件路径
+    Returns:
+        str: Blender Python脚本内容
+    """
+    return f'''
+import bpy
+import os
+import sys
+import time
+import shutil
+
+debug_log_path = r"{blender_debug_log}"
+done_flag_path = r"{done_flag_path}"
+obj_output_path = r"{obj_path}"
+output_dir = r"{output_dir}"
+
+def log_message(message):
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    with open(debug_log_path, "a", encoding="utf-8") as f:
+        f.write(f"[{{timestamp}}] {{message}}\\n")
+
+def write_done_flag():
+    try:
+        with open(done_flag_path, "w", encoding="utf-8") as f:
+            f.write("completed")
+        log_message(f"Done flag written: {{done_flag_path}}")
+    except Exception as e:
+        log_message(f"Failed to write done flag: {{e}}")
+
+log_message("Blender script started for FBX to OBJ with texture extraction")
+log_message(f"Input FBX: {fbx_path}")
+log_message(f"Output OBJ: {obj_path}")
+log_message(f"Output directory: {output_dir}")
+log_message(f"Done flag: {done_flag_path}")
+
+if not os.path.exists(r"{fbx_path}"):
+    log_message(f"ERROR: Input FBX file not found: {fbx_path}")
+    write_done_flag()
+    sys.exit(1)
+
+try:
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+    log_message("Default scene cleared")
+except Exception as e:
+    log_message(f"Failed to clear scene: {{e}}")
+
+try:
+    log_message("Starting FBX import...")
+    bpy.ops.import_scene.fbx(filepath=r"{fbx_path}")
+    log_message("FBX imported successfully")
+    imported_objects = len(bpy.context.scene.objects)
+    log_message(f"Imported objects count: {{imported_objects}}")
+    materials_count = len(bpy.data.materials)
+    log_message(f"Materials count: {{materials_count}}")
+    images_count = len(bpy.data.images)
+    log_message(f"Images count: {{images_count}}")
+except Exception as e:
+    log_message(f"Failed to import FBX: {{e}}")
+    write_done_flag()
+    sys.exit(1)
+
+# 贴图提取逻辑同GLB/OBJ
+extracted_textures = []
+try:
+    log_message("Starting texture extraction...")
+    for image in bpy.data.images:
+        if image.name in ['Render Result', 'Viewer Node']:
+            continue
+        image_name_lower = image.name.lower()
+        if image_name_lower.startswith("color") or image_name_lower.startswith("diffuse") or image_name_lower.startswith("albedo") or image_name_lower.startswith("basecolor"):
+            texture_type = "diffuse"
+        elif image_name_lower.startswith("normalgl") or image_name_lower.startswith("normal") or image_name_lower.startswith("nrm"):
+            texture_type = "normal"
+        elif image_name_lower.startswith("orm") or image_name_lower.startswith("metallicroughness") or image_name_lower.startswith("metallic_roughness"):
+            texture_type = "metallicroughness"
+        elif image_name_lower.startswith("roughness") or image_name_lower.startswith("rough"):
+            texture_type = "roughness"
+        elif image_name_lower.startswith("metallic") or image_name_lower.startswith("metal"):
+            texture_type = "metallic"
+        elif image_name_lower.startswith("ao") or image_name_lower.startswith("occlusion") or image_name_lower.startswith("ambient"):
+            texture_type = "ao"
+        elif image_name_lower.startswith("emission") or image_name_lower.startswith("emissive"):
+            texture_type = "emission"
+        elif image_name_lower == "image_0" or image_name_lower == "image0":
+            texture_type = "diffuse"
+        elif image_name_lower == "image_1" or image_name_lower == "image1":
+            texture_type = "metallicroughness"
+        elif image_name_lower == "image_2" or image_name_lower == "image2":
+            texture_type = "normal"
+        elif image_name_lower == "image_3" or image_name_lower == "image3":
+            texture_type = "roughness"
+        elif image_name_lower == "image_4" or image_name_lower == "image4":
+            texture_type = "ao"
+        elif image_name_lower == "image_5" or image_name_lower == "image5":
+            texture_type = "emission"
+        else:
+            texture_type = "diffuse"
+        texture_name = f"{{image.name}}_{{texture_type}}.png"
+        texture_path = os.path.join(output_dir, texture_name)
+        try:
+            image.file_format = 'PNG'
+            image.save_render(texture_path)
+            log_message(f"Texture saved: {{texture_path}}")
+            extracted_textures.append(texture_name)
+        except Exception as e:
+            log_message(f"Failed to save texture {{image.name}}: {{e}}")
+    log_message(f"Texture extraction completed. Extracted {{len(extracted_textures)}} textures: {{extracted_textures}}")
+except Exception as e:
+    log_message(f"Texture extraction failed: {{e}}")
+    import traceback
+    log_message(f"Traceback: {{traceback.format_exc()}}")
+
+# 导出为OBJ
+try:
+    log_message("Starting OBJ export...")
+    bpy.ops.export_scene.obj(
+        filepath=obj_output_path,
+        use_materials=True,
+        use_uvs=True,
+        use_normals=True,
+        use_triangles=False,
+        path_mode='RELATIVE'
+    )
+    mtl_path = obj_output_path.replace('.obj', '.mtl')
+    if os.path.exists(mtl_path):
+        log_message("Enhancing MTL file with all texture types...")
+        # 贴图增强逻辑同GLB/OBJ
+    log_message("OBJ export completed successfully")
+    if os.path.exists(obj_output_path):
+        file_size = os.path.getsize(obj_output_path)
+        log_message(f"OBJ file created, size: {{file_size}} bytes")
+    else:
+        log_message("ERROR: OBJ file was not created")
+        write_done_flag()
+        sys.exit(1)
+except Exception as e:
+    log_message(f"Failed to export OBJ: {{e}}")
+    write_done_flag()
+    sys.exit(1)
+log_message("Conversion completed successfully")
+write_done_flag()'''
+
+
+def get_fbx_to_glb_script(fbx_path: str, glb_path: str, done_flag_path: str, blender_debug_log: str) -> str:
+    """
+    生成 FBX 转 GLB 的 Blender 脚本。
+    Args:
+        fbx_path: 输入FBX文件路径
+        glb_path: 输出GLB文件路径
+        done_flag_path: 完成标记文件路径
+        blender_debug_log: 调试日志文件路径
+    Returns:
+        str: Blender Python脚本内容
+    """
+    return f'''
+import bpy
+import os
+import sys
+import time
+
+debug_log_path = r"{blender_debug_log}"
+done_flag_path = r"{done_flag_path}"
+glb_output_path = r"{glb_path}"
+
+def log_message(message):
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    with open(debug_log_path, "a", encoding="utf-8") as f:
+        f.write(f"[{{timestamp}}] {{message}}\\n")
+
+def write_done_flag():
+    try:
+        with open(done_flag_path, "w", encoding="utf-8") as f:
+            f.write("completed")
+        log_message(f"Done flag written: {{done_flag_path}}")
+    except Exception as e:
+        log_message(f"Failed to write done flag: {{e}}")
+
+log_message("Blender script started for FBX to GLB")
+log_message(f"Input FBX: {fbx_path}")
+log_message(f"Output GLB: {glb_path}")
+log_message(f"Done flag: {done_flag_path}")
+
+if not os.path.exists(r"{fbx_path}"):
+    log_message(f"ERROR: Input FBX file not found: {fbx_path}")
+    write_done_flag()
+    sys.exit(1)
+
+try:
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+    log_message("Default scene cleared")
+except Exception as e:
+    log_message(f"Failed to clear scene: {{e}}")
+
+try:
+    log_message("Starting FBX import...")
+    bpy.ops.import_scene.fbx(filepath=r"{fbx_path}")
+    log_message("FBX imported successfully")
+    imported_objects = len(bpy.context.scene.objects)
+    log_message(f"Imported objects count: {{imported_objects}}")
+    materials_count = len(bpy.data.materials)
+    log_message(f"Materials count: {{materials_count}}")
+    images_count = len(bpy.data.images)
+    log_message(f"Images count: {{images_count}}")
+except Exception as e:
+    log_message(f"Failed to import FBX: {{e}}")
+    write_done_flag()
+    sys.exit(1)
+
+try:
+    log_message("Starting GLB export...")
+    bpy.ops.export_scene.gltf(
+        filepath=glb_output_path,
+        export_format='GLB',
+        export_apply=True
+    )
+    log_message("GLB export completed successfully")
+    if os.path.exists(glb_output_path):
+        file_size = os.path.getsize(glb_output_path)
+        log_message(f"GLB file created, size: {{file_size}} bytes")
+    else:
+        log_message("ERROR: GLB file was not created")
+        write_done_flag()
+        sys.exit(1)
+except Exception as e:
+    log_message(f"Failed to export GLB: {{e}}")
+    write_done_flag()
+    sys.exit(1)
+log_message("Conversion completed successfully")
+write_done_flag()'''

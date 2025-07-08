@@ -23,10 +23,7 @@
 {
     "mcpServers":{
         "Picui": {
-            "command": "python",
-            "args": [
-                "your_abs_dir/picui-image-upload-mcp/server.py"
-            ],
+            "command": "picui-mcp-server",
             "env": {
                 "PICUI_TOKEN": "your_token"
             }

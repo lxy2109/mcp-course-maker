@@ -25,8 +25,12 @@ async def realesrgan_upscale(input_path: str, output_path: str = None, scale: in
     if not output_path:
         root, ext = os.path.splitext(input_path)
         output_path = f"{root}_4k{ext}"
+    # 获取当前脚本所在目录
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    exe_path = os.path.join(script_dir, "..", "realesrgan-ncnn-vulkan-20220424-windows", "realesrgan-ncnn-vulkan.exe")
+    exe_path = os.path.abspath(exe_path)
     cmd = [
-        r"E:\Tools\realesrgan-ncnn-vulkan-20220424-windows\realesrgan-ncnn-vulkan.exe",
+        exe_path,
         "-i", input_path,
         "-o", output_path,
         "-s", str(scale)
@@ -39,5 +43,8 @@ async def realesrgan_upscale(input_path: str, output_path: str = None, scale: in
         "image_base64": img_b64
     }
 
-if __name__ == "__main__":
+def main():
     mcp.run()
+
+if __name__ == "__main__":
+    main()

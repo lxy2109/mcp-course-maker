@@ -394,6 +394,9 @@ async def get_text_to_texture_task(task_id: str) -> Dict[str, Any]:
         response.raise_for_status()
         return response.json()
 
-if __name__ == "__main__":
+def main():
     # Start the MCP server
     mcp.run()
+
+if __name__ == "__main__":
+    main()

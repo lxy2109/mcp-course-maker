@@ -227,7 +227,9 @@ async def generate_image(prompt: str, file_name: str, save_folder: str, sample_s
             )
         ]
 
-
-if __name__ == "__main__":
+def main():
     logger.info("启动图像生成服务...")
     mcp.run() 
+
+if __name__ == "__main__":
+    main()

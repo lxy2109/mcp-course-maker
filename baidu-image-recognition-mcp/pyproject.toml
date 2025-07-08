@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "baidu-mcp-server"
+version = "0.1.0"
+description = "百度图像识别 MCP Server - 基于百度智能云API的多功能图像识别服务。"
+authors = [
+    { name = "wzq101", email = "2189003939@qq.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "httpx>=0.24.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "requests>=2.28.0",
+    "fastmcp>=0.4.1",
+    "mcp>=1.2.1"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[project.scripts]
+baidu-mcp-server = "baidu_mcp.server:main" 

@@ -341,6 +341,9 @@ def polyhaven_usage_guide() -> str:
 
 # -------------------- 主函数 --------------------
 
-if __name__ == "__main__":
+def main():
     print("启动Poly Haven MCP服务器...")
     mcp.run() 
+
+if __name__ == "__main__":
+    main()

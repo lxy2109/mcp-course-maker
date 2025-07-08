@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "realesrgan-mcp"
+version = "0.1.0"
+description = "Real-ESRGAN 超分辨率 FastMCP 服务。"
+authors = [
+    { name = "wzq101", email = "2189003939@qq.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    "fastmcp>=0.4.1",
+    "mcp>=1.2.1"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[project.scripts]
+realesrgan-mcp-server = "realesrgan_mcp.server:main" 

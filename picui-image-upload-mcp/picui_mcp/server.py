@@ -192,5 +192,8 @@ async def picui_api(params: PicuiApiParams) -> PicuiApiResponse:
         else:
             raise ValueError(f"不支持的 action: {action}")
 
-if __name__ == "__main__":
+def main():
     mcp.run() 
+
+if __name__ == "__main__":
+    main()

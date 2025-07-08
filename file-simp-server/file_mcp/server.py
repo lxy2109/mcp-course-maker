@@ -199,5 +199,8 @@ async def to_absolute_path(
     abs_path = os.path.abspath(os.path.join(PROJECT_ROOT, relative_path))
     return [types.TextContent(type="text", text=abs_path)]
 
+def main():
+    mcp.run()
+
 if __name__ == "__main__":
-    mcp.run() 
+    main()

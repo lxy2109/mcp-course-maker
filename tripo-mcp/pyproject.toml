@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-tripo-mcp = "src.main:main"
+tripo-mcp-server = "tripo_mcp.main:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]

@@ -3,7 +3,7 @@
         "FileSimp": {
             "command": "python",
             "args": [
-                "your_project_root/MCP-Course-Maker/file-simp-server/server.py"
+                "your_project_root/MCP-Course-Maker/file-simp-server/file_mcp/server.py"
             ],
             "env":{
                 "PROJECT_ROOT":"your_project_root"

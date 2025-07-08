@@ -24,12 +24,11 @@ dependencies = [
     "pydantic>=2.6.4",
 ]
 
-[project.urls]
-"Homepage" = "https://github.com/yourusername/meshy-ai-mcp-server"
-"Bug Tracker" = "https://github.com/yourusername/meshy-ai-mcp-server/issues"
+[project.scripts]
+meshy-mcp-server = "meshy_mcp.server:main" 
 
 [tool.setuptools]
-packages = ["src"]
+packages = ["meshy_mcp"]
 
 [tool.black]
 line-length = 88

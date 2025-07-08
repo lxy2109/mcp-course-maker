@@ -55,13 +55,11 @@ mcp run config.json
 {
   "mcpServers": {
     "polyhaven": {
-      "command": "python",
-      "args": [
-        "path/to/your/polyhaven-mcp-server/src/server.py"
-      ],
+      "command": "polyhaven-mcp-server",
       "disabled": false,
-      "autoApprove": [],
-      "alwaysAllow": []
+      "env":[
+        "DOWNLOAD_PATH":"YOUR DOWNLOAD PATH"
+      ]
     }
   }
 }

@@ -6,6 +6,7 @@ type: Always
 description: 统一3D模型生成引擎的调用顺序与自动容错，确保生成流程稳定、可追溯，提高建模质量。
 
 ***规则内容***
+
 - 生成的模型需要有材质和纹理贴图。
 - 模型命名提取文字描述或图片中物体的主体词。
 - 仅允许调用以下三种3D建模引擎（白名单）：Meshy3D、Tripo3D、Hunyuan3D。
@@ -14,18 +15,20 @@ description: 统一3D模型生成引擎的调用顺序与自动容错，确保�
 - 生成的模型需要是y-up的坐标系。
 
 ***建模引擎调用优先级和策略***
+
 - 第一选择：**[MCP] mcp_Meshy3D_meshy3d_create_task**
-  * 优势：质量高，细节丰富，纹理稳定
-  * 参数建议：target_polycount=300000，ai_model="meshy-4",should_texture=true,enable_pbr=true,toplogy=quad
-  * 纹理策略：保证基础颜色准确性
+  - 优势：质量高，细节丰富，纹理稳定
+  - 参数建议：target_polycount=300000，ai_model="meshy-4",should_texture=true,enable_pbr=true,toplogy=quad
+  - 纹理策略：保证基础颜色准确性
 - 第二选择：**[MCP] mcp_Tripo3D_tripo3d_image_to_model**（如果Meshy3D失败）
-  * 优势：速度快，稳定性好，纹理保真度高
-  * 纹理对齐：texture_alignment=original_image确保与原图一致
+  - 优势：速度快，稳定性好，纹理保真度高
+  - 参数建议：target_polycount=300000
+  - 纹理对齐：texture_alignment=original_image确保与原图一致
 - 第三选择：**[MCP] mcp_Hunyuan3D_submitHunyuanTo3DJob**（如果前两者都失败）
-  * 优势：效果好
-  * 纹理对齐：texture_alignment=original_image确保与原图一致
+  - 优势：效果好
+  - 参数建议：target_polycount=300000
+  - 纹理对齐：texture_alignment=original_image确保与原图一致
 
 禁止调用上述以外的3D建模引擎。
 允许后续扩展新的建模引擎，但需在规则中补充说明调用顺序和容错策略。
 </cursorrules_3dmodeling>
-

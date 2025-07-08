@@ -9,12 +9,16 @@ try:
     from mcp import FastMCP
 except ImportError:
     from mcp.server.fastmcp import FastMCP
-from models import (
+from .models import (
     TextToModelRequest, ImageToModelRequest, MultiviewToModelRequest, TextureModelRequest,
     RefineModelRequest, AnimatePrerigcheckRequest, AnimateRigRequest, AnimateRetargetRequest,
     StylizeModelRequest, ConvertModelRequest, TaskIdRequest, UploadImageRequest
 )
-import tripo_api
+from .tripo_api import (
+    text_to_model, image_to_model, multiview_to_model, texture_model, refine_model,
+    animate_prerigcheck, animate_rig, animate_retarget, stylize_model, convert_model,
+    get_task_status, upload_image, get_balance
+)
 
 # 加载环境变量
 load_dotenv()
@@ -57,7 +61,7 @@ class TaskResponse(BaseModel):
     """
     )
 async def tripo3d_text_to_model(request: TextToModelRequest):
-    return await tripo_api.text_to_model(request)
+    return await text_to_model(request)
 
 @mcp.tool(description=
     """
@@ -84,7 +88,7 @@ async def tripo3d_text_to_model(request: TextToModelRequest):
     """
     )
 async def tripo3d_image_to_model(request: ImageToModelRequest):
-    return await tripo_api.image_to_model(request)
+    return await image_to_model(request)
 
 @mcp.tool(description=
     """
@@ -110,7 +114,7 @@ async def tripo3d_image_to_model(request: ImageToModelRequest):
     """
     )
 async def tripo3d_multiview_to_model(request: MultiviewToModelRequest):
-    return await tripo_api.multiview_to_model(request)
+    return await multiview_to_model(request)
 
 @mcp.tool(description=
     """
@@ -123,7 +127,7 @@ async def tripo3d_multiview_to_model(request: MultiviewToModelRequest):
     """
     )
 async def tripo3d_texture_model(request: TextureModelRequest):
-    return await tripo_api.texture_model(request)
+    return await texture_model(request)
 
 @mcp.tool(description=
     """
@@ -134,7 +138,7 @@ async def tripo3d_texture_model(request: TextureModelRequest):
     """
     )
 async def tripo3d_refine_model(request: RefineModelRequest):
-    return await tripo_api.refine_model(request)
+    return await refine_model(request)
 
 @mcp.tool(description=
     """
@@ -145,7 +149,7 @@ async def tripo3d_refine_model(request: RefineModelRequest):
     """
     )
 async def tripo3d_animate_prerigcheck(request: AnimatePrerigcheckRequest):
-    return await tripo_api.animate_prerigcheck(request)
+    return await animate_prerigcheck(request)
 
 @mcp.tool(description=
     """
@@ -159,7 +163,7 @@ async def tripo3d_animate_prerigcheck(request: AnimatePrerigcheckRequest):
     """
     )
 async def tripo3d_animate_rig(request: AnimateRigRequest):
-    return await tripo_api.animate_rig(request)
+    return await animate_rig(request)
 
 @mcp.tool(description=
     """
@@ -173,7 +177,7 @@ async def tripo3d_animate_rig(request: AnimateRigRequest):
     """
     )
 async def tripo3d_animate_retarget(request: AnimateRetargetRequest):
-    return await tripo_api.animate_retarget(request)
+    return await animate_retarget(request)
 
 @mcp.tool(description=
     """
@@ -186,7 +190,7 @@ async def tripo3d_animate_retarget(request: AnimateRetargetRequest):
     """
     )
 async def tripo3d_stylize_model(request: StylizeModelRequest):
-    return await tripo_api.stylize_model(request)
+    return await stylize_model(request)
 
 @mcp.tool(description=
     """
@@ -200,7 +204,7 @@ async def tripo3d_stylize_model(request: StylizeModelRequest):
     """
     )
 async def tripo3d_convert_model(request: ConvertModelRequest):
-    return await tripo_api.convert_model(request)
+    return await convert_model(request)
 
 @mcp.tool(description=
     """
@@ -211,7 +215,7 @@ async def tripo3d_convert_model(request: ConvertModelRequest):
     """
     )
 async def tripo3d_get_task_status(request: TaskIdRequest):
-    return await tripo_api.get_task_status(request)
+    return await get_task_status(request)
 
 @mcp.tool(description=
     """
@@ -222,7 +226,7 @@ async def tripo3d_get_task_status(request: TaskIdRequest):
     """
     )
 async def tripo3d_upload_image(request: UploadImageRequest):
-    return await tripo_api.upload_image(request)
+    return await upload_image(request)
 
 @mcp.tool(description=
     """
@@ -233,10 +237,10 @@ async def tripo3d_upload_image(request: UploadImageRequest):
     """
     )
 async def tripo3d_get_balance():
-    return await tripo_api.get_balance()
+    return await get_balance()
 
 def main():
-    print("MCP server starting...")
+    #print("MCP server starting...")
     mcp.run()
 if __name__ == "__main__":
     main()

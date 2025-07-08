@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "file-simp-server"
+version = "0.1.0"
+description = "文件自动重命名和压缩解压 FastMCP 服务。"
+authors = [
+    { name = "lxy2109", email = "cinnamon_l@163.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    "fastmcp>=0.4.1",
+    "mcp>=1.2.1"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[project.scripts]
+file-simp-server = "file_mcp.server:main" 

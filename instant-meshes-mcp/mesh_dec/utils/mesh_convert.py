@@ -490,3 +490,175 @@ def obj_to_glb(obj_path: str, glb_path: str) -> None:
         with open(log_file, "a", encoding="utf-8") as logf:
             logf.write(f"Trimesh conversion failed: {e}\n")
         raise RuntimeError(f"OBJ to GLB conversion failed: {e}")
+
+def fbx_to_obj(fbx_path: str, obj_path: str) -> list:
+    """
+    将FBX转换为OBJ，并提取所有嵌入的贴图文件。
+    优先使用Blender以更好地处理材质和贴图。
+    Args:
+        fbx_path (str): 输入FBX文件路径
+        obj_path (str): 输出OBJ文件路径
+    Returns:
+        list: 提取的贴图文件路径列表
+    Raises:
+        RuntimeError: 转换失败时抛出
+    """
+    import time
+    import datetime
+    import os
+    from .blender_utils import get_blender_executable_with_fallback
+    from .blender_scripts import get_fbx_to_obj_script
+    from .file_utils import get_temp_file
+    from ..config import LOG_DIR
+    log_file = os.path.join(LOG_DIR, f"fbx_to_obj_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+    extracted_textures = []
+    blender_exe = get_blender_executable_with_fallback()
+    if not blender_exe:
+        raise RuntimeError("Blender not found, cannot convert FBX to OBJ.")
+    done_flag_path = get_temp_file(".done")
+    if os.path.exists(done_flag_path):
+        try:
+            os.remove(done_flag_path)
+        except Exception:
+            pass
+    blender_debug_log = os.path.join(LOG_DIR, "blender_debug.log")
+    output_dir = os.path.dirname(obj_path)
+    os.makedirs(output_dir, exist_ok=True)
+    script_content = get_fbx_to_obj_script(
+        fbx_path=fbx_path,
+        obj_path=obj_path,
+        output_dir=output_dir,
+        done_flag_path=done_flag_path,
+        blender_debug_log=blender_debug_log
+    )
+    script_path = get_temp_file(".py")
+    with open(script_path, 'w', encoding='utf-8') as f:
+        f.write(script_content)
+    import subprocess
+    cmd = f'start "" "{blender_exe}" --background --python "{script_path}"'
+    with open(log_file, "a", encoding="utf-8") as logf:
+        logf.write(f"Starting Blender process independently: {cmd}\n")
+    subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    max_wait_time = 180
+    wait_interval = 1
+    waited_time = 0
+    blender_completed = False
+    start_wait_time = time.time()
+    while waited_time < max_wait_time:
+        done_flag_exists = os.path.exists(done_flag_path)
+        obj_exists = os.path.exists(obj_path)
+        obj_size = os.path.getsize(obj_path) if obj_exists else 0
+        if waited_time % 10 == 0:
+            with open(log_file, "a", encoding="utf-8") as logf:
+                logf.write(f"Wait status at {waited_time}s: done_flag={done_flag_exists}, obj_exists={obj_exists}, obj_size={obj_size}\n")
+        if done_flag_exists and obj_exists and obj_size > 0:
+            blender_completed = True
+            break
+        elif obj_exists and obj_size > 0 and waited_time > 30:
+            time.sleep(2)
+            new_obj_size = os.path.getsize(obj_path) if os.path.exists(obj_path) else 0
+            if new_obj_size == obj_size and obj_size > 0:
+                blender_completed = True
+                break
+        time.sleep(wait_interval)
+        waited_time += 1
+    if not blender_completed:
+        with open(log_file, "a", encoding="utf-8") as logf:
+            logf.write(f"Blender timeout after {max_wait_time}s\n")
+        raise RuntimeError("FBX to OBJ conversion timeout.")
+    # 收集贴图
+    for filename in os.listdir(output_dir):
+        file_path = os.path.join(output_dir, filename)
+        if os.path.isfile(file_path) and filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tga', '.bmp')):
+            extracted_textures.append(file_path)
+    try:
+        os.remove(script_path)
+    except Exception:
+        pass
+    try:
+        if os.path.exists(done_flag_path):
+            os.remove(done_flag_path)
+    except Exception:
+        pass
+    return extracted_textures
+
+
+def fbx_to_glb(fbx_path: str, glb_path: str) -> None:
+    """
+    将FBX文件转换为GLB文件，优先使用Blender。
+    Args:
+        fbx_path (str): 输入FBX文件路径
+        glb_path (str): 输出GLB文件路径
+    Raises:
+        RuntimeError: 转换失败时抛出
+    """
+    import time
+    import datetime
+    import os
+    from .blender_utils import get_blender_executable_with_fallback
+    from .blender_scripts import get_fbx_to_glb_script
+    from .file_utils import get_temp_file
+    from ..config import LOG_DIR
+    log_file = os.path.join(LOG_DIR, f"fbx_to_glb_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+    blender_exe = get_blender_executable_with_fallback()
+    if not blender_exe:
+        raise RuntimeError("Blender not found, cannot convert FBX to GLB.")
+    done_flag_path = get_temp_file(".done")
+    if os.path.exists(done_flag_path):
+        try:
+            os.remove(done_flag_path)
+        except Exception:
+            pass
+    blender_debug_log = os.path.join(LOG_DIR, "blender_debug.log")
+    script_content = get_fbx_to_glb_script(
+        fbx_path=fbx_path,
+        glb_path=glb_path,
+        done_flag_path=done_flag_path,
+        blender_debug_log=blender_debug_log
+    )
+    script_path = get_temp_file(".py")
+    with open(script_path, 'w', encoding='utf-8') as f:
+        f.write(script_content)
+    import subprocess
+    cmd = f'start "" "{blender_exe}" --background --python "{script_path}"'
+    with open(log_file, "a", encoding="utf-8") as logf:
+        logf.write(f"Starting Blender process independently: {cmd}\n")
+    subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    max_wait_time = 180
+    wait_interval = 1
+    waited_time = 0
+    blender_completed = False
+    start_wait_time = time.time()
+    while waited_time < max_wait_time:
+        done_flag_exists = os.path.exists(done_flag_path)
+        glb_exists = os.path.exists(glb_path)
+        glb_size = os.path.getsize(glb_path) if glb_exists else 0
+        if waited_time % 10 == 0:
+            with open(log_file, "a", encoding="utf-8") as logf:
+                logf.write(f"Wait status at {waited_time}s: done_flag={done_flag_exists}, glb_exists={glb_exists}, glb_size={glb_size}\n")
+        if done_flag_exists and glb_exists and glb_size > 0:
+            blender_completed = True
+            break
+        elif glb_exists and glb_size > 0 and waited_time > 30:
+            time.sleep(2)
+            new_glb_size = os.path.getsize(glb_path) if os.path.exists(glb_path) else 0
+            if new_glb_size == glb_size and glb_size > 0:
+                blender_completed = True
+                break
+        time.sleep(wait_interval)
+        waited_time += 1
+    if not blender_completed:
+        with open(log_file, "a", encoding="utf-8") as logf:
+            logf.write(f"Blender timeout after {max_wait_time}s\n")
+        raise RuntimeError("FBX to GLB conversion timeout.")
+    try:
+        os.remove(script_path)
+    except Exception:
+        pass
+    try:
+        if os.path.exists(done_flag_path):
+            os.remove(done_flag_path)
+    except Exception:
+        pass
+    return
+

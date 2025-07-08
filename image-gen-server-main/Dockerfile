@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 8000
 
 # Start the MCP server using uv and fastmcp
-CMD ["uv", "run", "--with", "fastmcp", "fastmcp", "run", "server.py"]
+CMD ["uv", "run", "--with", "fastmcp", "fastmcp", "run", "jimeng_mcp/server.py"]

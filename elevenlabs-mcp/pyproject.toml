@@ -41,7 +41,7 @@ dependencies = [
 ]
 
 [project.scripts]
-elevenlabs-mcp = "elevenlabs_mcp.server:main"
+elevenlabs-mcp-server = "elevenlabs_mcp.server:main"
 
 [project.optional-dependencies]
 dev = [

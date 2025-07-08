@@ -17,7 +17,8 @@ from ..config import INSTANT_MESHES_PATH, LOG_DIR
 
 def simplify_with_uv_preservation(input_path: str, target_faces: int, preserve_boundaries: bool = True) -> str:
     """
-    专门针对带贴图的模型进行减面，特别保护UV坐标。
+    针对带贴图的模型进行减面，特别保护UV坐标、法线和边界。
+    对于大模型（如>100万面）自动调用Blender减面，其余情况用pymeshlab分步减面。
     Args:
         input_path (str): 输入OBJ文件路径
         target_faces (int): 目标面数
@@ -29,107 +30,65 @@ def simplify_with_uv_preservation(input_path: str, target_faces: int, preserve_b
     try:
         ms.load_new_mesh(input_path)
     except Exception:
-        # 如果加载失败，返回原始路径
         return input_path
-    
     original_faces = ms.current_mesh().face_number()
-    
     if original_faces <= target_faces:
         return input_path
-    
-    # 检查是否有UV坐标
+    # 大模型自动用Blender减面
+    if original_faces > 1_000_000:
+        simplified_path = input_path.replace('.obj', '_blender_decimated.obj')
+        blender_decimate(input_path, simplified_path, target_faces)
+        return simplified_path
+    # 分步减面，每步减面不超过50%
+    step_faces = original_faces
+    current_path = input_path
+    step_idx = 0
+    while step_faces > 2 * target_faces:
+        next_faces = max(target_faces, int(step_faces * 0.5))
+        ms = pymeshlab.MeshSet()
+        ms.load_new_mesh(current_path)
+        try:
+            ms.meshing_decimation_quadric_edge_collapse(
+                targetfacenum=next_faces,
+                preserveboundary=preserve_boundaries,
+                preservenormal=True,  # 保留法线
+                preservetopology=True,
+                optimalplacement=True,
+                planarquadric=False,
+                qualityweight=False,
+                autoclean=True,
+                boundaryweight=2.0,  # 边界保护
+                selected=False
+            )
+        except Exception:
+            return current_path  # 某步失败，返回当前结果
+        temp_path = current_path.replace('.obj', f'_step{step_idx}.obj')
+        ms.save_current_mesh(temp_path)
+        ms.clear()
+        current_path = temp_path
+        step_faces = next_faces
+        step_idx += 1
+    # 最后一步精简到目标面数
+    ms = pymeshlab.MeshSet()
+    ms.load_new_mesh(current_path)
     try:
-        has_texcoords = ms.current_mesh().has_face_tex_coord() or ms.current_mesh().has_vert_tex_coord()
+        ms.meshing_decimation_quadric_edge_collapse(
+            targetfacenum=target_faces,
+            preserveboundary=preserve_boundaries,
+            preservenormal=True,  # 保留法线
+            preservetopology=True,
+            optimalplacement=True,
+            planarquadric=False,
+            qualityweight=False,
+            autoclean=True,
+            boundaryweight=2.0,  # 边界保护
+            selected=False
+        )
     except Exception:
-        has_texcoords = False
-    
-    if has_texcoords:
-        # 对有UV的模型使用更保守的参数
-        reduction_ratio = target_faces / original_faces
-        
-        if reduction_ratio < 0.3:
-            # 极大减面，需要非常保守
-            intermediate_target = int(original_faces * 0.5)
-            
-            # 第一步：减少到50%
-            try:
-                ms.meshing_decimation_quadric_edge_collapse(
-                    targetfacenum=intermediate_target,
-                    preserveboundary=True,
-                    preservenormal=True,
-                    preservetopology=True,
-                    optimalplacement=True,
-                    planarquadric=False,
-                    qualityweight=False,
-                    autoclean=False,
-                    boundaryweight=3.0,  # 增强边界保护
-                    selected=False
-                )
-            except Exception:
-                # 如果第一步失败，尝试更保守的参数
-                try:
-                    ms.meshing_decimation_quadric_edge_collapse(
-                        targetfacenum=target_faces,
-                        preserveboundary=True,
-                        preservenormal=True,
-                        preservetopology=False,  # 降低要求
-                        optimalplacement=True,
-                        planarquadric=False,
-                        qualityweight=False,
-                        autoclean=True,
-                        boundaryweight=2.0,
-                        selected=False
-                    )
-                except Exception:
-                    # 如果仍然失败，返回原始路径
-                    return input_path
-            else:
-                # 第二步：减少到目标面数
-                try:
-                    ms.meshing_decimation_quadric_edge_collapse(
-                        targetfacenum=target_faces,
-                        preserveboundary=True,
-                        preservenormal=True,
-                        preservetopology=True,
-                        optimalplacement=True,
-                        planarquadric=False,
-                        qualityweight=False,
-                        autoclean=True,
-                        boundaryweight=3.0,
-                        selected=False
-                    )
-                except Exception:
-                    # 如果第二步失败，使用当前结果
-                    pass
-        else:
-            # 中等减面，一次性完成
-            try:
-                ms.meshing_decimation_quadric_edge_collapse(
-                    targetfacenum=target_faces,
-                    preserveboundary=preserve_boundaries,
-                    preservenormal=True,
-                    preservetopology=True,
-                    optimalplacement=True,
-                    planarquadric=False,
-                    qualityweight=False,
-                    autoclean=True,
-                    boundaryweight=2.0,
-                    selected=False
-                )
-            except Exception:
-                # 如果简化失败，返回原始路径
-                return input_path
-    else:
-        # 没有UV坐标，使用标准简化
-        return progressive_simplify(input_path, target_faces, preserve_boundaries)
-    
+        return current_path
     simplified_path = input_path.replace('.obj', '_uv_simplified.obj')
-    try:
-        ms.save_current_mesh(simplified_path)
-    except Exception:
-        # 如果保存失败，返回原始路径
-        return input_path
-    
+    ms.save_current_mesh(simplified_path)
+    ms.clear()
     return simplified_path
 
 def run_instant_meshes(
@@ -409,3 +368,89 @@ def high_quality_simplify(input_path: str, target_faces: int, preserve_boundarie
         str: 简化后的OBJ文件路径
     """
     return progressive_simplify(input_path, target_faces, preserve_boundaries)
+
+def blender_decimate(input_obj: str, output_obj: str, target_faces: int) -> None:
+    """
+    用Blender自动对OBJ模型分步减面到目标面数，保留UV/法线/边界。
+    每步减面不超过50%，每步保存并重新加载，极大降低Blender内存峰值。
+    Args:
+        input_obj (str): 输入OBJ路径
+        output_obj (str): 输出OBJ路径
+        target_faces (int): 目标面数
+    Raises:
+        RuntimeError: Blender减面失败时抛出
+    """
+    import os
+    import subprocess
+    import tempfile
+    from .blender_utils import get_blender_executable_with_fallback
+    blender_exe = get_blender_executable_with_fallback()
+    if not blender_exe:
+        raise RuntimeError("Blender not found, cannot perform decimation.")
+    # 生成Blender分步减面脚本
+    script_content = f'''
+import bpy
+import os
+import sys
+import tempfile
+input_path = r"{input_obj}"
+output_path = r"{output_obj}"
+target_faces = {target_faces}
+
+# 清空场景
+def clear_scene():
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+
+def import_obj(path):
+    bpy.ops.import_scene.obj(filepath=path)
+    return bpy.context.selected_objects[0]
+
+def export_obj(obj, path):
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.ops.export_scene.obj(filepath=path, use_selection=True)
+
+def get_face_count(obj):
+    return len(obj.data.polygons)
+
+def decimate_step(obj, ratio):
+    mod = obj.modifiers.new(name="Decimate", type='DECIMATE')
+    mod.ratio = ratio
+    mod.use_collapse_triangulate = True
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+
+# 分步减面
+cur_path = input_path
+step = 0
+while True:
+    clear_scene()
+    obj = import_obj(cur_path)
+    face_count = get_face_count(obj)
+    if face_count <= target_faces:
+        export_obj(obj, output_path)
+        break
+    # 每步减面不超过50%
+    ratio = max(target_faces / face_count, 0.5)
+    decimate_step(obj, ratio)
+    # 每步保存到临时文件
+    tmp_path = os.path.join(tempfile.gettempdir(), f"blender_decimate_step{{step}}.obj")
+    export_obj(obj, tmp_path)
+    cur_path = tmp_path
+    step += 1
+'''
+    # 写入临时脚本
+    with tempfile.NamedTemporaryFile('w', suffix='.py', delete=False, encoding='utf-8') as f:
+        f.write(script_content)
+        script_path = f.name
+    # 调用Blender
+    try:
+        subprocess.check_call([
+            blender_exe, '--python', script_path
+        ])
+    except Exception as e:
+        raise RuntimeError(f"Blender decimate failed: {e}")
+    finally:
+        if os.path.exists(script_path):
+            os.remove(script_path)

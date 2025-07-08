@@ -2,7 +2,7 @@ import os
 import httpx
 from typing import Dict, Any
 from dotenv import load_dotenv
-from models import (
+from .models import (
     TextToModelRequest, ImageToModelRequest, MultiviewToModelRequest, TextureModelRequest,
     RefineModelRequest, AnimatePrerigcheckRequest, AnimateRigRequest, AnimateRetargetRequest,
     StylizeModelRequest, ConvertModelRequest, TaskIdRequest, UploadImageRequest

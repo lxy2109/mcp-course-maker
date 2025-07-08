@@ -24,12 +24,15 @@ dependencies = [
     "pydantic>=2.6.4",
 ]
 
+[project.scripts]
+polyhaven-mcp-server = "polyhaven_mcp.server:main"
+
 [project.urls]
 "Homepage" = "https://github.com/yourusername/polyhaven-mcp-server"
 "Bug Tracker" = "https://github.com/yourusername/polyhaven-mcp-server/issues"
 
 [tool.setuptools]
-packages = ["src"]
+packages = ["polyhaven_mcp"]
 
 [tool.black]
 line-length = 88

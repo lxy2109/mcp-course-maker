@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "picui-image-upload-mcp"
+version = "0.1.0"
+description = "PICUI 图床 MCP Server - 多功能API封装，支持图片上传、管理等操作。"
+authors = [
+    { name = "lxy2109", email = "cinnamon_l@163.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "httpx>=0.23.0",
+    "python-dotenv>=0.21.0",
+    "pydantic>=1.10.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[project.scripts]
+picui-mcp-server = "picui_mcp.server:main" 

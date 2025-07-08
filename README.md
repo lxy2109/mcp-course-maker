@@ -173,17 +173,18 @@
 
 2. **🔧 安装与依赖**
    - Python 3.8+，已安装 fastmcp。
-   - 进入 `file-simp-server` 目录，无需额外依赖（zipfile为Python内置模块）。
+   - 进入 `file-simp-server` 目录，执行：
+
+     ```bash
+     pip install -e .
+     ```
 
 3. **⚙️ 配置 MCP Server**
    - 在 MCP 客户端（如 Cursor）配置 `mcp.json`，添加如下内容：
 
      ```json
      "FileSimp": {
-       "command": "python",
-       "args": [
-         "你的绝对路径/file-simp-server/server.py"
-       ] ,
+       "command": "file-simp-server",
       "env": {
         "PROJECT_ROOT": "你的绝对路径（项目根目录）"
       }
@@ -222,7 +223,6 @@
    - 进入 `doubao-tts-mcp` 目录，执行：
 
      ```bash
-     pip install -r requirements.txt
      pip install -e .
      ```
 
@@ -272,54 +272,8 @@
    - 进入 `elevenlabs-mcp` 目录，执行：
 
      ```bash
-     pip install -r requirements.txt
-     或
-     pip install -e ".[dev]"
+     pip install -e .
      ```
-
-#### ⚠️ 常见问题：字符序列过长导致依赖安装失败
-
-在 Windows 下，使用 `pip install -e ".[dev]"` 或安装依赖时，可能会遇到如下报错：
-
-```
-ERROR: [WinError 206] 文件名或扩展名太长
-error: invalid command 'bdist_wheel'
-...
-```
-
-**原因说明**：
-
-- Windows 注册表的"命令行长度"默认限制为 2047 字符，某些依赖包（如 `pip`、`setuptools`、`wheel` 等）在安装时生成的 entry_points 超过此长度，导致写入注册表失败。
-
-**解决方法**：
-
-1. **命令行一键修复（推荐）**
-   - 以管理员身份打开 PowerShell，执行：
-
-     ```powershell
-     Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' -Name 'Path' -Value ([Environment]::GetEnvironmentVariable('Path','Machine'))
-     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" /t REG_EXPAND_SZ /d "%Path%" /f
-     ```
-
-   - 或直接将注册表项类型改为 `REG_EXPAND_SZ`：
-
-     ```powershell
-     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" /t REG_EXPAND_SZ /f
-     ```
-
-   - 执行后重启电脑或注销当前用户。
-
-2. **手动修改注册表**
-   - 按 Win+R 输入 `regedit`，回车打开注册表编辑器。
-   - 定位到：
-     `计算机\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment`
-   - 找到右侧的 `Path`，右键点击，选择"修改"，将类型改为 `REG_EXPAND_SZ`（可扩展字符串值）。
-   - 保存后重启电脑。
-
-**参考资料**：
-
-- [pip install error: [WinError 206] The filename or extension is too long](https://github.com/pypa/pip/issues/4251)
-- [StackOverflow: Windows registry Path too long](https://stackoverflow.com/questions/9546324/windows-registry-path-too-long)
 
 2. **🔑 配置 API Key 和输出目录**  
    - 在 MCP 配置的 env 字段中设置：
@@ -339,10 +293,7 @@ error: invalid command 'bdist_wheel'
      {
        "mcpServers": {
          "ElevenLabs": {
-           "command": "python",
-           "args": [
-             "你的绝对路径/elevenlabs-mcp/elevenlabs_mcp/server.py"
-           ],
+           "command": "elevenlabs-mcp-server",
            "env": {
              "ELEVENLABS_API_KEY": "请替换为你的ElevenLabs API Key",
              "ELEVENLABS_MCP_BASE_PATH": "你的目标输出路径"
@@ -409,8 +360,7 @@ error: invalid command 'bdist_wheel'
    - 进入 `image-gen-server-main` 目录，执行：
 
      ```bash
-     pip install -r requirements.txt
-     pip install uv
+     pip install -e .
      ```
 
 3. **🔑 配置 API Token 和图片保存路径**  
@@ -431,15 +381,7 @@ error: invalid command 'bdist_wheel'
      {
        "mcpServers": {
          "JiMengAI": {
-           "command": "uv",
-           "args": [
-             "run",
-             "--with",
-             "fastmcp",
-             "fastmcp",
-             "run",
-             "你的绝对路径/image-gen-server-main/server.py"
-           ],
+           "command": "image-gen-server",
            "env": {
              "JIMENG_API_TOKEN": "请替换为你的即梦sessionid",
              "IMG_SAVA_FOLDER": "请替换为你的图片保存目录"
@@ -462,9 +404,7 @@ error: invalid command 'bdist_wheel'
    - 进入 `baidu-image-recognition-mcp` 目录，执行：
 
      ```bash
-     python install.py
-     # 或手动安装
-     pip install -r requirements.txt
+     pip install -e .
      ```
 
 2. **🔑 配置 API Key**  
@@ -486,8 +426,7 @@ error: invalid command 'bdist_wheel'
      {
        "mcpServers": {
          "BaiduImageRecognition": {
-           "command": "python",
-           "args": ["你的绝对路径/baidu-image-recognition-mcp/server.py"],
+           "command": "baidu-mcp-server",
            "env": {
              "BAIDU_API_KEY": "your_actual_api_key",
              "BAIDU_SECRET_KEY": "your_actual_secret_key"
@@ -517,14 +456,7 @@ error: invalid command 'bdist_wheel'
    - 进入 `picui-image-upload-mcp` 目录，执行：
 
     ```bash
-    pip install -r requirements.txt
-    ```
-
-   - 配置 `mcpjson`（见下方详细示例）
-   - 运行服务：
-
-    ```bash
-    python picui-image-upload-mcp/server.py
+    pip install -e .
     ```
 
 4. **⚙️ mcpjson 配置详细示例**
@@ -535,10 +467,7 @@ error: invalid command 'bdist_wheel'
    {
      "mcpServers": {
        "Picui": {
-         "command": "python",
-         "args": [
-           "你的绝对路径/picui-image-upload-mcp/server.py"
-         ],
+         "command": "picui-mcp-server",
          "env": {
            "PICUI_TOKEN": "你的BearerToken"
          }
@@ -563,7 +492,7 @@ error: invalid command 'bdist_wheel'
    - 进入 `meshy-ai-mcp-server` 目录，执行：
 
      ```bash
-     pip install -r requirements.txt
+     pip install -e .
      ```
 
 2. **🔑 配置 API Key**  
@@ -583,10 +512,7 @@ error: invalid command 'bdist_wheel'
      {
        "mcpServers": {
          "Meshy3D": {
-           "command": "python",
-           "args": [
-             "你的绝对路径/meshy-ai-mcp-server/src/server.py"
-           ],
+           "command": "meshy-mcp-server",
            "env": {
              "MESHY_API_KEY": "请替换为你的Meshy API Key"
            }
@@ -608,7 +534,7 @@ error: invalid command 'bdist_wheel'
    - 进入 `tripo-mcp` 目录，执行：
 
      ```bash
-     pip install -r requirements.txt
+     pip install -e .
      ```
 
 2. **🔑 配置 API Key**  
@@ -629,10 +555,7 @@ error: invalid command 'bdist_wheel'
      {
        "mcpServers": {
          "Tripo3D": {
-           "command": "python",
-           "args": [
-             "你的绝对路径/tripo-mcp/src/main.py"
-           ],
+           "command": "tripo-mcp-server",
            "env": {
              "TRIPO_API_KEY": "请替换为你的Tripo3D_API_Key"
            }
@@ -770,7 +693,7 @@ error: invalid command 'bdist_wheel'
    - 进入 `polyhaven-mcp-server` 目录，执行：
 
      ```bash
-     pip install -r requirements.txt
+     pip install -e .
      ```
 
 3. **⚙️ 配置 MCP Server**
@@ -778,12 +701,9 @@ error: invalid command 'bdist_wheel'
 
      ```json
      "Polyhaven": {
-       "command": "python",
-       "args": [
-         "your_abs_dir/polyhaven-mcp-server/src/server.py"
-       ],
+       "command": "polyhaven-mcp-server",
        "env": {
-         "DOWNLOAD_PATH": "your_abs_dir/Assets/Skybox"
+         "DOWNLOAD_PATH": "your download path"
        }
      }
      ```
@@ -831,17 +751,18 @@ error: invalid command 'bdist_wheel'
 
 2. **🔧 安装与依赖**
 
-   - 确保 `mcp_realesrgan_server.py` 位于 `realesrgan-mcp` 目录下。
+   - 进入 `realesrgan-mcp` 目录，执行：
+
+     ```bash
+     pip install -e .
+     ```
 
 3. **⚙️ 配置 MCP Server**
    - 在 MCP 客户端（如 Cursor）配置 `mcp.json`，添加如下内容：
 
      ```json
      "Realesrgan": {
-       "command": "python",
-       "args": [
-         "your_abs_dir/realesrgan-mcp/mcp_realesrgan_server.py"
-       ]
+       "command": "realesrgan-mcp-server"
      }
      ```
 
@@ -877,6 +798,48 @@ error: invalid command 'bdist_wheel'
 - **🔌 端口冲突/服务未启动**：如遇端口占用或服务未响应，检查是否有其他进程占用，或尝试重启。
 - **🎮 Unity 路径/权限问题**：Unity 项目路径不能有空格，需有读写权限。
 - **📊 Excel MCP 仅支持 Windows**，且需本地安装 Excel。
+- **⚠️ 常见问题：字符序列过长导致依赖安装失败**
+  - 在 Windows 下，使用 `pip install -e ".[dev]"` 或安装依赖时，可能会遇到如下报错：
+
+    ```
+    ERROR: [WinError 206] 文件名或扩展名太长
+    error: invalid command 'bdist_wheel'
+    ...
+    ```
+
+    **原因说明**：
+
+    - Windows 注册表的"命令行长度"默认限制为 2047 字符，某些依赖包（如 `pip`、`setuptools`、`wheel` 等）在安装时生成的 entry_points 超过此长度，导致写入注册表失败。
+
+    **解决方法**：
+
+    1. **命令行一键修复（推荐）**
+    - 以管理员身份打开 PowerShell，执行：
+
+        ```powershell
+        Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' -Name 'Path' -Value ([Environment]::GetEnvironmentVariable('Path','Machine'))
+        reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" /t REG_EXPAND_SZ /d "%Path%" /f
+        ```
+
+    - 或直接将注册表项类型改为 `REG_EXPAND_SZ`：
+
+        ```powershell
+        reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v "Path" /t REG_EXPAND_SZ /f
+        ```
+
+    - 执行后重启电脑或注销当前用户。
+
+    2. **手动修改注册表**
+    - 按 Win+R 输入 `regedit`，回车打开注册表编辑器。
+    - 定位到：
+        `计算机\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment`
+    - 找到右侧的 `Path`，右键点击，选择"修改"，将类型改为 `REG_EXPAND_SZ`（可扩展字符串值）。
+    - 保存后重启电脑。
+
+    **参考资料**：
+
+    - [pip install error: [WinError 206] The filename or extension is too long](https://github.com/pypa/pip/issues/4251)
+    - [StackOverflow: Windows registry Path too long](https://stackoverflow.com/questions/9546324/windows-registry-path-too-long)
 
 ---
 

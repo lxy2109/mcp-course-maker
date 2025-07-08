@@ -19,10 +19,7 @@
     },
 
     "FileSimp": {
-      "command": "python",
-      "args": [
-        "YOUR_PATH/file-simp-server/server.py"
-      ],
+      "command": "file-simp-server",
       "env": {
         "PROJECT_ROOT": "YOUR_PATH"
       }
@@ -41,10 +38,7 @@
     },
 
     "ElevenLabs": {
-      "command": "python",
-      "args": [
-        "YOUR_PATH/elevenlabs-mcp/elevenlabs_mcp/server.py"
-      ],
+      "command": "elevenlabs-mcp-server",
       "env": {
         "ELEVENLABS_API_KEY": "YOUR_ELEVENLABS_API_KEY",
         "ELEVENLABS_MCP_BASE_PATH": "your_output_filepath"
@@ -65,15 +59,7 @@
     },
 
     "JiMengAI": {
-        "command": "uv",
-        "args": [
-            "run",
-            "--with",
-            "fastmcp",
-            "fastmcp",
-            "run",
-            "YOUR_PATH/image-gen-server-main/server.py"
-        ],
+        "command": "image-gen-server",
         "env": {
             "JIMENG_API_TOKEN": "YOUR_JIMENG_SESSIONID",
             "IMG_SAVA_FOLDER": "YOUR_IMAGE_SAVE_PATH"
@@ -81,9 +67,7 @@
     },
     
     "BaiduImageRecognition": {
-      "command": "python",
-      "args": ["server.py"],
-      "cwd": "baidu-image-recognition-mcp",
+      "command": "baidu-mcp-server",
       "env": {
         "BAIDU_API_KEY": "YOUR_BAIDU_API_KEY",
         "BAIDU_SECRET_KEY": "YOUR_BAIDU_SECRET_KEY"
@@ -91,30 +75,21 @@
     },
 
     "Picui": {
-      "command": "python",
-      "args": [
-        "YOUR_PATH/picui-image-upload-mcp/server.py"
-      ],
+      "command": "picui-mcp-server",
       "env": {
         "PICUI_TOKEN": "YOUR_PICUI_BEARER_TOKEN"
       }
     },
 
     "Meshy3D":{
-      "command": "python",
-      "args": [
-        "YOUR_PATH/meshy-ai-mcp-server/src/server.py"
-      ],
+      "command": "meshy-mcp-server",
       "env":{
         "MESHY_API_KEY":"YOUR_MESHY_API_KEY"
       }
     },
 
     "Tripo3D": {
-      "command": "python",
-      "args": [
-        "YOUR_PATH/tripo-mcp/src/main.py"
-      ],
+      "command": "tripo-mcp-server",
       "env": {
         "TRIPO_API_KEY": "YOUR_TRIPO3D_API_KEY"
       },
@@ -143,20 +118,14 @@
     },
 
     "Polyhaven": {
-      "command": "python",
-      "args": [
-        "your_abs_dir/polyhaven-mcp-server/src/server.py"
-      ],
+      "command": "polyhaven-mcp-server",
       "env": {
-        "DOWNLOAD_PATH": "your_abs_dir/Assets/Skybox"
+        "DOWNLOAD_PATH": "YOUR_DOWNLOAD_PATH"
       }
     },
 
     "Realesrgan": {
-      "command": "python",
-      "args": [
-        "your_abs_dir/realesrgan-mcp/mcp_realesrgan_server.py"
-      ]
+      "command": "realesrgan-mcp-server"
     }
   }
 }

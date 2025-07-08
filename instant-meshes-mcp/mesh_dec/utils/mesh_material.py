@@ -280,6 +280,67 @@ def enhance_meshy_ai_materials(obj_path: str, log_file: str = None) -> None:
         # 记录到日志文件而不是控制台
         pass
 
+
+
+def rename_tripo_textures_and_update_mtl(model_dir: str, obj_name: str = None, mtl_name: str = None) -> None:
+    """
+    自动识别Tripo导出的贴图文件，按序号重命名为标准PBR格式，并自动修正MTL文件中的贴图引用。
+    支持tripo_image_xxx_N.png和tripo_image_xxx_N_diffuse.png两种情况。
+    Args:
+        model_dir (str): 模型目录，包含OBJ/MTL/贴图
+        obj_name (str): OBJ文件名（可选，仅用于日志）
+        mtl_name (str): MTL文件名（可选，默认自动查找）
+    """
+    import os
+    import re
+    # 贴图序号与PBR用途映射
+    pbr_map = {
+        0: 'basecolor',
+        1: 'metallic',
+        2: 'roughness',
+        3: 'normal',
+    }
+    files = os.listdir(model_dir)
+    # 支持无_diffuse和有_diffuse两种情况
+    tripo_tex = [f for f in files if re.match(r'tripo_image_.*_(\d)(?:_diffuse)?\.png$', f)]
+    rename_map = {}
+    for f in tripo_tex:
+        m = re.match(r'(tripo_image_.*)_(\d)(?:_diffuse)?\.png$', f)
+        if not m:
+            continue
+        idx = int(m.group(2))
+        pbr = pbr_map.get(idx)
+        if not pbr:
+            continue
+        # 统一重命名为tripo_image_xxx_{pbr}.png
+        new_name = f"{m.group(1)}_{pbr}.png"
+        src = os.path.join(model_dir, f)
+        dst = os.path.join(model_dir, new_name)
+        if src != dst:
+            # 若目标已存在，先删除
+            if os.path.exists(dst):
+                os.remove(dst)
+            os.rename(src, dst)
+        rename_map[f] = new_name
+    # 自动查找MTL文件
+    if not mtl_name:
+        mtl_name = next((f for f in files if f.lower().endswith('.mtl')), None)
+    if not mtl_name:
+        return
+    mtl_path = os.path.join(model_dir, mtl_name)
+    # 读取并修正MTL
+    with open(mtl_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    new_lines = []
+    for line in lines:
+        for old, new in rename_map.items():
+            if old in line:
+                line = line.replace(old, new)
+        new_lines.append(line)
+    with open(mtl_path, 'w', encoding='utf-8') as f:
+        f.writelines(new_lines)
+
+
 def restore_obj_material(obj_path: str, original_obj_path: str):
     """
     将原始OBJ的mtl和贴图引用复制到新OBJ，修正mtllib和usemtl，保证贴图不丢失。

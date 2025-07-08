@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mesh_dec",
-    version="0.1.0",
+    version="0.1.1",
     description="Instant Meshes MCP Server",
     author="lxy2109",
     packages=find_packages(),

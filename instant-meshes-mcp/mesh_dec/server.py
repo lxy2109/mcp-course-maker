@@ -8,10 +8,10 @@ import pymeshlab
 import urllib.parse
 import datetime
 from .utils.file_utils import copy_folder_to_temp, download_to_temp, copy_obj_package_to_temp, get_temp_file, clean_temp_directory, move_and_cleanup
-from .utils.mesh_convert import glb_to_obj, obj_to_glb
+from .utils.mesh_convert import glb_to_obj, obj_to_glb, fbx_to_obj
 from .utils.mesh_repair import repair_mesh_with_pymeshlab
 from .utils.mesh_simplify import simplify_with_uv_preservation, run_instant_meshes, auto_simplify_mesh, force_triangle_simplify, progressive_simplify, high_quality_simplify
-from .utils.mesh_material import enhance_meshy_ai_materials, restore_obj_material
+from .utils.mesh_material import enhance_meshy_ai_materials, restore_obj_material, rename_tripo_textures_and_update_mtl
 from .utils.mesh_quality import check_mesh_quality
 from .utils.texture_utils import collect_all_texture_files, collect_texture_files_from_directory, enhanced_is_texture_file, ensure_textures_in_obj_dir
 from .utils.archive_utils import create_model_archive
@@ -166,33 +166,66 @@ async def process_model(
             # 文件夹模式：复制整个文件夹到temp
             obj_in = process_obj_with_materials(input_model, additional_files)
             temp_files.append(obj_in)
+            # 自动处理Tripo贴图重命名和MTL修正
+            model_dir = os.path.dirname(obj_in)
+            rename_tripo_textures_and_update_mtl(model_dir)
         elif input_model.lower().endswith(".obj"):
             # OBJ文件，使用新的处理函数
             obj_in = process_obj_with_materials(input_model, additional_files)
             temp_files.append(obj_in)
+            # 自动处理Tripo贴图重命名和MTL修正
+            model_dir = os.path.dirname(obj_in)
+            rename_tripo_textures_and_update_mtl(model_dir)
+        elif input_model.lower().endswith(".fbx") and os.path.exists(input_model):
+            # FBX文件，先转OBJ
+            temp_obj_for_fbx = get_temp_file('.obj')
+            extracted_textures = fbx_to_obj(input_model, temp_obj_for_fbx)
+            # 将提取的贴图添加到归档列表
+            for texture_path in extracted_textures:
+                temp_files.append(texture_path)
+            # 自动处理Tripo贴图重命名和MTL修正
+            model_dir = os.path.dirname(temp_obj_for_fbx)
+            rename_tripo_textures_and_update_mtl(model_dir)
+            obj_in = temp_obj_for_fbx
+            temp_files.append(obj_in)
         elif is_url(input_model):
             local_input = download_to_temp(input_model)
             temp_files.append(local_input)
-            
             # 若输入为GLB，先转OBJ
             if local_input.lower().endswith(".glb"):
                 obj_in = get_temp_file(".obj")
                 glb_to_obj(local_input, obj_in)
+                temp_files.append(obj_in)
+            # 若输入为FBX，先转OBJ
+            elif local_input.lower().endswith(".fbx"):
+                temp_obj_for_fbx = get_temp_file('.obj')
+                extracted_textures = fbx_to_obj(local_input, temp_obj_for_fbx)
+                for texture_path in extracted_textures:
+                    if os.path.exists(texture_path) and texture_path not in texture_files_for_archive:
+                        texture_files_for_archive.append(texture_path)
+                obj_in = temp_obj_for_fbx
                 temp_files.append(obj_in)
             else:
                 obj_in = local_input
         else:
             # 本地文件
             local_input = input_model
-            
             # 确保使用绝对路径
             if not os.path.isabs(local_input):
                 local_input = os.path.abspath(local_input)
-            
             # 若输入为GLB，先转OBJ
             if local_input.lower().endswith(".glb"):
                 obj_in = get_temp_file(".obj")
                 glb_to_obj(local_input, obj_in)
+                temp_files.append(obj_in)
+            # 若输入为FBX，先转OBJ
+            elif local_input.lower().endswith(".fbx"):
+                temp_obj_for_fbx = get_temp_file('.obj')
+                extracted_textures = fbx_to_obj(local_input, temp_obj_for_fbx)
+                for texture_path in extracted_textures:
+                    if os.path.exists(texture_path) and texture_path not in texture_files_for_archive:
+                        texture_files_for_archive.append(texture_path)
+                obj_in = temp_obj_for_fbx
                 temp_files.append(obj_in)
             else:
                 # 本地OBJ文件，复制到temp目录
@@ -227,6 +260,20 @@ async def process_model(
         with open(log_file, "a", encoding="utf-8") as logf:
             logf.write(f"Original faces: {original_faces}\n")
             logf.write(f"Original quality: {original_quality}\n")
+
+        # === 自动破洞修复集成 ===
+        try:
+            watertight = original_quality.get("watertight", True)
+            issues = original_quality.get("issues", [])
+            if not watertight or (isinstance(issues, list) and any("hole" in str(issue).lower() for issue in issues)):
+                repaired_obj = repair_mesh_with_pymeshlab(obj_in)
+                temp_files.append(repaired_obj)
+                obj_in = repaired_obj
+                with open(log_file, "a", encoding="utf-8") as logf:
+                    logf.write("Auto-repaired mesh holes before further processing.\n")
+        except Exception as e:
+            with open(log_file, "a", encoding="utf-8") as logf:
+                logf.write(f"WARNING: Auto hole repair failed: {e}\n")
 
         # 3. 智能选择操作方式
         if operation == "auto":

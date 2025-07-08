@@ -387,13 +387,18 @@ async def get_recognition_types() -> Dict[str, Any]:
     }
 
 # -------------------- 主函数 --------------------
-
-if __name__ == "__main__":
+def main():
     # 启动前检查配置
     if not BAIDU_API_KEY or not BAIDU_SECRET_KEY:
         logger.warning("警告: 未设置百度API密钥，请在环境变量中设置 BAIDU_API_KEY 和 BAIDU_SECRET_KEY")
     
     logger.info("百度图像识别 MCP 服务器启动...")
     logger.info(f"支持的识别类型数量: {len(RECOGNITION_TYPES)}")
-    
-    mcp.run() 
+    mcp.run()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        logger.error(f"服务器启动失败: {str(e)}")
+        raise

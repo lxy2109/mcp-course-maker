@@ -1,6 +1,6 @@
 # instant-meshes-mcp
 
-高效3D模型自动减面与重拓扑服务，基于 Instant Meshes、pymeshlab、Blender 3.6，支持 MCP 协议批量处理 OBJ/GLB 模型，自动归档、材质贴图保留、质量分析。
+高效3D模型自动减面与重拓扑服务，基于 Instant Meshes、pymeshlab、Blender 3.6，支持 MCP 协议批量处理 OBJ/GLB/FBX 模型，自动归档、材质贴图保留、质量分析。
 
 ---
 
