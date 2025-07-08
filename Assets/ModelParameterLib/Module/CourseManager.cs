@@ -234,7 +234,8 @@ namespace ModelParameterLib.Module
                 "TriLib", "unitymcp", "ModelParameterLib", "TimeLine","excel-mcp-server",
                 // 新增：忽略Timeline相关目录
                 "Timeline", "TimelineAsset", "TimelineAssets",
-                "Fronts", "Pictures", "Prefabs", "Models", "Textures", "Materials", "Audio"
+                "Fronts", "Pictures", "Prefabs", "Models", "Textures", "Materials", "Audio",
+                "Excel","Skybox"
             };
             // 忽略Timeline相关目录（不区分大小写）
             if (dirName.ToLower().Contains("timeline"))
