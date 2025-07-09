@@ -12,7 +12,10 @@ decription: 规范生成的图片或音频的保存目录。
   - elevenlabs: **[PATH] Output/elevenlabs"**
   - jimeng: **[PATH] Output/jimeng**
   - minimax: 如果是图片，则 **[PATH] Output/minimax/pictures**；如果是音频，则 **[PATH] Output/minimax/audios**
-  - 3D模型等其他类型，按后续扩展目录规范执行
+  - 3D模型保存目录为  **[PATH] Output/models**
+    - 如果没有要求减面，则直接将模型保存至该路径
+    - 如果要求模型减面，则将模型减面后的归档文件夹复制至该路径
+  - 天空盒保存目录为  **[PATH] Output/skybox**
 
 - 文件生成后，必须自动调用重命名工具 **[MCP] mcp_FileSimp_rename_files**，对新生成的文件进行自动重命名。
   - 重命名优先使用输入的关键词（如"光度计""兰亭集序"），如有重名则自动递增序号（如"光度计.jpg""光度计_1.jpg"）。

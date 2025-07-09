@@ -178,6 +178,16 @@ async def extract_zip(
     except Exception as e:
         return [types.TextContent(type="text", text=f"解压失败: {str(e)}")]
 
+def get_allowed_roots():
+    """
+    自动获取项目根目录下所有一级文件夹，返回以/结尾的列表
+    """
+    return [
+        f"{name}/"
+        for name in os.listdir(PROJECT_ROOT)
+        if os.path.isdir(os.path.join(PROJECT_ROOT, name))
+    ]
+
 @mcp.tool("to_absolute_path")
 async def to_absolute_path(
     relative_path: str
@@ -191,9 +201,7 @@ async def to_absolute_path(
     """
     if not relative_path or not isinstance(relative_path, str):
         return [types.TextContent(type="text", text="路径不能为空且必须为字符串")]
-    allowed_roots = [
-        "Assets/", "Output/", "instant-meshes-mcp/", "image-gen-server-main/", "file-simp-server/", "elevenlabs-mcp/", "baidu-image-recognition-mcp/", "doubao-tts-mcp/", "tripo-mcp/", "picui-image-upload-mcp/", "meshy-ai-mcp-server/", "环境配置图示/"
-    ]
+    allowed_roots = get_allowed_roots()
     if not any(relative_path.startswith(root) for root in allowed_roots):
         return [types.TextContent(type="text", text=f"路径必须以{allowed_roots}之一开头: {relative_path}")]
     abs_path = os.path.abspath(os.path.join(PROJECT_ROOT, relative_path))

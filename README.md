@@ -892,9 +892,9 @@
    - 专为glTF/GLB格式3D模型设计的可视化插件，支持PBR材质、动画等特性，适合AI建模流程的模型预览。
    - 可在 Cursor 内置应用商店通过名称搜索并安装。
 
-4. **HDR/EXR/KTX2 Viewer**
-   - 支持HDR、EXR、KTX2等高动态范围贴图和天空盒格式的可视化，方便美术资源和天空盒的快速预览。
-   - **本项目已自带本地插件**，位于 `HDR_EXR_KTX2_Viewer` 文件夹，可直接通过 VSCode 插件管理器安装本地 `.vsix` 文件（`HDR_EXR_KTX2_Viewer/hdr-exr-ktx2-viewer-0.0.1.vsix`）。
+4. **Skybox Viewer**
+   - 支持HDR、EXR、KTX2等高动态范围贴图和天空盒格式的可视化，支持jpg、jpeg、png格式图片的天空盒格式的可视化，方便美术资源和天空盒的快速预览。
+   - **本项目已自带本地插件**，位于 `Skybox_Viewer` 文件夹，可直接通过 VSCode 插件管理器安装本地 `.vsix` 文件（`Skybox_Viewer/skybox-viewer-0.0.2.vsix`）。
    - 该插件未在应用商店发布，仅支持本地安装。
 
 5. **SpecStory**
