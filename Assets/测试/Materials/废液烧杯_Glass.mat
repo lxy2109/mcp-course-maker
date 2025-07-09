@@ -52,7 +52,7 @@ Material:
     m_Floats:
     - _AlphaCutoff: 0.5
     - _ChromaticOffset: 0.01
-    - _QueueControl: 0
+    - _QueueControl: -1
     - _QueueOffset: 0
     - _fresnelMax: 1
     - _fresnelMin: 0

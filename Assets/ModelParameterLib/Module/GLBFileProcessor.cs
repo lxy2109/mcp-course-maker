@@ -144,12 +144,19 @@ namespace ModelParameterLib.Module
             string apiKey = UnityEditor.EditorPrefs.GetString("ModelVolumeViewer_DeepSeekApiKey", "");
             aiFiller.FillMaterialAsync(file.fileNameWithoutExtension, apiKey, (succ, json, err) =>
             {
+                Debug.Log("[AI返回] json=" + json);
                 if (succ && !string.IsNullOrEmpty(json))
                 {
                     try
                     {
                         var jobj = Newtonsoft.Json.Linq.JObject.Parse(json);
                         aiMaterial = jobj["material"]?.ToString();
+                        if (string.IsNullOrEmpty(aiMaterial))
+                            aiMaterial = jobj["材质"]?.ToString();
+                        if (string.IsNullOrEmpty(aiMaterial))
+                            aiMaterial = jobj["type"]?.ToString();
+                        if (string.IsNullOrEmpty(aiMaterial))
+                            aiMaterial = jobj["category"]?.ToString();
                     }
                     catch { }
                 }
