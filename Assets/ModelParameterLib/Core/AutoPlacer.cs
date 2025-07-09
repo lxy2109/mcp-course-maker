@@ -27,7 +27,7 @@ namespace ModelParameterLib.Core{
         [BoxGroup("基础参数")]
         [LabelText("网格分布间距 (X/Z)")]
         [MinValue(0.01f)]
-        public Vector2 gridSpacing = new Vector2(0.3f, 0.2f);
+        public Vector2 gridSpacing = new Vector2(0.1f, 0.2f);
 
         [BoxGroup("基础参数")]
         [LabelText("是否自动Y轴贴合父物体表面")]
@@ -48,7 +48,7 @@ namespace ModelParameterLib.Core{
                 return;
             }
             AutoArrange();
-            hasArranged = true;
+            //hasArranged = true;
         }
         #endregion
 
@@ -268,6 +268,26 @@ namespace ModelParameterLib.Core{
             }
             var parentBounds = GetWorldMeshBounds(parentObj);
             float baseY = parentBounds.max.y;
+
+            // === 新增：主模型优先排布到桌面中心 ===
+            GameObject mainObj = null;
+            foreach (var obj in allObjs)
+            {
+                var rule = GetRule(obj.name);
+                if (rule != null && rule.isMainModel)
+                {
+                    mainObj = obj;
+                    break;
+                }
+            }
+            if (mainObj != null)
+            {
+                Vector3 center = parentBounds.center;
+                mainObj.transform.position = new Vector3(center.x, baseY, center.z);
+                if (autoYAlign) PlaceOnTop(parentObj, mainObj);
+                allObjs.Remove(mainObj);
+            }
+
             // 3. XZ平面自适应包围盒分布（防重叠，自动换行）
             float margin = 0.1f; // 桌面边缘留白
             float minSpacingX = gridSpacing.x;
@@ -284,6 +304,7 @@ namespace ModelParameterLib.Core{
             {
                 float curX = tableMinX;
                 float maxRowDepth = 0f;
+                int rowStartI = i;
                 // 一行内尽量多排物体，直到放不下
                 while (i < allObjs.Count)
                 {
@@ -293,15 +314,25 @@ namespace ModelParameterLib.Core{
                     float objDepth = bounds.size.z;
                     // 如果当前物体放下会超出桌面右边界，则换行
                     if (curX + objWidth > tableMaxX)
-                        break;
-                    // 物体中心点坐标
-                    float x = curX + objWidth / 2f;
-                    float z = curZ + objDepth / 2f;
-                    obj.transform.position = new Vector3(x, baseY, z);
-                    if (autoYAlign)
                     {
-                        PlaceOnTop(parentObj, obj);
+                        // 如果本行一个都没排，强制排下第一个
+                        if (i == rowStartI)
+                        {
+                            float x = curX + objWidth / 2f;
+                            float z = curZ + objDepth / 2f;
+                            obj.transform.position = new Vector3(x, baseY, z);
+                            if (autoYAlign) PlaceOnTop(parentObj, obj);
+                            curX += objWidth + minSpacingX;
+                            maxRowDepth = Mathf.Max(maxRowDepth, objDepth);
+                            i++;
+                        }
+                        break;
                     }
+                    // 正常排布
+                    float x2 = curX + objWidth / 2f;
+                    float z2 = curZ + objDepth / 2f;
+                    obj.transform.position = new Vector3(x2, baseY, z2);
+                    if (autoYAlign) PlaceOnTop(parentObj, obj);
                     curX += objWidth + minSpacingX;
                     maxRowDepth = Mathf.Max(maxRowDepth, objDepth);
                     i++;
