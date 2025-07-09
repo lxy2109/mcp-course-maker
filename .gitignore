@@ -38,7 +38,7 @@ Thumbs.db
 *.unitypackage
 
 # Unity meta files
-*.meta
+#*.meta
 
 # Large files that should use LFS
 *.unitypackage filter=lfs diff=lfs merge=lfs -text 
