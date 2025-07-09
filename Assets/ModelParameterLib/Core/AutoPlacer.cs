@@ -48,7 +48,7 @@ namespace ModelParameterLib.Core{
                 return;
             }
             AutoArrange();
-            //hasArranged = true;
+            hasArranged = true;
         }
         #endregion
 
@@ -268,26 +268,49 @@ namespace ModelParameterLib.Core{
             }
             var parentBounds = GetWorldMeshBounds(parentObj);
             float baseY = parentBounds.max.y;
-            // 3. XZ平面网格分布
-            int n = allObjs.Count;
-            int cols = Mathf.CeilToInt(Mathf.Sqrt(n));
-            int rows = Mathf.CeilToInt((float)n / cols);
-            float spacingX = gridSpacing.x;
-            float spacingZ = gridSpacing.y;
-            float startX = parentBounds.center.x - (cols - 1) * spacingX / 2f;
-            float startZ = parentBounds.center.z - (rows - 1) * spacingZ / 2f;
-            for (int i = 0; i < n; i++)
+            // 3. XZ平面自适应包围盒分布（防重叠，自动换行）
+            float margin = 0.1f; // 桌面边缘留白
+            float minSpacingX = gridSpacing.x;
+            float minSpacingZ = gridSpacing.y;
+
+            float tableMinX = parentBounds.min.x + margin;
+            float tableMaxX = parentBounds.max.x - margin;
+            float tableMinZ = parentBounds.min.z + margin;
+            float tableMaxZ = parentBounds.max.z - margin;
+            float curZ = tableMinZ;
+
+            int i = 0;
+            while (i < allObjs.Count)
             {
-                int row = i / cols;
-                int col = i % cols;
-                var obj = allObjs[i];
-                float x = startX + col * spacingX;
-                float z = startZ + row * spacingZ;
-                obj.transform.position = new Vector3(x, baseY, z);
-                if (autoYAlign)
+                float curX = tableMinX;
+                float maxRowDepth = 0f;
+                // 一行内尽量多排物体，直到放不下
+                while (i < allObjs.Count)
                 {
-                    PlaceOnTop(parentObj, obj);
+                    var obj = allObjs[i];
+                    var bounds = GetWorldMeshBounds(obj);
+                    float objWidth = bounds.size.x;
+                    float objDepth = bounds.size.z;
+                    // 如果当前物体放下会超出桌面右边界，则换行
+                    if (curX + objWidth > tableMaxX)
+                        break;
+                    // 物体中心点坐标
+                    float x = curX + objWidth / 2f;
+                    float z = curZ + objDepth / 2f;
+                    obj.transform.position = new Vector3(x, baseY, z);
+                    if (autoYAlign)
+                    {
+                        PlaceOnTop(parentObj, obj);
+                    }
+                    curX += objWidth + minSpacingX;
+                    maxRowDepth = Mathf.Max(maxRowDepth, objDepth);
+                    i++;
                 }
+                // 换行
+                curZ += maxRowDepth + minSpacingZ;
+                // 如果超出桌面下边界，提前终止
+                if (curZ > tableMaxZ)
+                    break;
             }
             Debug.Log("[AutoPlacer] XZ网格分布+Y轴贴合自动摆放完成");
         }
