@@ -141,7 +141,7 @@ namespace ModelParameterLib.Module
             var aiFiller = new ModelAIFiller();
             string aiMaterial = null;
             var tcs = new System.Threading.Tasks.TaskCompletionSource<string>();
-            string apiKey = UnityEditor.EditorPrefs.GetString("ModelVolumeViewer_DeepSeekApiKey", "");
+            string apiKey = UnityEditor.EditorPrefs.GetString("DeepSeekApiKey", "");
             aiFiller.FillMaterialAsync(file.fileNameWithoutExtension, apiKey, (succ, json, err) =>
             {
                 Debug.Log("[AI返回] json=" + json);
