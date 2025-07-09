@@ -179,7 +179,7 @@ namespace ModelParameterLib.Module
         /// <param name="onResult">回调，参数为(success, jsonResult, errorMsg)</param>
         public void FillMaterialAsync(string itemName, string apiKey, Action<bool, string, string> onResult)
         {
-            Debug.Log($"[ModelAISizeFiller] FillMaterialAsync called. itemName: {itemName}, apiKey empty: {string.IsNullOrEmpty(apiKey)}");
+            Debug.Log($"[ModelAIMaterialFiller] FillMaterialAsync called. itemName: {itemName}, apiKey empty: {string.IsNullOrEmpty(apiKey)}");
 #if UNITY_2019_1_OR_NEWER
             EditorCoroutineUtility.StartCoroutineOwnerless(FillMaterialInternalCoroutine(itemName, apiKey, onResult));
 #else
@@ -195,7 +195,7 @@ namespace ModelParameterLib.Module
         /// <param name="onResult">回调，参数为(index, success, jsonResult, errorMsg)</param>
         public void FillMaterialBatchAsync(List<string> items, string apiKey, Action<int, bool, string, string> onResult)
         {
-            Debug.Log($"[ModelAISizeFiller] FillMaterialBatchAsync called. items.Count: {items?.Count ?? 0}, apiKey empty: {string.IsNullOrEmpty(apiKey)}");
+            Debug.Log($"[ModelAIMaterialFiller] FillMaterialBatchAsync called. items.Count: {items?.Count ?? 0}, apiKey empty: {string.IsNullOrEmpty(apiKey)}");
 #if UNITY_2019_1_OR_NEWER
             EditorCoroutineUtility.StartCoroutineOwnerless(FillMaterialBatchInternalCoroutine(items, apiKey, onResult));
 #else
@@ -209,7 +209,7 @@ namespace ModelParameterLib.Module
         private System.Collections.IEnumerator FillMaterialInternalCoroutine(string itemName, string apiKey, Action<bool, string, string> onResult)
         {
             var prompt = BuildMaterialPrompt(itemName);
-            Debug.Log($"[ModelAISizeFiller] FillMaterialInternalCoroutine: prompt=\n{prompt}");
+            Debug.Log($"[ModelAIMaterialFiller] FillMaterialInternalCoroutine: prompt=\n{prompt}");
             var body = new
             {
                 model = "deepseek-chat",
@@ -218,7 +218,7 @@ namespace ModelParameterLib.Module
                 max_tokens = 256
             };
             var jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
-            Debug.Log($"[ModelAISizeFiller] Material Request body: {jsonBody}");
+            Debug.Log($"[ModelAIMaterialFiller] Material Request body: {jsonBody}");
 
             var request = new UnityEngine.Networking.UnityWebRequest(apiUrl, "POST");
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
@@ -236,7 +236,7 @@ namespace ModelParameterLib.Module
             else
             {
                 var respStr = request.downloadHandler.text;
-                Debug.Log($"[ModelAISizeFiller] DeepSeek AI原始返回(Material): {respStr}");
+                Debug.Log($"[ModelAIMaterialFiller] DeepSeek AI原始返回(Material): {respStr}");
                 if (!request.result.ToString().StartsWith("Success"))
                 {
                     onResult(false, null, respStr);
@@ -244,15 +244,15 @@ namespace ModelParameterLib.Module
                 }
                 var respObj = JObject.Parse(respStr);
                 var aiResult = respObj["choices"]?[0]?["message"]?["content"]?.ToString();
-                Debug.Log($"[ModelAISizeFiller] DeepSeek AI content(Material): {aiResult}");
+                Debug.Log($"[ModelAIMaterialFiller] DeepSeek AI content(Material): {aiResult}");
                 var json = ExtractJson(aiResult);
                 if (json == null)
                 {
-                    Debug.LogError($"[ModelAISizeFiller] 材质AI返回内容无法提取为JSON: {aiResult}");
+                    Debug.LogError($"[ModelAIMaterialFiller] 材质AI返回内容无法提取为JSON: {aiResult}");
                     onResult(false, null, "材质AI返回内容无法提取为JSON: " + aiResult);
                     yield break;
                 }
-                Debug.Log($"[ModelAISizeFiller] 材质AI提取到的JSON: {json}");
+                Debug.Log($"[ModelAIMaterialFiller] 材质AI提取到的JSON: {json}");
                 onResult(true, json, null);
             }
         }
@@ -266,7 +266,7 @@ namespace ModelParameterLib.Module
             {
                 int idx = i;
                 var itemName = items[i];
-                Debug.Log($"[ModelAISizeFiller] Batch(Material) item {idx}: itemName={itemName}");
+                Debug.Log($"[ModelAIMaterialFiller] Batch(Material) item {idx}: itemName={itemName}");
                 bool done = false;
                 bool success = false;
                 string jsonResult = null;
