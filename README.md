@@ -870,6 +870,7 @@
 - [Tripo3d 官方API文档](https://platform.tripo3d.ai/docs)
 - [instant-meshes-mcp 文档](https://github.com/lxy2109/instant-meshes-mcp)
 - [Polyhaven 官方API文档](https://redocly.github.io/redoc/?url=https://api.polyhaven.com/api-docs/swagger.json&nocors)
+- [Real-ESRGAN 官方文档](https://github.com/xinntao/Real-ESRGAN)
 - [Unity MCP 文档](https://github.com/VR-Jobs/UnityMCPbeta)
 
 ---
