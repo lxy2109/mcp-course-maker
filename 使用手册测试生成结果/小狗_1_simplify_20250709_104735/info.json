@@ -1,0 +1,58 @@
+{
+  "archive_created": "20250709_104735",
+  "original_input": "H:\\MCPCourseMaking\\MCP-Course-Maker-main\\使用手册测试生成结果\\小狗_1.glb",
+  "output_model": "小狗_1_simplify.glb",
+  "processing_info": {
+    "operation": "simplify",
+    "mode": "balanced",
+    "original_faces": 369616,
+    "target_faces": 5000,
+    "final_faces": 5000,
+    "reduction_ratio": "1.35%",
+    "preserve_boundaries": true,
+    "preserve_uv": true,
+    "options": null,
+    "quality_info": {
+      "vertices": 14379,
+      "faces": 5000,
+      "edges": 15000,
+      "watertight": false,
+      "volume": "N/A",
+      "surface_area": 1.3434874669067112,
+      "bounds": [
+        [
+          -0.501036822504916,
+          -0.3086712780824063,
+          -0.225810639285615
+        ],
+        [
+          0.5008909655025182,
+          0.307508827754538,
+          0.2268203559389402
+        ]
+      ],
+      "bbox_diagonal": 1.2603221941426999,
+      "components": 4795,
+      "issues": [
+        "Not watertight (has holes)"
+      ],
+      "warnings": [
+        "Model has 4795 separate components"
+      ]
+    }
+  },
+  "copied_textures": [
+    "小猫.jpg",
+    "Color_b7dba1fd-f1ab-4a64-81e0-d7d29c1007cc_diffuse.png",
+    "NormalGL_b7dba1fd-f1ab-4a64-81e0-d7d29c1007cc_normal.png",
+    "ORM_b7dba1fd-f1ab-4a64-81e0-d7d29c1007cc_metallicroughness.png",
+    "dummy.png"
+  ],
+  "file_structure": {
+    "model/": "主模型文件和材质文件",
+    "textures/": "从temp目录和模型目录复制的贴图文件",
+    "logs/": "本次处理的日志文件",
+    "info.json": "处理信息和元数据"
+  },
+  "processing_log": "process_model_20250709_104636.log"
+}

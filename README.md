@@ -858,16 +858,19 @@
 
 ## 📚 六、参考文档
 
-- [MiniMax-MCP 官方文档](https://github.com/MiniMax-AI/MiniMax-MCP)
-- [豆包TTS文档](https://github.com/lxy2109/doubao-tts-mcp/blob/main/README.md)
-- [云开发MCP Host官方文档](https://docs.cloudbase.net/ai/mcp/use/mcp-host)
-- [excel-mcp-server 文档](https://cloud.tencent.com/developer/mcp/server/10590)
-- [image-gen-server](https://github.com/fengin/image-gen-server)
-- [tripo-mcp](https://github.com/lxy2109/tripo-mcp)
-- [elevenlabs-mcp](https://github.com/elevenlabs/elevenlabs-mcp)
-- [meshy-ai-mcp-server](https://github.com/pasie15/scenario.com-mcp-server)
-- [instant-meshes-mcp](https://github.com/lxy2109/instant-meshes-mcp)
-- [Unity MCP](https://github.com/VR-Jobs/UnityMCPbeta)
+- [MiniMax-MCP 官方文档](https://github.com/MiniMax-AI/MiniMax-MCP/blob/main/README-CN.md)
+- [豆包TTS官方API文档](https://www.volcengine.com/docs/6561/79818)
+- [云开发MCP Host官方文档（Hunyuan3D）](https://docs.cloudbase.net/ai/mcp/use/mcp-host)
+- [excel-mcp-server 文档](https://github.com/haris-musa/excel-mcp-server)
+- [Elevenlabs 官方API文档](https://docs.elevenlabs.io/api-reference/)
+- [JiMengAI（即梦AI）官方API文档](https://jimeng.jianying.com/api-docs)
+- [百度智能识图 官方API文档](https://cloud.baidu.com/doc/IMAGERECOGNITION/s/Kkbg3gxs7)
+- [Picui图床 官方API文档](https://picui.cn/page/api-docs.html)
+- [Meshyai 官方API文档](https://docs.meshy.ai/zh)
+- [Tripo3d 官方API文档](https://platform.tripo3d.ai/docs)
+- [instant-meshes-mcp 文档](https://github.com/lxy2109/instant-meshes-mcp)
+- [Polyhaven 官方API文档](https://redocly.github.io/redoc/?url=https://api.polyhaven.com/api-docs/swagger.json&nocors)
+- [Unity MCP 文档](https://github.com/VR-Jobs/UnityMCPbeta)
 
 ---
 
