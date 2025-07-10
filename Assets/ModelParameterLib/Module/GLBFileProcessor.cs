@@ -31,6 +31,7 @@ namespace ModelParameterLib.Module
             public bool applyRigidbody = true;
             public bool applyGlassMaterial = true;
             public bool applyScaleFromLibrary = true;
+            public float scaleMultiplier = 50f; // 新增：缩放倍数，默认50
         }
 
         public async Task<bool> CreatePrefabFromGLB(GLBFileInfo file, JsonScaleDataLoader jsonLoader, GLBProcessOptions options = null, string outputFolder = null)
@@ -47,6 +48,9 @@ namespace ModelParameterLib.Module
             // 2. 应用JSON配置（带scale*10）
             if (options.applyScaleFromLibrary && file.jsonScaleData != null)
                 ApplyJsonConfigToPrefabWithScale10(prefabInstance, file.jsonScaleData);
+            // 2.5. 应用scaleMultiplier到Prefab本体
+            if (Mathf.Abs(options.scaleMultiplier - 1f) > 0.0001f)
+                prefabInstance.transform.localScale *= options.scaleMultiplier;
             // 3. 添加碰撞体和刚体
             if (options.applyCollider || options.applyRigidbody)
                 AddColliderAndRigidbodySelective(prefabInstance, options.applyCollider, options.applyRigidbody);

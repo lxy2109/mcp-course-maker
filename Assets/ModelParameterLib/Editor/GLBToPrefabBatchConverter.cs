@@ -56,6 +56,9 @@ namespace ModelParameterLib.Editor
         private bool showApiKey = false;
         private string apiKeyStatus = "";
 
+        // 新增：整体缩放倍数，默认50
+        private float scaleMultiplier = 50f;
+
         private HashSet<string> missingScaleFiles = new HashSet<string>(); // 记录比例库缺失的文件名
         
         [MenuItem("Tools/ModelParameterLib/GLB转预制件 &g")]
@@ -432,6 +435,15 @@ namespace ModelParameterLib.Editor
             GUILayout.Label("转换设置", EditorStyles.boldLabel);
             GUILayout.Space(5);
 
+            // 新增：整体缩放倍数输入
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Prefab和场景实例缩放倍数", GUILayout.Width(180));
+            scaleMultiplier = EditorGUILayout.FloatField(scaleMultiplier, GUILayout.Width(80));
+            scaleMultiplier = Mathf.Clamp(scaleMultiplier, 0.01f, 1000f);
+            GUILayout.Label("倍 (Prefab和场景实例均应用)", GUILayout.Width(200));
+            EditorGUILayout.EndHorizontal();
+            GUILayout.Space(5);
+
             float totalWidth = position.width - 40; // 适当减去边距
             float toggleMinWidth = 220f;
             int togglesPerRow = Mathf.Max(1, Mathf.FloorToInt(totalWidth / toggleMinWidth));
@@ -533,7 +545,8 @@ namespace ModelParameterLib.Editor
                 applyCollider = applyCollider,
                 applyRigidbody = applyRigidbody,
                 applyGlassMaterial = applyGlassMaterial,
-                applyScaleFromLibrary = applyScaleFromLibrary
+                applyScaleFromLibrary = applyScaleFromLibrary,
+                scaleMultiplier = scaleMultiplier // 关键：Prefab本体缩放倍数
             };
             try
             {
@@ -593,7 +606,7 @@ namespace ModelParameterLib.Editor
                         if (instance != null)
                         {
                             instance.transform.SetParent(root.transform, false);
-                            
+                            // 不再额外乘以scaleMultiplier，Prefab本体已缩放
                             // 🔥 新增：为场景中的实例添加Clickable uiPrefab赋值
                             AssignClickableUIPrefab(instance);
                         }
@@ -725,7 +738,7 @@ namespace ModelParameterLib.Editor
             return scaleData;
         }
 
-        public static async Task<object> RunBatchConvert(string courseRootFolder, string deepSeekApiKey = null)
+        public static async Task<object> RunBatchConvert(string courseRootFolder, string deepSeekApiKey = null, float scaleMultiplier = 50f)
         {
             if (string.IsNullOrEmpty(deepSeekApiKey))
                 deepSeekApiKey = GetApiKey();
@@ -746,7 +759,8 @@ namespace ModelParameterLib.Editor
                 applyCollider = true,
                 applyRigidbody = true,
                 applyGlassMaterial = true,
-                applyScaleFromLibrary = true
+                applyScaleFromLibrary = true,
+                scaleMultiplier = scaleMultiplier // 关键：Prefab本体缩放倍数
             };
             foreach (var file in glbFiles)
             {
@@ -793,7 +807,7 @@ namespace ModelParameterLib.Editor
                     if (instance != null)
                     {
                         instance.transform.SetParent(root.transform, false);
-                        
+                        // 不再额外乘以scaleMultiplier，Prefab本体已缩放
                         // 🔥 新增：为场景中的实例添加Clickable uiPrefab赋值
                         AssignClickableUIPrefab(instance);
                     }
