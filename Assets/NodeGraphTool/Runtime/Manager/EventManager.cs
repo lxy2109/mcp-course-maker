@@ -11,6 +11,7 @@ using System.Reflection;
 using UnityEngine.Events;
 using System.Linq;
 using EPOOutline;
+using UnityEngine.UI;
 
 #if UNITY_EDITOR
 #endif
@@ -88,7 +89,7 @@ public class EventManager : SceneSingleton<EventManager>
     [SerializeField]
     [TabGroup("UI")]
     [LabelText("Event 文字内容UI")]
-    public TextMeshProUGUI contentUI;
+    public Text contentUI;
     
     private Transform showUI;
 

@@ -710,6 +710,7 @@ namespace UnityMCP.Editor.Commands
         public static void AddGraphPool(NodeGraph.NodeGraph nodeGraph)
         {
             var eventmanager = EventManager.GetInstanceInEditor();
+            eventmanager.graphs = new Dictionary<string, NodeGraph.NodeGraph>();
 
             if (eventmanager.graphs.ContainsKey("默认"))
                 eventmanager.graphs["默认"] = nodeGraph;
