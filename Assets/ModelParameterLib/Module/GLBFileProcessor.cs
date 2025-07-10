@@ -227,6 +227,21 @@ namespace ModelParameterLib.Module
                 // 只设置 _Texture 属性，其他属性保持默认
                 if (glassMatAsset.HasProperty("_Texture"))
                     glassMatAsset.SetTexture("_Texture", mainTex);
+                // 设置默认玻璃参数
+                if (glassMatAsset.HasProperty("_matcapStrength"))
+                    glassMatAsset.SetFloat("_matcapStrength", 0.509f);
+                if (glassMatAsset.HasProperty("_refractStrength"))
+                    glassMatAsset.SetFloat("_refractStrength", 0.038f);
+                if (glassMatAsset.HasProperty("_fresnelMin"))
+                    glassMatAsset.SetFloat("_fresnelMin", 0.436f);
+                if (glassMatAsset.HasProperty("_fresnelMax"))
+                    glassMatAsset.SetFloat("_fresnelMax", 0.654f);
+                if (glassMatAsset.HasProperty("_fresnelVal"))
+                    glassMatAsset.SetFloat("_fresnelVal", 0.393f);
+                if (glassMatAsset.HasProperty("_mainColor"))
+                    glassMatAsset.SetColor("_mainColor", Color.white);
+                if (glassMatAsset.HasProperty("_ChromaticOffset"))
+                    glassMatAsset.SetFloat("_ChromaticOffset", 0.005f);
                 AssetDatabase.CreateAsset(glassMatAsset, matPath);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
