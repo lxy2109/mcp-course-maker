@@ -644,6 +644,7 @@
      ```
 
      >如果安装失败，请检查是否安装C/C++ builder<https://www.embarcadero.com/products/cbuilder/downloads>
+     >如果提示编码问题，可以将windows全局字体改为UTF-8
 
    - 确保 `Instant Meshes.exe` 放在 instant-meshes-mcp 根目录。
    - **下载并安装 Blender 3.6**：
