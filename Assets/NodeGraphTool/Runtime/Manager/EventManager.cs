@@ -207,7 +207,7 @@ public class EventManager : SceneSingleton<EventManager>
         showUI = GameObject.Find("Canvas").transform.GetChild(3);
         targetpos = GameObject.Find("Canvas").transform.GetChild(5).transform.position;
         originalpos = GameObject.Find("Canvas").transform.GetChild(4).transform.position;
-        contentUI = GameObject.Find("Canvas").transform.GetChild(3).transform.GetComponentInChildren<TextMeshProUGUI>();
+        contentUI = GameObject.Find("Canvas").transform.GetChild(3).transform.GetComponentInChildren<Text>();
         eventAudio = GameObject.Find("AudioManager").GetComponent<AudioSource>();    
 
 
