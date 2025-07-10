@@ -18,7 +18,7 @@ description: 统一3D模型生成引擎的调用顺序与自动容错，确保�
 
 - 第一选择：**[MCP] mcp_Meshy3D_meshy3d_create_task**
   - 优势：质量高，细节丰富，纹理稳定
-  - 参数建议：target_polycount=300000，ai_model="meshy-4",should_texture=true,enable_pbr=false,toplogy=quad
+  - 参数建议：target_polycount=300000，ai_model="meshy-5",should_texture=true,enable_pbr=true,toplogy=quad
   - 纹理策略：保证基础颜色准确性
 - 第二选择：**[MCP] mcp_Tripo3D_tripo3d_image_to_model**（如果Meshy3D失败）
   - 优势：速度快，稳定性好，纹理保真度高
