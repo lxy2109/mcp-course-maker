@@ -6,7 +6,7 @@ from mcp.server.fastmcp import FastMCP
 from volcengine_mcp.volc_tts import VolcTTS
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from volcengine_mcp.config import get_voice_type
+from volcengine_mcp.config import VOICE_LIST, get_voice_type
 from typing import Optional
 import uuid
 
@@ -50,33 +50,6 @@ mcp = FastMCP("VolcEngineTTS")
     返回：
         TextContent，包含合成成功提示和音频文件路径。
 
-    English:
-    Convert text to speech with a given voice and save the output audio file to a given directory.
-    Directory is optional, if not provided, the output file will be saved to the current working directory.
-
-    Args:
-        text (str): The text to convert to speech.
-        voice_type (str, optional): The name of the voice to use.
-        encoding (str, optional): Output audio encoding, default is mp3.
-        speed_ratio (float, optional): Speed of the generated audio. 1.0 is normal speed.
-        uid (str, optional): User ID, default is uid123.
-        cluster (str, optional): Cluster, default is volcano_tts.
-        emotion (str, optional): Emotion tag.
-        enable_emotion (bool, optional): Whether to enable emotion.
-        emotion_scale (float, optional): Emotion intensity.
-        rate (int, optional): Sampling rate, default is 24000.
-        bitrate (int, optional): Bitrate, default is 160.
-        loudness_ratio (float, optional): Loudness, default is 1.0.
-        explicit_language (str, optional): Explicit language.
-        context_language (str, optional): Context language.
-        silence_duration (float, optional): Silence duration.
-        with_timestamp (bool, optional): Whether to return timestamp.
-        extra_param (dict, optional): Extra parameters.
-        output_dir (str, optional): Directory to save the output audio file. Priority: argument > env OUTPUT_DIR > current dir.
-        output_filename (str, optional): Custom audio file name (no extension needed). If not specified, a unique file name will be generated.
-
-    Returns:
-        Text content with the path to the output file and name of the voice used.
     """
 )
 def volcengine_tts(
@@ -150,6 +123,18 @@ def volcengine_tts(
         type="text",
         text=f"合成成功，音频文件路径：{out_path}"
     )
+
+@mcp.tool(
+    description="""
+    获取所有可用的火山引擎TTS音色列表。
+    返回：
+        List[dict]，每个元素包含音色的scene、desc、voice_type、lang、emotions、keywords等信息。
+    """
+)
+def list_voice() -> list:
+    """返回所有可用音色信息列表"""
+    return VOICE_LIST
+
 
 def main():
     mcp.run()
