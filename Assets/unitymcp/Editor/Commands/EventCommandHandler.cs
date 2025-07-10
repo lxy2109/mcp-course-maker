@@ -249,7 +249,7 @@ namespace UnityMCP.Editor.Commands
             { "TimelineManager", "TimelineManager" },
             { "UnityEventListeners", "" },
             { "AudioManager", ""},
-            { "AutoPlacer", "AutoPlacer"}
+            { "AutoPlacer", ""}
         };
 
             // 创建管理器物体
@@ -282,6 +282,11 @@ namespace UnityMCP.Editor.Commands
                 {
                     managerObj.AddComponent<PlayableDirector>();
 
+                }
+                if(managerName == "AutoPlacer")
+                {
+                    managerObj.AddComponent<ModelParameterLib.Core.AutoPlacer>();
+                  
                 }
 
             }

@@ -714,6 +714,8 @@ namespace UnityMCP.Editor.Commands
 
             if (eventmanager.graphs.ContainsKey("默认"))
                 eventmanager.graphs["默认"] = nodeGraph;
+            else
+                eventmanager.graphs.Add("默认", nodeGraph);
             
             // eventmanager.currentGraph = nodeGraph;
 
