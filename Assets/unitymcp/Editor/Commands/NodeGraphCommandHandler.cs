@@ -1116,18 +1116,25 @@ namespace UnityMCP.Editor.Commands
                     }
                 }
 
+                // timelineCount现在是自动计算属性，无需手动设置
+                int previousTimelineCount = flowEventNode.timelineCount;
+                // flowEventNode.timelineCount 现在自动等于 timelineAssets.Count
+                
                 // 标记为脏数据，确保保存
                 EditorUtility.SetDirty(nodeGraph);
 
                 return new
                 {
                     success = true,
-                    message = $"成功更新FlowEventNode '{eventName}' 的Timeline资产",
+                    message = $"成功更新FlowEventNode '{eventName}' 的Timeline资产 | timelineCount已自动更新: {previousTimelineCount} -> {flowEventNode.timelineCount}",
                     nodeGraphPath = assetPath,
                     eventName = eventName,
                     updatedCount = updatedCount,
                     updatedAssets = updatedAssets,
-                    totalTimelineAssets = flowEventNode.timelineAssets.Count
+                    totalTimelineAssets = flowEventNode.timelineAssets.Count,
+                    timelineCountBefore = previousTimelineCount,
+                    timelineCountAfter = flowEventNode.timelineCount,
+                    timelineCountChanged = previousTimelineCount != flowEventNode.timelineCount
                 };
             }
             catch (Exception ex)

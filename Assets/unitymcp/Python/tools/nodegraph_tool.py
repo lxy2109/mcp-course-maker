@@ -19,6 +19,7 @@ def register_nodegraph_tools(mcp):
     mcp.tool()(get_flow_event_node_names)
     mcp.tool()(get_flow_event_node_by_name)
     mcp.tool()(update_flow_event_node_timeline_assets)
+    mcp.tool()(update_timeline_count_smart)
     mcp.tool()(save_nodegraph_changes)
     
     
@@ -289,7 +290,7 @@ def update_flow_event_node_timeline_assets(
         object_timeline_asset: Optional[str] = None,
         path: str = "Assets/NodeGraphTool/Test"
 ) -> Dict[str, Any]:
-    """更新指定FlowEventNode节点的timeline资产引用。
+    """更新指定FlowEventNode节点的timeline资产引用，并自动更新timelineCount计数。
 
     参数：
         ctx: MCP上下文
@@ -300,12 +301,27 @@ def update_flow_event_node_timeline_assets(
         path: NodeGraph文件所在路径，默认为"Assets/NodeGraphTool/Test"
 
     返回值：
-        Dict[str, Any]: 更新结果信息
+        Dict[str, Any]: 更新结果信息，包含timelineCount更新状态
     """
     path = clean_path(path)
     camera_timeline_asset = clean_path(camera_timeline_asset) if camera_timeline_asset else camera_timeline_asset
     object_timeline_asset = clean_path(object_timeline_asset) if object_timeline_asset else object_timeline_asset
+    
     try:
+        # 1. 获取添加前的状态
+        before_response = get_unity_connection().send_command("GET_FLOW_EVENT_NODE_BY_NAME", {
+            "name": name,
+            "eventName": event_name,
+            "path": path
+        })
+        
+        before_count = 0
+        if before_response.get("success", False):
+            before_node_data = before_response.get("nodeData", {})
+            before_timeline_assets = before_node_data.get("timelineAssets", [])
+            before_count = sum(1 for t in before_timeline_assets if t and t.strip())
+        
+        # 2. 更新timeline资产
         response = get_unity_connection().send_command("UPDATE_FLOW_EVENT_NODE_TIMELINE_ASSETS", {
             "name": name,
             "eventName": event_name,
@@ -314,19 +330,196 @@ def update_flow_event_node_timeline_assets(
             "path": path
         })
 
-        if response.get("success") == True:
-            return response
-        else:
+        if not response.get("success", False):
             return {
                 "success": False,
                 "error": response.get("message", f"更新FlowEventNode '{event_name}' 的Timeline资产失败")
             }
+        
+        # 3. 获取更新后的状态并计算timeline数量
+        after_response = get_unity_connection().send_command("GET_FLOW_EVENT_NODE_BY_NAME", {
+            "name": name,
+            "eventName": event_name,
+            "path": path
+        })
+        
+        if after_response.get("success", False):
+            after_node_data = after_response.get("nodeData", {})
+            after_timeline_assets = after_node_data.get("timelineAssets", [])
+            
+            # 计算有效的timeline数量（非空的timeline资产）
+            valid_timeline_count = 0
+            timeline_info = []
+            
+            for timeline in after_timeline_assets:
+                if timeline and timeline.strip():  # 检查timeline不为空
+                    valid_timeline_count += 1
+                    timeline_info.append(timeline.strip())
+            
+            # 4. 通过重新更新来同步timelineCount（包含计算的数量）
+            sync_response = get_unity_connection().send_command("UPDATE_FLOW_EVENT_NODE_TIMELINE_ASSETS", {
+                "name": name,
+                "eventName": event_name,
+                "cameraTimelineAsset": camera_timeline_asset,
+                "objectTimelineAsset": object_timeline_asset,
+                "timelineCount": valid_timeline_count,  # 添加计算出的timelineCount
+                "path": path
+            })
+            
+            # 5. 保存修改
+            save_response = get_unity_connection().send_command("SAVE_NODEGRAPH_CHANGES", {
+                "name": name,
+                "path": path
+            })
+            
+            # 6. 构建详细的返回信息
+            added_timelines = []
+            if camera_timeline_asset:
+                added_timelines.append(f"相机Timeline: {camera_timeline_asset}")
+            if object_timeline_asset:
+                added_timelines.append(f"物体Timeline: {object_timeline_asset}")
+            
+            result = {
+                "success": True,
+                "message": response.get("message", "Timeline资产更新成功"),
+                "timeline_count_before": before_count,
+                "timeline_count_after": valid_timeline_count,
+                "timeline_count_changed": valid_timeline_count != before_count,
+                "timeline_assets": timeline_info,
+                "added_timelines": added_timelines,
+                "sync_success": sync_response.get("success", False),
+                "save_success": save_response.get("success", False)
+            }
+            
+            # 添加详细状态信息
+            if valid_timeline_count != before_count:
+                count_change = valid_timeline_count - before_count
+                change_text = f"增加了{count_change}个" if count_change > 0 else f"减少了{abs(count_change)}个"
+                result["message"] += f" | timelineCount {change_text}timeline (从{before_count}变为{valid_timeline_count})"
+            else:
+                result["message"] += f" | timelineCount保持为{valid_timeline_count}"
+            
+            if not sync_response.get("success", False):
+                result["warning"] = "Timeline资产更新成功，但timelineCount同步可能失败"
+            
+            if not save_response.get("success", False):
+                result["warning"] = result.get("warning", "") + " | NodeGraph保存可能失败"
+            
+            return result
+        else:
+            return {
+                "success": True,
+                "message": response.get("message", "Timeline资产更新成功"),
+                "warning": "无法重新获取节点状态以更新timelineCount"
+            }
+            
     except Exception as e:
         return {
             "success": False,
             "error": f"执行操作时出错: {str(e)}"
         }
 
+
+def update_timeline_count_smart(
+        ctx: Context,
+        name: str,
+        event_name: str,
+        path: str = "Assets/NodeGraphTool/Test"
+) -> Dict[str, Any]:
+    """智能更新FlowEventNode的timelineCount计数，基于实际timelineAssets数量。
+
+    参数：
+        ctx: MCP上下文
+        name: NodeGraph文件名(不含扩展名)
+        event_name: FlowEventNode节点的事件名称
+        path: NodeGraph文件所在路径，默认为"Assets/NodeGraphTool/Test"
+
+    返回值：
+        Dict[str, Any]: 更新结果信息
+    """
+    path = clean_path(path)
+    try:
+        # 1. 获取当前节点状态
+        node_response = get_unity_connection().send_command("GET_FLOW_EVENT_NODE_BY_NAME", {
+            "name": name,
+            "eventName": event_name,
+            "path": path
+        })
+        
+        if not node_response.get("success", False):
+            return {
+                "success": False,
+                "error": f"无法获取FlowEventNode '{event_name}' 的状态"
+            }
+        
+        node_data = node_response.get("nodeInfo", {})
+        timeline_assets = node_data.get("timelineAssets", [])
+        current_count = node_data.get("timelineCount", 0)
+        
+        # 2. 计算有效的timeline数量
+        valid_timeline_count = sum(1 for timeline in timeline_assets if timeline and timeline.strip())
+        
+        if current_count == valid_timeline_count:
+            return {
+                "success": True,
+                "message": f"timelineCount已正确 (当前值: {current_count})",
+                "timeline_count": current_count,
+                "timeline_assets_count": len(timeline_assets),
+                "valid_timeline_count": valid_timeline_count,
+                "no_update_needed": True
+            }
+        
+        # 3. 尝试通过Unity命令更新timelineCount
+        # 使用一个特殊的UPDATE命令来直接更新计数
+        update_response = get_unity_connection().send_command("UPDATE_FLOW_EVENT_NODE_FIELD", {
+            "name": name,
+            "eventName": event_name,
+            "fieldName": "timelineCount",
+            "fieldValue": valid_timeline_count,
+            "path": path
+        })
+        
+        # 4. 如果专用命令不存在，尝试通过重新设置timeline资产来触发计数更新
+        if not update_response.get("success", False):
+            # 获取当前的timeline资产
+            camera_timeline = node_data.get("cameraTimelineName", "")
+            object_timeline = node_data.get("objectTimelineName", "")
+            
+            # 通过重新设置来触发计数更新（带计数参数）
+            fallback_response = get_unity_connection().send_command("UPDATE_FLOW_EVENT_NODE_TIMELINE_ASSETS_WITH_COUNT", {
+                "name": name,
+                "eventName": event_name,
+                "cameraTimelineAsset": camera_timeline if camera_timeline and camera_timeline.strip() else None,
+                "objectTimelineAsset": object_timeline if object_timeline and object_timeline.strip() else None,
+                "timelineCount": valid_timeline_count,
+                "path": path
+            })
+            
+            if fallback_response.get("success", False):
+                update_response = fallback_response
+        
+        # 5. 保存修改
+        save_response = get_unity_connection().send_command("SAVE_NODEGRAPH_CHANGES", {
+            "name": name,
+            "path": path
+        })
+        
+        return {
+            "success": update_response.get("success", False),
+            "message": f"timelineCount从{current_count}更新为{valid_timeline_count}" if update_response.get("success", False) else "timelineCount更新失败",
+            "timeline_count_before": current_count,
+            "timeline_count_after": valid_timeline_count,
+            "timeline_assets": [t for t in timeline_assets if t and t.strip()],
+            "valid_timeline_count": valid_timeline_count,
+            "update_method": "direct_field" if update_response.get("success", False) else "fallback",
+            "save_success": save_response.get("success", False)
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"执行智能timelineCount更新时出错: {str(e)}"
+        }
 
 def save_nodegraph_changes(
         ctx: Context,

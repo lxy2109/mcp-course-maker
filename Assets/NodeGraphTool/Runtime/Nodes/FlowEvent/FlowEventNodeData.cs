@@ -25,65 +25,66 @@ public class GameObjectID
 public class FlowEventNodeData : NodeBaseData
 {
     
-    [LabelText("description½ÚµãÃèÊö")]
+    [LabelText("descriptionèŠ‚ç‚¹æè¿°")]
     [TextArea(1, 10)]
     public string description;
 
-    //ÊÂ¼şÃû³Æ ĞèÒªÎ¨Ò»
+    //äº‹ä»¶åç§° éœ€è¦å”¯ä¸€
     
-    [LabelText("flowGraph ÊµÑé²½Öè(FlowGraph)ÊµÑéÂß¼­²¿·Ö")] 
+    [LabelText("flowGraph å®éªŒæ­¥éª¤(FlowGraph)å®éªŒé€»è¾‘æµç¨‹")] 
     public string flowGraph;
     
-    [LabelText("eventName ÊµÑé¶¯×÷(EventName)¾ßÌå¶¯×÷ÊÂ¼ş")]
+    [LabelText("eventName å®éªŒåŠ¨ä½œ(EventName)å…·ä½“åŠ¨ä½œäº‹ä»¶")]
     public string eventName;
     
-    //½×¶ÎÎÄ°¸
-    [LabelText("eventContent Òıµ¼ÎÄ±¾(½×¶ÎÎÄ°¸ UIÒıµ¼ÌáÊ¾)")]
+    //é˜¶æ®µå†…å®¹
+    [LabelText("eventContent äº‹ä»¶æ–‡æœ¬(é˜¶æ®µå†…å®¹ UIç•Œé¢æ˜¾ç¤º)")]
     [TextArea(1, 10)]
     public string eventContent;
     
-    [LabelText("ÊÖ²¿ÌáÊ¾(ĞèÒªµã»÷µÄÎïÆ·Ãû³Æ)")]
+    [LabelText("æ‰‹éƒ¨æç¤º(éœ€è¦æ“ä½œçš„ç‰©å“æç¤º)")]
     public string handTip;
     public int itemCount = 0;
     [SerializeField]
-    [LabelText("¸ßÁÁ¿É½»»¥ÎïÌåID")]
+    [LabelText("å¯äº¤äº’é€‰æ‹©ç‰©ä½“ID")]
     public List<GameObjectID> selectableObectsID=new List<GameObjectID>();
-    [LabelText("¸ßÁÁ¿É½»»¥ÎïÌå")]
+    [LabelText("å¯äº¤äº’é€‰æ‹©ç‰©ä½“")]
     public List<GameObject> selectableObects = new List<GameObject>();
     
-    [LabelText("ĞéÄâ½»»¥Enter(½øÈëÊÂ¼şÊ±½øĞĞµÄEventÃû³Æ)")]
+    [LabelText("é¢å¤–äº¤äº’Enter(è¿›å…¥äº‹ä»¶æ—¶è§¦å‘çš„Eventäº‹ä»¶)")]
     public string enterEventName;
     
-    [LabelText("½»»¥ÄÚÈİEnter(½øÈëÊÂ¼şÊ±½øĞĞµÄEventÃûÄÚÈİ)")]
+    [LabelText("äº‹ä»¶å†…å®¹Enter(è¿›å…¥äº‹ä»¶æ—¶è§¦å‘çš„Eventäº‹ä»¶å†…å®¹)")]
     public string enterEventContent;
     
-    [LabelText("ĞéÄâ½»»¥Exit(Àë¿ªÊÂ¼şÊ±½øĞĞµÄEventÃû³Æ)")]
+    [LabelText("é¢å¤–äº¤äº’Exit(ç¦»å¼€äº‹ä»¶æ—¶è§¦å‘çš„Eventäº‹ä»¶)")]
     public string exitEventName;
     
-    [LabelText("½»»¥ÄÚÈİExit(Àë¿ªÊÂ¼şÊ±½øĞĞµÄEventÃûÄÚÈİ)")]
+    [LabelText("äº‹ä»¶å†…å®¹Exit(ç¦»å¼€äº‹ä»¶æ—¶è§¦å‘çš„Eventäº‹ä»¶å†…å®¹)")]
     public string exitEventContent;
     
-    [LabelText("ÅäÒô½Å±¾Ãû³Æ(½øÈëÊÂ¼şÊ±²¥·ÅµÄÒôÆµÃû³Æ)")]
+    [LabelText("è¯­éŸ³è„šæœ¬åç§°(è¿›å…¥äº‹ä»¶æ—¶æ’­æ”¾çš„éŸ³é¢‘åç§°)")]
     public string voiceName;
-    [LabelText("ÅäÒô½Å±¾ÄÚÈİ(½øÈëÊÂ¼şÊ±²¥·ÅµÄÒôÆµÎÄ°¸ÄÚÈİ)")]
+    [LabelText("è¯­éŸ³è„šæœ¬å†…å®¹(è¿›å…¥äº‹ä»¶æ—¶æ’­æ”¾çš„éŸ³é¢‘çš„å†…å®¹æè¿°)")]
     public string voiceContent;
     
-    [LabelText("½øÈëÊÂ¼şÊ±²¥·ÅµÄÒôÆµ")]
+    [LabelText("è¿›å…¥äº‹ä»¶æ—¶æ’­æ”¾çš„éŸ³é¢‘")]
     public AudioClip inAudioClip;
     
-    [LabelText("¾µÍ·timelineÃû³Æ")]
+    [LabelText("æ‘„åƒå¤´timelineåç§°")]
     public string cameraTimelineName;
-    [LabelText("¾µÍ·timelineÄÚÈİ")]
+    [LabelText("æ‘„åƒå¤´timelineå†…å®¹")]
     public string cameraTimelineContent;
-    [LabelText("ÎïÌåtimelineÃû³Æ")]
+    [LabelText("ç‰©ä½“timelineåç§°")]
     public string objectTimelineName;
-    [LabelText("ÎïÌåtimelineÄÚÈİ")]
+    [LabelText("ç‰©ä½“timelineå†…å®¹")]
     public string objectTimelineContent;
-    public int timelineCount = 0;
-    [LabelText("²¥·Åtimeline")]
+    [LabelText("Timelineæ•°é‡ï¼ˆè‡ªåŠ¨è®¡ç®—ï¼‰")]
+    public int timelineCount => timelineAssets?.Count ?? 0;
+    [LabelText("ç›¸å…³timeline")]
     public List<TimelineAsset> timelineAssets;
     
-    [LabelText("ÊÂ¼ş½áÊøºóĞĞÎª")]
+    [LabelText("äº‹ä»¶ç»“æŸåè¡Œä¸º")]
     public EventEndAction endActionEnum;
 
     
@@ -112,11 +113,11 @@ public class FlowEventNodeData : NodeBaseData
 
 
     /// <summary>
-    /// µ÷ÓÃÇ°½øĞĞ³õÊ¼»¯
+    /// è¿è¡Œå‰éœ€è¦å‡ºç°çš„åˆå§‹åŒ–
     /// </summary>
     public void Init()
     {
-        //¸ù¾İ³¡¾°ÎïÆ·ID½øĞĞ³õÊ¼»¯
+        //æ ¹æ®äº§å“ä¿¡æ¯IDåˆ—è¡¨å‡ºåˆå§‹åŒ–
         selectableObects.Clear();
         if (selectableObectsID == null) return;
         for (int i = 0; i < selectableObectsID.Count; i++)

@@ -63,9 +63,13 @@ def create_movement_animation(
     obstacle_detection_radius: float = 0.5,  # 障碍物检测半径
     avoidance_height: float = 2.0,  # 避障时的额外高度
     obstacle_layers: Optional[List[str]] = None,  # 要检测的障碍物层级
-    max_avoidance_attempts: int = 3  # 最大避障尝试次数
+    max_avoidance_attempts: int = 3,  # 最大避障尝试次数
+    timeline_folder: str = "Assets/Timeline"  # 新增：timeline保存路径，默认为"Assets/Timeline"
 ) -> str:
-    """为指定物体创建移动和旋转动画，支持多点路径和智能避障。
+    """⚠️ 重要提醒：timeline_folder参数必须进行配置！
+    请根据课程名称设置自定义路径，如"Assets/{课程名称}/Timeline"。
+    
+    为指定物体创建移动和旋转动画，支持多点路径和智能避障。
 
     参数：
         ctx: MCP 上下文
@@ -111,6 +115,7 @@ def create_movement_animation(
         avoidance_height: 避障时的额外高度（米）
         obstacle_layers: 要检测的障碍物层级名称列表，如["Default", "Obstacle"]
         max_avoidance_attempts: 最大避障尝试次数
+        timeline_folder: 【必须配置】timeline保存路径，必须根据课程名称设置，如"Assets/课程名称/Timeline"
 
     返回值：
         str: 成功消息或错误详情
@@ -191,7 +196,9 @@ def create_movement_animation(
             "obstacle_detection_radius": obstacle_detection_radius,
             "avoidance_height": avoidance_height,
             "obstacle_layers": obstacle_layers if obstacle_layers else ["Default"],
-            "max_avoidance_attempts": max_avoidance_attempts
+            "max_avoidance_attempts": max_avoidance_attempts,
+            # timeline保存路径参数
+            "timeline_folder": timeline_folder
         }
 
         # 只有当这些参数不是None时才添加到请求中，并确保所有值为浮点数
@@ -266,9 +273,13 @@ def create_multipoint_animation(
         obstacle_detection_radius: float = 0.5,
         avoidance_height: float = 2.0,
         obstacle_layers: Optional[List[str]] = None,
-        max_avoidance_attempts: int = 3
+        max_avoidance_attempts: int = 3,
+        timeline_folder: str = "Assets/Timeline"  # 新增：timeline保存路径，默认为"Assets/Timeline"
 ) -> str:
     """创建多点路径动画，可以指定多个路径点。
+
+    ⚠️ 重要提醒：timeline_folder参数必须进行配置！
+    请根据课程名称设置自定义路径，如"Assets/{课程名称}/Timeline"。
 
     参数：
         ctx: MCP 上下文
@@ -290,6 +301,7 @@ def create_multipoint_animation(
         avoidance_height: 避障时的额外高度（米）
         obstacle_layers: 要检测的障碍物层级名称列表
         max_avoidance_attempts: 最大避障尝试次数
+        timeline_folder: timeline保存路径，默认为"Assets/Timeline"，必须配置！
 
     返回值：
         str: 成功消息或错误详情
@@ -401,7 +413,8 @@ def create_multipoint_animation(
             obstacle_detection_radius=obstacle_detection_radius,
             avoidance_height=avoidance_height,
             obstacle_layers=obstacle_layers,
-            max_avoidance_attempts=max_avoidance_attempts
+            max_avoidance_attempts=max_avoidance_attempts,
+            timeline_folder=timeline_folder
         )
 
     except Exception as e:
@@ -419,10 +432,14 @@ def rotate_around_target_animation(
         timeline_asset_name: str = "RotationAroundTarget",
         look_at_target: bool = False,
         move_to_start: bool = True,  # 新增参数
-        return_to_origin: bool = False  # 新增参数
+        return_to_origin: bool = False,  # 新增参数
+        timeline_folder: str = "Assets/Timeline"  # 新增：timeline保存路径，默认为"Assets/Timeline"
 ) -> str:
     """
     让一个物体围绕目标物体旋转，创建动画。在开始时直接瞬移到第一个围绕位置。
+
+    ⚠️ 重要提醒：timeline_folder参数必须进行配置！
+    请根据课程名称设置自定义路径，如"Assets/{课程名称}/Timeline"。
 
     参数：
         ctx: MCP 上下文
@@ -435,6 +452,7 @@ def rotate_around_target_animation(
         look_at_target: 是否让移动物体始终朝向目标物体
         move_to_start: 是否在timeline开始前将物体从当前位置移动到动画起始位置
         return_to_origin: 是否在timeline结束后将物体从结束位置移回原始位置
+        timeline_folder: timeline保存路径，默认为"Assets/Timeline"，必须配置！
 
     返回值：
         str: 成功消息或错误详情
@@ -494,7 +512,8 @@ def rotate_around_target_animation(
             timeline_asset_name=timeline_asset_name,
             include_rotation=True,
             move_to_start=move_to_start,
-            return_to_origin=return_to_origin
+            return_to_origin=return_to_origin,
+            timeline_folder=timeline_folder
         )
 
     except Exception as e:
@@ -512,6 +531,7 @@ def camera_panorama_animation(
         steps: int = 24,  # 旋转分段数量，值越大越平滑
         move_to_start: bool = True,  # 新增参数
         return_to_origin: bool = False,  # 新增参数
+        timeline_folder: str = "Assets/Timeline"  # 新增：timeline保存路径，默认为"Assets/Timeline"
 ) -> str:
     """
     创建相机360度环视动画，相机将在原地旋转一周，可调整俯仰角。
@@ -579,7 +599,8 @@ def camera_panorama_animation(
             include_rotation=True,  # 必须包含旋转
             path_type="linear",  # 线性路径，因为仅旋转而不移动
             move_to_start=move_to_start,
-            return_to_origin=return_to_origin
+            return_to_origin=return_to_origin,
+            timeline_folder=timeline_folder
         )
 
     except Exception as e:
@@ -596,7 +617,8 @@ def camera_sweep_animation(
         timeline_asset_name: str = "CameraSweep",
         steps: int = 18,  # 每段路径的分段数量，值越大越平滑
         move_to_start: bool = True,  # 是否在timeline开始前将相机从当前位置移动到动画起始位置
-        return_to_origin: bool = False  # 是否在timeline结束后将相机从结束位置移回原始位置
+        return_to_origin: bool = False,  # 是否在timeline结束后将相机从结束位置移回原始位置
+        timeline_folder: str = "Assets/Timeline"  # 新增：timeline保存路径，默认为"Assets/Timeline"
 ) -> str:
     """
     创建相机扫视动画，相机将从左前方扫视到右前方，然后回到正前方，可调整俯仰角和扫视角度。
@@ -713,7 +735,8 @@ def camera_sweep_animation(
             include_rotation=True,  # 必须包含旋转
             path_type="linear",  # 线性路径，因为仅旋转而不移动
             move_to_start=move_to_start,
-            return_to_origin=return_to_origin
+            return_to_origin=return_to_origin,
+            timeline_folder=timeline_folder
         )
 
     except Exception as e:
@@ -722,15 +745,23 @@ def camera_sweep_animation(
 
 # 创建相机特写动画，镜头从原位置移动到目标物体周围进行特写，然后回到原始位置。
 def camera_closeup_animation(
-        ctx: Context,
-        camera_name: str = "Main Camera",
-        target_object_name: str = None,  # 支持单个物体名称或逗号分隔的多个物体名称
-        duration: float = 6.0,  # 总动画时长
-        timeline_asset_name: str = "CameraCloseup",
-        move_to_start: bool = True,
-        return_to_origin: bool = False
+    ctx: Context,
+    camera_name: str = "Main Camera",
+    target_object_name: str = None,  # 支持单个物体名称或逗号分隔的多个物体名称
+    duration: float = 6.0,  # 总动画时长
+    timeline_asset_name: str = "CameraCloseup",
+    move_to_start: bool = True,
+    return_to_origin: bool = False,
+    timeline_folder: str = "Assets/Timeline",  # timeline保存路径
+    # NodeGraph自动导入相关参数
+    nodegraph_name: str = None,  # NodeGraph的名称
+    nodegraph_path: str = None,  # NodeGraph的路径 
+    flow_event_node_name: str = None  # 当前FlowEventNode节点的名称
 ) -> str:
     """
+    ⚠️ 重要提醒：timeline_folder参数必须进行配置！
+    请根据课程名称设置自定义路径，如"Assets/{课程名称}/Timeline"。
+    
     重构版：使用AutoPositionCameraToObjects算法计算最佳聚焦位置，然后创建特写动画。
     
     支持单个或多个物体观察：
@@ -747,6 +778,10 @@ def camera_closeup_animation(
     参数：
         target_object_name: 支持单个物体名称或逗号分隔的多个物体名称（如"物体1,物体2,物体3"）
         duration: 总动画时长，会根据物体数量和距离自动分配时间
+        timeline_folder: 【必须配置】timeline保存路径，必须根据课程名称设置，如"Assets/课程名称/Timeline"
+        nodegraph_name: NodeGraph的名称（可选），如果提供则自动导入timeline到指定NodeGraph
+        nodegraph_path: NodeGraph的路径（可选），与nodegraph_name配合使用
+        flow_event_node_name: 当前FlowEventNode节点的名称（可选），指定要更新的具体节点
     
     智能物体选择提醒：
     - 当target_object_name为None或空时，AI应该：
@@ -1009,7 +1044,7 @@ def camera_closeup_animation(
             print(f"  {i+1}. 位置: ({point['position']['x']:.2f}, {point['position']['y']:.2f}, {point['position']['z']:.2f}) 时间: {point['time']:.2f}s")
         
         # 使用create_multipoint_animation创建动画
-        return create_multipoint_animation(
+        result = create_multipoint_animation(
             ctx=ctx,
             name=camera_name,
             points=all_points,
@@ -1018,8 +1053,36 @@ def camera_closeup_animation(
             include_rotation=True,
             path_type="curve",  # 使用曲线插值确保平滑运动
             move_to_start=move_to_start,
-            return_to_origin=return_to_origin
+            return_to_origin=return_to_origin,
+            timeline_folder=timeline_folder
         )
+        
+        # 自动导入到NodeGraph（如果提供了相关参数）
+        if nodegraph_name and flow_event_node_name:
+            try:
+                from .nodegraph_tool import update_flow_event_node_timeline_assets
+                
+                # 构建Timeline资产路径
+                timeline_asset_path = f"{timeline_folder}/{timeline_asset_name}.playable"
+                
+                # 调用导入函数
+                import_result = update_flow_event_node_timeline_assets(
+                    ctx=ctx,
+                    name=nodegraph_name,
+                    event_name=flow_event_node_name,
+                    camera_timeline_asset=timeline_asset_path,
+                    object_timeline_asset=None,  # camera_closeup_animation只有相机timeline
+                    path=nodegraph_path if nodegraph_path else "Assets/NodeGraphTool/Test"
+                )
+                
+                if import_result.get("success", False):
+                    result += f"\n✅ 已成功导入到NodeGraph: {nodegraph_name} -> {flow_event_node_name}"
+                else:
+                    result += f"\n⚠️ NodeGraph导入失败: {import_result.get('error', '未知错误')}"
+            except Exception as import_error:
+                result += f"\n⚠️ NodeGraph导入过程出错: {str(import_error)}"
+        
+        return result
         
     except Exception as e:
         return f"创建相机特写动画时出错：{str(e)}"
@@ -1196,7 +1259,12 @@ def generate_combined_timeline(
     fov: float = 45.0,  # 修改：相机FOV，默认45度
     pitch_angle: float = 35.0,  # 新增：俯视角度，默认35度（自动限制在30-40度范围内）
     padding: float = 1.0,  # 新增：边距系数，默认3倍间距
-    force_reset_rotation_y: bool = True  # 新增：是否强制重置Y轴旋转
+    force_reset_rotation_y: bool = True,  # 新增：是否强制重置Y轴旋转
+    timeline_folder: str = "Assets/Timeline",  # timeline保存路径
+    # NodeGraph自动导入相关参数
+    nodegraph_name: str = None,  # NodeGraph的名称
+    nodegraph_path: str = None,  # NodeGraph的路径 
+    flow_event_node_name: str = None  # 当前FlowEventNode节点的名称
 ) -> str:
     """
     生成智能三段式timeline：标准观察位置 -> 多物体操作位置 -> 返回标准位置
@@ -1303,6 +1371,7 @@ def generate_combined_timeline(
         pitch_angle: 俯视角度（度），默认35度（自动限制在30-40度范围内）
         padding: 边距系数（倍数），默认3倍间距
         force_reset_rotation_y: 是否强制重置Y轴旋转为0
+        timeline_folder: timeline保存路径，默认为"Assets/Timeline"，支持自定义路径如"Assets/{课程名称}/Timeline"
         
     返回值：
         str: 生成结果信息，包含bounds分析和相机计算详情
@@ -1520,7 +1589,9 @@ def generate_combined_timeline(
             "fov": fov,
             "pitch_angle": pitch_angle,
             "padding": padding,
-            "force_reset_rotation_y": force_reset_rotation_y
+            "force_reset_rotation_y": force_reset_rotation_y,
+            # 新增timeline保存路径参数
+            "timeline_folder": timeline_folder
         })
         
         success = response.get("success", False)
@@ -1529,7 +1600,34 @@ def generate_combined_timeline(
         if success:
             # 添加clip2时长信息到返回消息
             clip_info = f"\nClip时长分配: Clip1={clip_duration}s, Clip2={clip2_duration}s ({clip2_function_name}), Clip3={clip_duration}s"
-            return f"成功生成智能三段式timeline: {message}{positioning_info}{clip_info}"
+            result = f"成功生成智能三段式timeline: {message}{positioning_info}{clip_info}"
+            
+            # 自动导入到NodeGraph（如果提供了相关参数）
+            if nodegraph_name and flow_event_node_name:
+                try:
+                    from .nodegraph_tool import update_flow_event_node_timeline_assets
+                    
+                    # 构建Timeline资产路径
+                    timeline_asset_path = f"{timeline_folder}/{timeline_name}.playable"
+                    
+                    # 调用导入函数
+                    import_result = update_flow_event_node_timeline_assets(
+                        ctx=ctx,
+                        name=nodegraph_name,
+                        event_name=flow_event_node_name,
+                        camera_timeline_asset=timeline_asset_path,
+                        object_timeline_asset=None,  # generate_combined_timeline生成的是组合timeline
+                        path=nodegraph_path if nodegraph_path else "Assets/NodeGraphTool/Test"
+                    )
+                    
+                    if import_result.get("success", False):
+                        result += f"\n✅ 已成功导入到NodeGraph: {nodegraph_name} -> {flow_event_node_name}"
+                    else:
+                        result += f"\n⚠️ NodeGraph导入失败: {import_result.get('error', '未知错误')}"
+                except Exception as import_error:
+                    result += f"\n⚠️ NodeGraph导入过程出错: {str(import_error)}"
+            
+            return result
         else:
             return f"生成智能timeline失败: {message}"
 
@@ -1680,7 +1778,8 @@ def execute_animation_function(ctx: Context, params: Dict[str, Any]) -> str:
             camera_name=params.get('name', 'Main Camera'),
             pitch_angle=params.get('pitch_angle', -20.0),
             duration=params.get('duration', 10.0),
-            timeline_asset_name=params.get('timeline_asset_name', 'CameraPanorama')
+            timeline_asset_name=params.get('timeline_asset_name', 'CameraPanorama'),
+            timeline_folder=params.get('timeline_folder', 'Assets/Timeline')
         )
     
     elif function_name == 'camera_sweep_animation':
@@ -1690,7 +1789,8 @@ def execute_animation_function(ctx: Context, params: Dict[str, Any]) -> str:
             pitch_angle=params.get('pitch_angle', 0.0),
             sweep_angle=params.get('sweep_angle', 45.0),
             duration=params.get('duration', 8.0),
-            timeline_asset_name=params.get('timeline_asset_name', 'CameraSweep')
+            timeline_asset_name=params.get('timeline_asset_name', 'CameraSweep'),
+            timeline_folder=params.get('timeline_folder', 'Assets/Timeline')
         )
     
     elif function_name == 'camera_closeup_animation':
@@ -1700,7 +1800,8 @@ def execute_animation_function(ctx: Context, params: Dict[str, Any]) -> str:
             target_object_name=params.get('target_object_name'),
             closeup_distance=params.get('closeup_distance', 3.0),
             duration=params.get('duration', 10.0),
-            timeline_asset_name=params.get('timeline_asset_name', 'CameraCloseup')
+            timeline_asset_name=params.get('timeline_asset_name', 'CameraCloseup'),
+            timeline_folder=params.get('timeline_folder', 'Assets/Timeline')
         )
     
     elif function_name == 'rotate_around_target_animation':
@@ -1711,7 +1812,8 @@ def execute_animation_function(ctx: Context, params: Dict[str, Any]) -> str:
             radius=params.get('radius', 5.0),
             height=params.get('height', 2.0),
             duration=params.get('duration', 8.0),
-            timeline_asset_name=params.get('timeline_asset_name', 'RotationAroundTarget')
+            timeline_asset_name=params.get('timeline_asset_name', 'RotationAroundTarget'),
+            timeline_folder=params.get('timeline_folder', 'Assets/Timeline')
         )
     
     elif function_name == 'create_multipoint_animation':
@@ -1726,7 +1828,8 @@ def execute_animation_function(ctx: Context, params: Dict[str, Any]) -> str:
             obstacle_detection_radius=params.get('obstacle_detection_radius', 0.5),
             avoidance_height=params.get('avoidance_height', 2.0),
             obstacle_layers=params.get('obstacle_layers', None),
-            max_avoidance_attempts=params.get('max_avoidance_attempts', 3)
+            max_avoidance_attempts=params.get('max_avoidance_attempts', 3),
+            timeline_folder=params.get('timeline_folder', 'Assets/Timeline')
         )
     
     else:
