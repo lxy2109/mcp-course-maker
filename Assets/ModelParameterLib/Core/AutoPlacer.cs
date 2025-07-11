@@ -36,7 +36,7 @@ namespace ModelParameterLib.Core{
         [Button("一键AI分析并填充规则")]
         public void AIAnalyzeButton()
         {
-            AnalyzeAllWithAI();
+            AnalyzeAllWithAI("", false);
         }
 
         [Button("自动摆放（应用规则）")]
@@ -56,7 +56,7 @@ namespace ModelParameterLib.Core{
         /// <summary>
         /// 一键AI分析所有模型，填充itemRules，分析结果立即显示在Inspector
         /// </summary>
-        public void AnalyzeAllWithAI(string sceneHint = "")
+        public void AnalyzeAllWithAI(string sceneHint = "", bool autoArrangeAfterAnalyze = true)
         {
             var root = GameObject.Find("GameObjectRoot");
             if (root == null)
@@ -154,12 +154,14 @@ namespace ModelParameterLib.Core{
     #if UNITY_EDITOR
                         EditorUtility.SetDirty(this);
                         UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-                        if (autoArrangeCoroutine != null)
-                            EditorCoroutineUtility.StopCoroutine(autoArrangeCoroutine);
-                        autoArrangeCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(WaitForItemRulesAndAutoArrange());
+                        if (autoArrangeAfterAnalyze) {
+                            if (autoArrangeCoroutine != null)
+                                EditorCoroutineUtility.StopCoroutine(autoArrangeCoroutine);
+                            autoArrangeCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(WaitForItemRulesAndAutoArrange());
+                        }
     #endif
                         Debug.Log("AI分析全部完成！（部分或全部使用缓存）");
-                        if (itemRules.Count == GetPlacableModelCount())
+                        if (autoArrangeAfterAnalyze && itemRules.Count == GetPlacableModelCount())
                         {
                             Debug.Log("[AutoPlacer] AI分析完成后自动检测到itemRules数量齐全，自动开始自动摆放...");
                             AutoArrange();
@@ -198,11 +200,19 @@ namespace ModelParameterLib.Core{
     #if UNITY_EDITOR
                             EditorUtility.SetDirty(this);
                             UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-                            if (autoArrangeCoroutine != null)
-                                EditorCoroutineUtility.StopCoroutine(autoArrangeCoroutine);
-                            autoArrangeCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(WaitForItemRulesAndAutoArrange());
+                            if (autoArrangeAfterAnalyze) {
+                                if (autoArrangeCoroutine != null)
+                                    EditorCoroutineUtility.StopCoroutine(autoArrangeCoroutine);
+                                autoArrangeCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(WaitForItemRulesAndAutoArrange());
+                            }
     #endif
                             Debug.Log("AI分析全部完成！");
+                            if (autoArrangeAfterAnalyze && itemRules.Count == GetPlacableModelCount())
+                            {
+                                Debug.Log("[AutoPlacer] AI分析完成后自动检测到itemRules数量齐全，自动开始自动摆放...");
+                                AutoArrange();
+                                hasArranged = true;
+                            }
                         }
                     }
                 );
