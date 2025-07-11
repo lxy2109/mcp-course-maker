@@ -793,6 +793,95 @@
 
 ## ❓ 四、常见问题与排查
 
+### 🎯 **各阶段MCP Server开启指南**
+
+为了提升性能和避免MCP Server过多导致的请求失败问题，建议按阶段开启必要的MCP Server：
+
+#### **🔧 阶段0-4：基础准备与Excel生成阶段**
+**必须开启的MCP Server：**
+- `FileSimp` - 路径转换和文件操作
+- `excel` - Excel文件创建和编辑
+
+**可选择性开启：**
+- 其他MCP Server暂时可以关闭，以减少系统负载
+
+#### **🎨 阶段5：音频与3D模型生成阶段**
+**必须开启的MCP Server：**
+- `FileSimp` - 文件重命名和路径操作
+- `DoubaoTTS` - 音频生成（主力）
+- `JiMengAI` - 图片生成
+- `Tripo3D` - 3D建模（主力）
+
+**备用MCP Server（按需开启）：**
+- `MiniMax` - 音频生成备用
+- `ElevenLabs` - 音频生成备用
+- `Meshy3D` - 3D建模备用
+- `Hunyuan3D` - 3D建模备用
+- `BaiduImageRecognition` - 图片识别评分
+- `InstantMeshes` - 模型减面处理
+
+**可以关闭：**
+- `excel` - 此阶段不需要Excel操作
+- `unityMCP` - 还未到Unity操作阶段
+
+#### **🏗️ 阶段6：模型实例化与场景布局阶段**
+**必须开启的MCP Server：**
+- `unityMCP` - Unity场景操作（核心）
+- `FileSimp` - 文件操作
+- `Polyhaven` - 天空盒资源下载
+
+**可选择性开启：**
+- `JiMengAI` - 天空盒生成备用
+- `MiniMax` - 天空盒生成备用
+- `Realesrgan` - 图像超分辨率增强
+
+**可以关闭：**
+- 所有TTS相关Server（DoubaoTTS、ElevenLabs、MiniMax的TTS功能）
+- 所有3D建模相关Server（Tripo3D、Meshy3D、Hunyuan3D）
+
+#### **📊 阶段7：NodeGraph创建阶段**
+**必须开启的MCP Server：**
+- `unityMCP` - NodeGraph操作
+
+**可以关闭：**
+- 除unityMCP外的所有其他MCP Server
+
+#### **🎬 阶段8：资产关联与Timeline生成阶段**
+**必须开启的MCP Server：**
+- `unityMCP` - Timeline和资产关联操作
+- `excel` - 读取Excel数据
+
+**可以关闭：**
+- 除unityMCP和excel外的所有其他MCP Server
+
+---
+
+### ⚠️ **MCP Server性能警告**
+
+**🚨 重要提醒：MCP Server过多导致的性能问题**
+
+当同时开启过多MCP Server（超过8-10个）时，可能出现以下问题：
+
+1. **请求超时**：MCP Server响应变慢，工具调用失败
+2. **内存占用过高**：系统资源不足，导致服务崩溃
+3. **端口冲突**：多个服务竞争系统资源
+4. **连接失败**：Cursor/Claude Desktop无法正常连接所有服务
+
+**🎯 解决方案：**
+- **按阶段开启**：严格按照上述指南，仅开启当前阶段必需的MCP Server
+- **及时关闭**：完成某阶段后，主动关闭该阶段专用的MCP Server
+- **监控资源**：观察系统CPU和内存使用情况，适时减少服务数量
+- **重启服务**：如遇连接问题，重启Cursor并按需重新开启MCP Server
+
+**📈 推荐配置：**
+- **同时运行MCP Server数量**：建议不超过5-7个
+- **核心服务优先**：优先保证unityMCP、FileSimp等核心服务稳定运行
+- **按需激活**：使用动态开启策略，需要时再启动对应服务
+
+---
+
+### 🔧 **其他常见问题**
+
 - **📦 依赖未安装/版本不符**：请严格按照各服务 README 要求安装依赖和指定版本。
 - **🔑 API Key/Token 未配置**：部分服务需在 .env 或 server.py 中手动填写密钥。
 - **🔌 端口冲突/服务未启动**：如遇端口占用或服务未响应，检查是否有其他进程占用，或尝试重启。
