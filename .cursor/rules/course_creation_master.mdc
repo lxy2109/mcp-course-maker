@@ -129,7 +129,11 @@ description: Unity虚拟实验课程制作完整自动化流程，实现从课�
   - Timeline生成策略：
     - 严格遵循 *[RULE] timeline-prompt.mdc* 规则内容
   - Timeline资产保存：
-    - 工具：**[MCP] mcp_unityMCP_create_empty_nodegraph**
+    - 工具：**[MCP] mcp_unityMCP_get_flow_event_node_names**
+    **[MCP] mcp_unityMCP_find_camera_objects**
+    **[MCP] mcp_unityMCP_get_all_scene_objects**
+    **[MCP] mcp_unityMCP_generate_combined_timeline**
+    **[MCP] mcp_unityMCP_camera_closeup_animation**
     - 保存路径：**[PATH] Assets/{课程名称}/Timeline/**
     - 命名规范：按Excel中timeline名称命名
     - 自动关联：Timeline自动引用场景中对应的游戏对象

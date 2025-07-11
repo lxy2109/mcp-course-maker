@@ -176,14 +176,14 @@ def import_excel_to_nodegraph(
 def get_flow_event_nodes(
         ctx: Context,
         name: str,
-        path: str = "Assets/NodeGraphTool/Test"
+        path: str
 ) -> Dict[str, Any]:
     """获取NodeGraph文件中的所有FlowEventNode节点信息。
 
     参数：
         ctx: MCP上下文
         name: 节点图文件名(不含扩展名)
-        path: 资产路径，默认为"Assets/NodeGraphTool/Test"
+        path: 资产路径，例如"Assets/紫外可见光光度计测量实验",后面不加{文件名}.asset
 
     返回值：
         Dict[str, Any]: FlowEventNode节点的详细信息

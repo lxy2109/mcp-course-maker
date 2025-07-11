@@ -658,9 +658,7 @@ namespace UnityMCP.Editor.Commands
             {
                 if (nodeData == null) continue;
                 var eventName = nodeData.eventName;
-                var endAction = nodeData.endActionEnum;
-
-                if (endAction == EventEndAction.Hold)
+                if (!holdForCombineDict.ContainsKey(eventName))
                 {
                     bool hasOutput = targetGraph.Links.Any(link => link.BaseNodeGUID == nodeData.GUID);
                     if (!hasOutput) continue;
@@ -671,7 +669,7 @@ namespace UnityMCP.Editor.Commands
                         if (link.BaseNodeGUID == nodeData.GUID)
                         {
                             var targetNodeData = flowEventNodes.FirstOrDefault(n => n.GUID == link.TargetNodeGUID);
-                            if (targetNodeData != null && targetNodeData.endActionEnum == EventEndAction.Hold)
+                            if (targetNodeData != null && !holdForCombineDict.ContainsKey(targetNodeData.eventName))
                             {
                                 outputEventNames.Add(targetNodeData.eventName);
                             }
