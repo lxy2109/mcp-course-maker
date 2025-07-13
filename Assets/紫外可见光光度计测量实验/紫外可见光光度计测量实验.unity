@@ -181,6 +181,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 518145620236446937, guid: 9b29bdfc740e50b41a8410a91f03efc0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1052285838011030182, guid: 9b29bdfc740e50b41a8410a91f03efc0,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -3778,7 +3783,7 @@ PlayableDirector:
   m_GameObject: {fileID: 1762428181}
   m_Enabled: 1
   serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 848990c2427683741bc26862c119bec2, type: 2}
+  m_PlayableAsset: {fileID: 0}
   m_InitialState: 1
   m_WrapMode: 2
   m_DirectorUpdateMode: 1

@@ -133,7 +133,7 @@ MonoBehaviour:
     localScale: {x: 0.99728936, y: 0.99728936, z: 0.99728936}
     active: 1
   - position: {x: -17, y: 15.975962, z: 0.2}
-    rotation: {x: -0, y: 0.93482363, z: -0, w: -0.35511246}
+    rotation: {x: -0, y: 0.9348236, z: -0, w: -0.3551125}
     localScale: {x: 3.7497244, y: 3.7497244, z: 3.7497244}
     active: 1
   - position: {x: 18, y: 16.181496, z: -0.1}
