@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 590f545bd3e481f41b3b7fc74536233a, type: 3}
+  m_Name: "\u7D2B\u5916\u53EF\u89C1\u5149\u5149\u5EA6\u8BA1\u6D4B\u91CF\u5B9E\u9A8C_\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  objectNames:
+  - "\u5851\u6599\u6D17\u74F6"
+  - "\u5B9E\u9A8C\u684C"
+  - "\u5E9F\u6DB2\u70E7\u676F"
+  - "\u64E6\u62ED\u68C9\u7403"
+  - "\u6BD4\u8272\u76BF2"
+  - "\u6BD4\u8272\u76BF1"
+  - "\u6BD4\u8272\u76BF3"
+  - "\u7535\u6E90\u7EBF"
+  - "\u7B14\u8BB0\u672C"
+  - "\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+  - "\u5851\u6599\u6D17\u74F6"
+  - "\u5B9E\u9A8C\u684C"
+  - "\u5E9F\u6DB2\u70E7\u676F"
+  - "\u64E6\u62ED\u68C9\u7403"
+  - "\u6BD4\u8272\u76BF2"
+  - "\u6BD4\u8272\u76BF1"
+  - "\u6BD4\u8272\u76BF3"
+  - "\u7535\u6E90\u7EBF"
+  - "\u7B14\u8BB0\u672C"
+  - "\u7D2B\u5916\u53EF\u89C1\u5149\u5206\u5149\u4EEA"
+  eventNames:
+  - Default
+  - Default
+  - Default
+  - Default
+  - Default
+  - Default
+  - Default
+  - Default
+  - Default
+  - Default
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  - "\u4E86\u89E3\u5B9E\u9A8C\u76EE\u7684\u53CA\u610F\u4E49"
+  gameObjectStates:
+  - position: {x: -18.04, y: 17.611439, z: -9.49}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    localScale: {x: 2.0235143, y: 2.0235143, z: 2.0235143}
+    active: 1
+  - position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+    localScale: {x: 29.923626, y: 29.923626, z: 29.923626}
+    active: 1
+  - position: {x: -12.3, y: 16.979948, z: -8.91}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 1.3910525, y: 1.3910525, z: 1.3910525}
+    active: 1
+  - position: {x: 9.23, y: 16.084118, z: -8.61}
+    rotation: {x: -0, y: 1, z: -0, w: 0}
+    localScale: {x: 0.49931762, y: 0.49931762, z: 0.49931762}
+    active: 1
+  - position: {x: -4.26, y: 16.155125, z: -8.56}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 0.99728936, y: 0.99728936, z: 0.99728936}
+    active: 1
+  - position: {x: -0.09, y: 16.155125, z: -8.56}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 0.99728936, y: 0.99728936, z: 0.99728936}
+    active: 1
+  - position: {x: 4.31, y: 16.155125, z: -8.56}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 0.99728936, y: 0.99728936, z: 0.99728936}
+    active: 1
+  - position: {x: -17, y: 15.975962, z: 0.2}
+    rotation: {x: -0, y: 0.9348236, z: -0, w: -0.3551125}
+    localScale: {x: 3.7497244, y: 3.7497244, z: 3.7497244}
+    active: 1
+  - position: {x: 18, y: 16.181496, z: -0.1}
+    rotation: {x: 0, y: -0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 5.239518, y: 5.239518, z: 5.239518}
+    active: 1
+  - position: {x: 0.020412445, y: 19.630722, z: -0.031490326}
+    rotation: {x: -0, y: 1, z: -0, w: 0}
+    localScale: {x: 7.479909, y: 7.479909, z: 7.479909}
+    active: 1
+  - position: {x: -18.04, y: 17.611439, z: -9.49}
+    rotation: {x: -0, y: -0, z: -0, w: 1}
+    localScale: {x: 2.0235143, y: 2.0235143, z: 2.0235143}
+    active: 1
+  - position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+    localScale: {x: 29.923626, y: 29.923626, z: 29.923626}
+    active: 1
+  - position: {x: -12.3, y: 16.979948, z: -8.91}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 1.3910525, y: 1.3910525, z: 1.3910525}
+    active: 1
+  - position: {x: 9.23, y: 16.084118, z: -8.61}
+    rotation: {x: -0, y: 1, z: -0, w: 0}
+    localScale: {x: 0.49931762, y: 0.49931762, z: 0.49931762}
+    active: 1
+  - position: {x: -4.26, y: 16.155125, z: -8.56}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 0.99728936, y: 0.99728936, z: 0.99728936}
+    active: 1
+  - position: {x: -0.09, y: 16.155125, z: -8.56}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 0.99728936, y: 0.99728936, z: 0.99728936}
+    active: 1
+  - position: {x: 4.31, y: 16.155125, z: -8.56}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 0.99728936, y: 0.99728936, z: 0.99728936}
+    active: 1
+  - position: {x: -17, y: 15.975962, z: 0.2}
+    rotation: {x: -0, y: 0.93482363, z: -0, w: -0.35511246}
+    localScale: {x: 3.7497244, y: 3.7497244, z: 3.7497244}
+    active: 1
+  - position: {x: 18, y: 16.181496, z: -0.1}
+    rotation: {x: 0, y: -0.7071068, z: -0, w: 0.7071068}
+    localScale: {x: 5.239518, y: 5.239518, z: 5.239518}
+    active: 1
+  - position: {x: 0.020412445, y: 19.630722, z: -0.031490326}
+    rotation: {x: -0, y: 1, z: -0, w: 0}
+    localScale: {x: 7.479909, y: 7.479909, z: 7.479909}
+    active: 1

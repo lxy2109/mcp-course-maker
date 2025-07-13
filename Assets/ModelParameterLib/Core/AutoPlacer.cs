@@ -584,41 +584,42 @@ namespace ModelParameterLib.Core{
 
         private void OnDisable()
         {
-            EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+            // EditorApplication.hierarchyChanged -= OnHierarchyChanged;
         }
 
-        private void OnValidate()
-        {
-            if (Application.isPlaying) return; // 只在编辑器下
-            hasArranged = false;
-            int placableCount = GetPlacableModelCount();
-            if (itemRules.Count < placableCount)
-            {
-                Debug.Log("[AutoPlacer] OnValidate: 检测到itemRules数量不足，自动启动AI分析...");
-                AnalyzeAllWithAI();
-            }
-            else if (itemRules.Count == placableCount)
-            {
-                Debug.Log("[AutoPlacer] OnValidate: itemRules数量已齐，自动开始自动摆放...");
-                AutoArrange();
-                hasArranged = true;
-            }
-        }
+        // ======= 已禁用自动触发 =======
+        // private void OnValidate()
+        // {
+        //     if (Application.isPlaying) return; // 只在编辑器下
+        //     hasArranged = false;
+        //     int placableCount = GetPlacableModelCount();
+        //     if (itemRules.Count < placableCount)
+        //     {
+        //         Debug.Log("[AutoPlacer] OnValidate: 检测到itemRules数量不足，自动启动AI分析...");
+        //         AnalyzeAllWithAI();
+        //     }
+        //     else if (itemRules.Count == placableCount)
+        //     {
+        //         Debug.Log("[AutoPlacer] OnValidate: itemRules数量已齐，自动开始自动摆放...");
+        //         AutoArrange();
+        //         hasArranged = true;
+        //     }
+        // }
 
-        private void OnHierarchyChanged()
-        {
-            var root = GameObject.Find("GameObjectRoot");
-            if (root == null) return;
-            int currentCount = GetPlacableModelCount();
-            if (currentCount != lastChildCount)
-            {
-                Debug.Log($"[AutoPlacer] 检测到GameObjectRoot子物体数量变化: {lastChildCount} → {currentCount}，自动重新分析与摆放");
-                lastChildCount = currentCount;
-                hasArranged = false;
-                itemRules.Clear();
-                AnalyzeAllWithAI();
-            }
-        }
+        // private void OnHierarchyChanged()
+        // {
+        //     var root = GameObject.Find("GameObjectRoot");
+        //     if (root == null) return;
+        //     int currentCount = GetPlacableModelCount();
+        //     if (currentCount != lastChildCount)
+        //     {
+        //         Debug.Log($"[AutoPlacer] 检测到GameObjectRoot子物体数量变化: {lastChildCount} → {currentCount}，自动重新分析与摆放");
+        //         lastChildCount = currentCount;
+        //         hasArranged = false;
+        //         itemRules.Clear();
+        //         AnalyzeAllWithAI();
+        //     }
+        // }
 
         // 新增：只统计可摆放物体的itemRules条目
         private int GetPlacableItemRuleCount()
