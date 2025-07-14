@@ -12,6 +12,7 @@ using UnityEngine.Events;
 using System.Linq;
 using EPOOutline;
 using UnityEngine.UI;
+using System.Xml.Serialization;
 
 #if UNITY_EDITOR
 #endif
@@ -985,6 +986,12 @@ public class EventManager : SceneSingleton<EventManager>
         }
     }
 
+
+    public void RefreshNode()
+    {
+        RefreshCombine(currentFlowEvent);
+    }
+
     #region 辅助类
 
     /// <summary>
@@ -1534,7 +1541,7 @@ public class EventManager : SceneSingleton<EventManager>
                     clickable.SetWaitingForClick(true);
 
                     // 准备事件列表
-
+                    
 
                     // 更新UI内容（但此时UI还未显示）
                     if (eventUI != null)

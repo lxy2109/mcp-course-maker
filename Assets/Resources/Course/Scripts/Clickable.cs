@@ -30,6 +30,8 @@ public class Clickable : MonoBehaviour
 
         if (isWaitingForClick)
         {
+            
+
             if (!isUIOpen)
             {
                 // 显示UI并更新位置
@@ -48,6 +50,7 @@ public class Clickable : MonoBehaviour
     {
         if (uiPrefab != null)
         {
+            EventManager.instance.RefreshNode();
             uiPrefab.SetActive(true);
             // 更新UI位置
             eventUI.UpdateUIPosition(gameObject);
