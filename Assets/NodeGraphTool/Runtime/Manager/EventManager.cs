@@ -476,13 +476,13 @@ public class EventManager : SceneSingleton<EventManager>
         {
             if (isEventTrigger[index])
             {
-                // Debug.LogFormat("<color=yellow>【事件管理器】事件 {0} 已触发过，跳过</color>", eventName);
+                Debug.LogFormat("<color=yellow>【事件管理器】事件 {0} 已触发过，跳过</color>", eventName);
                 return;
             }
             else
             {
                 isEventTrigger[index] = true;
-                // Debug.LogFormat("<color=green>【事件管理器】标记事件 {0} 为已触发</color>", eventName);
+                Debug.LogFormat("<color=green>【事件管理器】标记事件 {0} 为已触发</color>", eventName);
             }
         }
 
@@ -521,6 +521,7 @@ public class EventManager : SceneSingleton<EventManager>
                 EventInvokerManager.instance.InvokeEvent(currentFlowEvent.enterEventName);
             }
         }
+
         if (currentFlowEvent != null && currentFlowEvent.eventName.Contains("后置"))
         {
             // 后置节点不切换UI显示
@@ -529,10 +530,12 @@ public class EventManager : SceneSingleton<EventManager>
         {
             ShowStartContent();
         }
+
         if (currentFlowEvent != null && !currentFlowEvent.eventName.Contains("后置"))
         {
             uiService.PlayUIAnimation();
         }
+
         PlayTimelines(currentFlowEvent);
     }
 
@@ -659,7 +662,7 @@ public class EventManager : SceneSingleton<EventManager>
             return;
         }
         
-        // Debug.LogFormat("<color=purple>【事件管理器】找到 {0} 个包含当前事件的组合组</color>", groups.Count);
+         Debug.LogFormat("<color=purple>【事件管理器】找到 {0} 个包含当前事件的组合组</color>", groups.Count);
         
         foreach (var group in groups)
         {
@@ -675,21 +678,21 @@ public class EventManager : SceneSingleton<EventManager>
             int eventIndex = group.inNodes.FindIndex(x => x.eventName == data.eventName);
             if (eventIndex >= 0 && eventIndex < group.eventsisDone.Length)
             {
-                // Debug.LogFormat("<color=purple>【事件管理器】当前事件在组合组中的索引: {0}</color>", eventIndex);
+                 Debug.LogFormat("<color=purple>【事件管理器】当前事件在组合组中的索引: {0}</color>", eventIndex);
             }
             
             for (int i = 0; i < group.eventsisDone.Length; i++)
             {
-                // Debug.LogFormat("<color=purple>【事件管理器】检查组合事件状态[{0}]: {1}</color>", i, group.eventsisDone[i] ? "已完成" : "未完成");
+                 Debug.LogFormat("<color=purple>【事件管理器】检查组合事件状态[{0}]: {1}</color>", i, group.eventsisDone[i] ? "已完成" : "未完成");
                 
                 if (!group.eventsisDone[i])
                 {
-                    // Debug.LogFormat("<color=purple>【事件管理器】将组合事件状态[{0}]标记为已完成</color>", i);
+                     Debug.LogFormat("<color=purple>【事件管理器】将组合事件状态[{0}]标记为已完成</color>", i);
                     group.eventsisDone[i] = true;
                     
                     if (i != group.eventsisDone.Length - 1)
                     {
-                        // Debug.LogFormat("<color=purple>【事件管理器】不是最后一个事件，继续等待其他事件完成</color>");
+                         Debug.LogFormat("<color=purple>【事件管理器】不是最后一个事件，继续等待其他事件完成</color>");
                         return; // 如果不是最后一个事件，直接返回
                     }
                 }
@@ -706,19 +709,19 @@ public class EventManager : SceneSingleton<EventManager>
                 }
             }
             
-            // Debug.LogFormat("<color=purple>【事件管理器】组合组事件状态检查: {0}</color>", allCompleted ? "全部完成" : "未全部完成");
+             Debug.LogFormat("<color=purple>【事件管理器】组合组事件状态检查: {0}</color>", allCompleted ? "全部完成" : "未全部完成");
             
             // 所有事件都完成，触发组合事件的输出节点
             if (allCompleted)
             {
                 if (group.outNode != null)
                 {
-                    // Debug.LogFormat("<color=purple>【事件管理器】所有组合事件已完成，触发输出节点: {0}</color>", group.outNode.eventName);
+                     Debug.LogFormat("<color=purple>【事件管理器】所有组合事件已完成，触发输出节点: {0}</color>", group.outNode.eventName);
                     LoadFlowEvent(group.outNode.eventName);
                 }
                 else
                 {
-                    // Debug.LogFormat("<color=red>【事件管理器】错误：组合组的输出节点为空</color>");
+                     Debug.LogFormat("<color=red>【事件管理器】错误：组合组的输出节点为空</color>");
                 }
             }
         }
@@ -802,8 +805,11 @@ public class EventManager : SceneSingleton<EventManager>
         TimelineManager.instance.PlayTimelines(data.timelineAssets.ToArray(), async () =>
         {
             // Timeline结束后，等待UI动画完整回到原位
-            if (uiService != null)
+            if (uiService != null && uiService.isAimnate()  )
+            {
+                Debug.Log("i do");
                 await uiService.PlayUIAnimationAsync();
+            }
             var action = EndEvent(data);
             if (action != null)
                 await action();
@@ -1006,6 +1012,7 @@ public class EventManager : SceneSingleton<EventManager>
         /// <param name="onComplete">动画完成回调</param>
         public void PlayUIAnimation(Action onComplete = null)
         {
+            Debug.Log("donghua");
             if (isAnimating)
             {
                 // 如果动画正在进行，直接忽略新的动画请求
@@ -1079,6 +1086,9 @@ public class EventManager : SceneSingleton<EventManager>
             isAnimating = false;
             animationTcs?.TrySetResult(true);
         }
+
+        public bool isAimnate() => isAnimating;
+
     }
 
     /// <summary>
@@ -1128,7 +1138,7 @@ public class EventManager : SceneSingleton<EventManager>
     public class HighlightService
     {
 
-        private GameObject highlightCone;
+        [SerializeField]private GameObject highlightCone;
         private Sequence floatSequence;
         private Coroutine highlightCoroutine; 
         private GameObject lastHighlightTarget = null;
@@ -1222,7 +1232,7 @@ public class EventManager : SceneSingleton<EventManager>
                 // 已在高亮，无需重复
                 return;
             }
-
+            Debug.Log("开始高亮");
             lastHighlightTarget = target;
 
             // 根据高亮方式执行不同的高亮逻辑
@@ -1307,7 +1317,7 @@ public class EventManager : SceneSingleton<EventManager>
             {
                 floatSequence.Kill();
             }
-            float floatHeight = 0.5f;
+            float floatHeight = 5f;
             float floatDuration = 1f;
             floatSequence = DG.Tweening.DOTween.Sequence();
             floatSequence.Append(highlightCone.transform.DOMoveY(targetPosition.y + floatHeight, floatDuration)

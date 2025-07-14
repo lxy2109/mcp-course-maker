@@ -532,7 +532,7 @@ namespace UnityMCP.Editor.Commands
                         selectableObectsID = new List<GameObjectID>();
                         selectableObectsIDField.SetValue(node, selectableObectsID);
                     }
-                    if (endAction == EventEndAction.Hold && holdDict.ContainsKey(eventName))
+                    if ( holdDict.ContainsKey(eventName))
                     {
                         Debug.Log($"处理Hold节点: {eventName}");
                         var linkedEvents = holdDict[eventName];
@@ -544,7 +544,7 @@ namespace UnityMCP.Editor.Commands
                             AddHighlightObject(objectpool, nexthand, selectableObects, selectableObectsID, ref highlightMatchCount);
                         }
                     }
-                    else if (endAction == EventEndAction.HoldForCombine && holdForCombineDict.ContainsKey(eventName))
+                    else if ( holdForCombineDict.ContainsKey(eventName))
                     {
                         Debug.Log($"处理HoldForCombine节点: {eventName}");
                         var linkedEvents = holdForCombineDict[eventName];
