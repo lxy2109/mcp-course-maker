@@ -1141,7 +1141,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: "\u7B14\u8BB0\u672C"
+      Data: "\u5B9E\u9A8C\u8BB0\u5F55\u672C"
     - Name: $v
       Entry: 10
       Data: 8
@@ -9003,7 +9003,7 @@ GameObject:
   - component: {fileID: 3769884380060926841}
   - component: {fileID: 1456241763}
   m_Layer: 0
-  m_Name: "\u7B14\u8BB0\u672C"
+  m_Name: "\u5B9E\u9A8C\u8BB0\u5F55\u672C"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10997,6 +10997,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: "\u9ED8\u8BA4\u63D0\u793A\u6807"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6239449058259819758, guid: c3489365006abbe4d8693615f5829d53,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
