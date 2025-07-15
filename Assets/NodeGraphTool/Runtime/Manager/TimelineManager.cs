@@ -128,26 +128,31 @@ public class TimelineManager : SceneSingleton<TimelineManager>
         // 1. 停止所有协程（关键）
         StopAllCoroutines();
 
-        currentPlayers.Clear();
 
-
-        // 4. 查找场景中所有以Timeline名称命名的临时GameObject并销毁
         GameObject[] allGameObjects = FindObjectsOfType<GameObject>();
         foreach (GameObject go in allGameObjects)
         {
             if (go != null && go != this.gameObject)
             {
                 PlayableDirector director = go.GetComponent<PlayableDirector>();
-                if (director != null)
+                if (director != null && director.playableAsset != null)
                 {
+                    // 将Timeline跳转到结束位置，这样物体会直接到达最终位置
+                    director.time = director.playableAsset.duration;
+                    director.Evaluate(); // 立即评估并应用最终状态
+
+                    Debug.Log($"【TimelineManager】已将Timeline {director.playableAsset.name} 跳转到最终位置");
+
+                    // 延迟一帧销毁，确保最终状态已应用
                     DestroyImmediate(go);
                 }
             }
         }
 
+        currentPlayers.Clear();
         // 5. 重置临时变量
-        tempPlaybleDirector = playableDirector;
 
+        tempPlaybleDirector = playableDirector;
         
     }
 
