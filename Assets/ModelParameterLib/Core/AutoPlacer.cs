@@ -43,13 +43,14 @@ namespace ModelParameterLib.Core{
         [Button("自动摆放（应用规则）")]
         public void AutoArrangeButton()
         {
+            hasArranged = false; // 用户主动点击时允许重置
             if (hasArranged)
             {
                 Debug.LogWarning("[AutoPlacer] 已自动摆放过，无需重复执行。");
                 return;
             }
             AutoArrange();
-            //hasArranged = true;
+            hasArranged = true;
         }
         #endregion
 
@@ -541,31 +542,6 @@ namespace ModelParameterLib.Core{
             }
         }
 
-//         private void OnEnable()
-//         {
-// #if UNITY_EDITOR
-//             EditorApplication.hierarchyChanged += OnHierarchyChanged;
-// #endif
-//             hasArranged = false; // 每次启用都重置，确保无论如何都能执行一次
-//             int placableCount = GetPlacableModelCount();
-//             lastChildCount = placableCount;
-//             // 无论数量是否变化，都强制检测一次
-//             if (itemRules.Count < placableCount)
-//             {
-//                 Debug.Log("[AutoPlacer] OnEnable: 检测到itemRules数量不足，自动启动AI分析...");
-//                 AnalyzeAllWithAI();
-//             }
-//             else if (itemRules.Count == placableCount)
-//             {
-//                 Debug.Log("[AutoPlacer] OnEnable: itemRules数量已齐，自动开始自动摆放...");
-//                 AutoArrange();
-//                 hasArranged = true;
-//             }
-//             else
-//             {
-//                 Debug.Log("[AutoPlacer] OnEnable: itemRules数量与可摆放模型数量不符，建议检查数据。");
-//             }
-//         }
 
         private int GetPlacableModelCount()
         {
@@ -590,22 +566,22 @@ namespace ModelParameterLib.Core{
 
         private void OnValidate()
         {
-            hasArranged = false;
+            if (Application.isPlaying) return;
+#if UNITY_EDITOR
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+#endif
             aiAnalyzed = false;
             if (modelCountCheckCoroutine != null)
                 EditorCoroutineUtility.StopCoroutine(modelCountCheckCoroutine);
             modelCountCheckCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(CheckModelCountAndAutoArrangeCoroutine());
         }
 
-        private void OnDisable()
-        {
-            if (modelCountCheckCoroutine != null)
-                EditorCoroutineUtility.StopCoroutine(modelCountCheckCoroutine);
-            modelCountCheckCoroutine = null;
-        }
-
         private void OnHierarchyChanged()
         {
+            if (Application.isPlaying) return;
+#if UNITY_EDITOR
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+#endif
             var root = GameObject.Find("GameObjectRoot");
             if (root == null) return;
             int currentCount = GetPlacableModelCount();
@@ -613,7 +589,7 @@ namespace ModelParameterLib.Core{
             {
                 Debug.Log($"[AutoPlacer] 检测到GameObjectRoot子物体数量变化: {lastChildCount} → {currentCount}，自动重置流程");
                 lastChildCount = currentCount;
-                hasArranged = false;
+                // hasArranged = false; // 不再重置
                 aiAnalyzed = false;
                 itemRules.Clear();
                 // 不再直接调用AnalyzeAllWithAI，由定时协程统一调度
@@ -672,6 +648,7 @@ namespace ModelParameterLib.Core{
         {
             while (true)
             {
+                if (Application.isPlaying) yield break;
                 int placableCount = GetPlacableModelCount();
                 int modelsFolderCount = GetModelsFolderModelCount();
                 int placableRuleCount = GetPlacableItemRuleCount();
@@ -697,7 +674,7 @@ namespace ModelParameterLib.Core{
                     modelCountCheckCoroutine = null;
                     yield break;
                 }
-                yield return new EditorWaitForSeconds(3f);
+                yield return new EditorWaitForSeconds(1f);
             }
         }
 
@@ -705,6 +682,7 @@ namespace ModelParameterLib.Core{
         {
             while (true)
             {
+                if (Application.isPlaying) yield break;
                 int placableCount = GetPlacableModelCount();
                 int placableRuleCount = GetPlacableItemRuleCount();
                 Debug.Log($"[AutoPlacer][协程] itemRules.Count={itemRules.Count}, placableRuleCount={placableRuleCount}, placableCount={placableCount}, hasArranged={hasArranged}");
@@ -720,12 +698,14 @@ namespace ModelParameterLib.Core{
                     // 不再直接调用AutoArrange，由定时协程统一调度
                     break;
                 }
-                yield return new EditorWaitForSeconds(3f);
+                yield return new EditorWaitForSeconds(1f);
             }
         }
 #endif
         #endregion
 
+        [SerializeField]
+        [HideInInspector]
         private bool hasArranged = false;
     }
 
