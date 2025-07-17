@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using Newtonsoft.Json;
 using ModelParameterLib.Data;
+using System.IO; // 新增
 #if UNITY_EDITOR
 using Unity.EditorCoroutines.Editor;
 #endif
@@ -62,6 +63,7 @@ namespace ModelParameterLib.Core{
             if (root == null)
             {
                 Debug.LogError("未找到名为GameObjectRoot的GameObject！");
+                aiAnalyzed = false; // 失败时允许下次再触发
                 return;
             }
             var aiFiller = new ModelAIFiller();
@@ -217,6 +219,8 @@ namespace ModelParameterLib.Core{
                     }
                 );
             }
+            // 在AI分析完成（无论成功与否）后，aiAnalyzed = false，允许后续再次触发
+            aiAnalyzed = false;
         }
         #endregion
 
@@ -581,47 +585,41 @@ namespace ModelParameterLib.Core{
 #if UNITY_EDITOR
         private int lastChildCount = -1;
         private EditorCoroutine autoArrangeCoroutine;
+        private EditorCoroutine modelCountCheckCoroutine; // 新增
+        private bool aiAnalyzed = false; // 新增：AI分析是否已触发
+
+        private void OnValidate()
+        {
+            hasArranged = false;
+            aiAnalyzed = false;
+            if (modelCountCheckCoroutine != null)
+                EditorCoroutineUtility.StopCoroutine(modelCountCheckCoroutine);
+            modelCountCheckCoroutine = EditorCoroutineUtility.StartCoroutineOwnerless(CheckModelCountAndAutoArrangeCoroutine());
+        }
 
         private void OnDisable()
         {
-            // EditorApplication.hierarchyChanged -= OnHierarchyChanged;
+            if (modelCountCheckCoroutine != null)
+                EditorCoroutineUtility.StopCoroutine(modelCountCheckCoroutine);
+            modelCountCheckCoroutine = null;
         }
 
-        // ======= 已禁用自动触发 =======
-        // private void OnValidate()
-        // {
-        //     if (Application.isPlaying) return; // 只在编辑器下
-        //     hasArranged = false;
-        //     int placableCount = GetPlacableModelCount();
-        //     if (itemRules.Count < placableCount)
-        //     {
-        //         Debug.Log("[AutoPlacer] OnValidate: 检测到itemRules数量不足，自动启动AI分析...");
-        //         AnalyzeAllWithAI();
-        //     }
-        //     else if (itemRules.Count == placableCount)
-        //     {
-        //         Debug.Log("[AutoPlacer] OnValidate: itemRules数量已齐，自动开始自动摆放...");
-        //         AutoArrange();
-        //         hasArranged = true;
-        //     }
-        // }
+        private void OnHierarchyChanged()
+        {
+            var root = GameObject.Find("GameObjectRoot");
+            if (root == null) return;
+            int currentCount = GetPlacableModelCount();
+            if (currentCount != lastChildCount)
+            {
+                Debug.Log($"[AutoPlacer] 检测到GameObjectRoot子物体数量变化: {lastChildCount} → {currentCount}，自动重置流程");
+                lastChildCount = currentCount;
+                hasArranged = false;
+                aiAnalyzed = false;
+                itemRules.Clear();
+                // 不再直接调用AnalyzeAllWithAI，由定时协程统一调度
+            }
+        }
 
-        // private void OnHierarchyChanged()
-        // {
-        //     var root = GameObject.Find("GameObjectRoot");
-        //     if (root == null) return;
-        //     int currentCount = GetPlacableModelCount();
-        //     if (currentCount != lastChildCount)
-        //     {
-        //         Debug.Log($"[AutoPlacer] 检测到GameObjectRoot子物体数量变化: {lastChildCount} → {currentCount}，自动重新分析与摆放");
-        //         lastChildCount = currentCount;
-        //         hasArranged = false;
-        //         itemRules.Clear();
-        //         AnalyzeAllWithAI();
-        //     }
-        // }
-
-        // 新增：只统计可摆放物体的itemRules条目
         private int GetPlacableItemRuleCount()
         {
             int count = 0;
@@ -634,6 +632,75 @@ namespace ModelParameterLib.Core{
             return count;
         }
 
+        private int GetModelsFolderModelCount()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            if (string.IsNullOrEmpty(scene.path)) return 0;
+            string sceneDir = Path.GetDirectoryName(scene.path);
+            if (string.IsNullOrEmpty(sceneDir)) return 0;
+            string modelsDir = Path.Combine(sceneDir, "Models");
+            if (!Directory.Exists(modelsDir)) return 0;
+            string[] exts = new[] { ".glb", ".obj", ".fbx" };
+
+            // 获取基准模型名
+            string baseModelName = null;
+            foreach (var kv in itemRules)
+            {
+                var rule = kv.Value;
+                if (rule != null && rule.keyword == rule.parentKeyword)
+                {
+                    baseModelName = rule.keyword;
+                    break;
+                }
+            }
+
+            int count = 0;
+            foreach (var file in Directory.GetFiles(modelsDir))
+            {
+                if (Array.Exists(exts, ext => file.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
+                {
+                    // 排除基准模型文件
+                    if (baseModelName != null && Path.GetFileNameWithoutExtension(file) == baseModelName)
+                        continue;
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private IEnumerator CheckModelCountAndAutoArrangeCoroutine()
+        {
+            while (true)
+            {
+                int placableCount = GetPlacableModelCount();
+                int modelsFolderCount = GetModelsFolderModelCount();
+                int placableRuleCount = GetPlacableItemRuleCount();
+                Debug.Log($"[AutoPlacer][定时检查] placableCount={placableCount}, modelsFolderCount={modelsFolderCount}, placableRuleCount={placableRuleCount}, hasArranged={hasArranged}, aiAnalyzed={aiAnalyzed}");
+                // 1. 先自动AI分析
+                if (placableCount == modelsFolderCount && placableRuleCount < placableCount && !aiAnalyzed)
+                {
+                    Debug.Log("[AutoPlacer][定时检查] 数量一致，自动触发AI分析...");
+                    aiAnalyzed = true;
+                    AnalyzeAllWithAI();
+                }
+                // 2. AI分析完成后再自动摆放（只要条件满足立即执行，不必等周期）
+                if (placableRuleCount == placableCount && placableCount == modelsFolderCount && !hasArranged)
+                {
+                    Debug.Log("[AutoPlacer][定时检查] itemRules数量齐全，自动开始自动摆放...");
+                    AutoArrange();
+                    hasArranged = true;
+                }
+                // 3. 如果一切都完成，协程自动退出
+                if (placableRuleCount == placableCount && placableCount == modelsFolderCount && hasArranged)
+                {
+                    Debug.Log("[AutoPlacer][定时检查] 自动摆放已完成，协程退出。");
+                    modelCountCheckCoroutine = null;
+                    yield break;
+                }
+                yield return new EditorWaitForSeconds(3f);
+            }
+        }
+
         private IEnumerator WaitForItemRulesAndAutoArrange()
         {
             while (true)
@@ -641,14 +708,19 @@ namespace ModelParameterLib.Core{
                 int placableCount = GetPlacableModelCount();
                 int placableRuleCount = GetPlacableItemRuleCount();
                 Debug.Log($"[AutoPlacer][协程] itemRules.Count={itemRules.Count}, placableRuleCount={placableRuleCount}, placableCount={placableCount}, hasArranged={hasArranged}");
+                // 如果已自动摆放，协程自动退出
+                if (hasArranged || (placableRuleCount == placableCount && hasArranged))
+                {
+                    Debug.Log("[AutoPlacer][协程] 自动摆放已完成，协程退出。");
+                    yield break;
+                }
                 if (placableRuleCount == placableCount && !hasArranged)
                 {
-                    Debug.Log("[AutoPlacer][协程] 检测到可摆放itemRules数量齐全，自动开始自动摆放...");
-                    AutoArrange();
-                    hasArranged = true;
+                    Debug.Log("[AutoPlacer][协程] 检测到可摆放itemRules数量齐全，等待定时检查统一调度...");
+                    // 不再直接调用AutoArrange，由定时协程统一调度
                     break;
                 }
-                yield return new EditorWaitForSeconds(0.2f);
+                yield return new EditorWaitForSeconds(3f);
             }
         }
 #endif
